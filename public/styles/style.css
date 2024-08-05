@@ -1,0 +1,111 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.custom-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+}
+
+.grid-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+}
+
+.grid-background div {
+    border: 1px solid #444;
+    transition: background-color 0.3s;
+}
+
+.grid-background div:hover {
+    background-color: #0f0;
+}
+
+.card-sigin {
+    position: relative;
+    z-index: 10;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    max-width: 400px;
+    background: white;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-control {
+    border-radius: 8px;
+    padding: 1.25rem;
+    font-size: 16px;
+}
+
+.form-control:focus {
+    border-color: #1a73e8;
+    box-shadow: none;
+}
+
+.form-label {
+    position: absolute;
+    top: 50%;
+    left: 1.25rem;
+    transform: translateY(-50%);
+    background-color: white;
+    padding: 0 0.25rem;
+    transition: all 0.2s;
+    color: #999;
+}
+
+.form-control:focus + .form-label,
+.form-control:not(:placeholder-shown) + .form-label {
+    top: -0.5rem;
+    left: 0.75rem;
+    font-size: 12px;
+    color: #1a73e8;
+}
+
+.is-invalid {
+    border-color: #dc3545;
+}
+
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
+
+.btn-primary {
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+}
+
+.main-signup-header {
+    text-align: center;
+}
+
+.main-signup-header h2 {
+    font-weight: bold;
+}
+
+.main-signup-header h5 {
+    color: #6c757d;
+}
+
+.text-primary {
+    color: #1a73e8 !important;
+}
