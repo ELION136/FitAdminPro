@@ -807,8 +807,12 @@
                                 <li class="slide side-menu__label1">
                                     <a href="javascript:void(0);">Membresias</a>
                                 </li>
+
                                 <li class="slide">
-                                    <a href="grid-tables.html" class="side-menu__item">Planes</a>
+                                    <a href="{{route('admin.planes.index')}}" class="side-menu__item">Planes de Membresias</a>
+                                </li>
+                                <li class="slide">
+                                    <a href="grid-tables.html" class="side-menu__item">Miembros</a>
                                 </li>
                                 <li class="slide">
                                     <a href="data-tables.html" class="side-menu__item">Pagos</a>

@@ -11,12 +11,19 @@ class PlanMembresia extends Model
 
     protected $table = 'planesMembresia';
     protected $primaryKey = 'idPlan';
+    public $timestamps = false;
 
     protected $fillable = [
         'nombrePlan',
         'descripcion',
         'duracion',
         'precio',
+        'idAutor',
+        'eliminado',
+    ];
+    protected $casts = [
+        'fechaCreacion' => 'datetime',
+        'fechaModificacion' => 'datetime',
     ];
 
     public function membresias()

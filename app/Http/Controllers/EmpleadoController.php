@@ -41,7 +41,7 @@ class EmpleadoController extends Controller
             'email' => 'required|email|unique:usuarios,email',
             'password' => 'required',
             'telefono' => 'nullable',
-            'image' => 'nullable|image',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'nombre' => 'required',
             'primerApellido' => 'required',
             'segundoApellido' => 'nullable',
@@ -54,7 +54,7 @@ class EmpleadoController extends Controller
         $usuario = User::create([
             'nombreUsuario' => $request->nombreUsuario,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => hash::make($request->password),
             'telefono' => $request->telefono,
             'rol' => 'Empleado',
             'idAutor' => $user->idUsuario, // Utilizar 'idUsuario' del modelo autenticado

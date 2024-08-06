@@ -1,0 +1,117 @@
+@extends('layouts.admin')
+
+@section('content')
+
+<!-- Page Header -->
+<div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
+    <div class="my-auto">
+        <h5 class="page-title fs-21 mb-1">Membresias</h5>
+        <nav>
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a>Pagina</a></li><i class="bi bi-three-dots-vertical"></i>
+                <li aria-current="page">Planes</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex my-xl-auto right-content align-items-center">
+        
+        <div class="mb-xl-0">
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuDate" data-bs-toggle="dropdown" aria-expanded="false">
+                    14 Aug 2019
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuDate">
+                    <li><a class="dropdown-item" href="javascript:void(0);">2015</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0);">2016</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0);">2017</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0);">2018</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Page Header Close -->
+
+<!-- Start::row-1 -->
+<div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 grid-margin">
+        <div class="card">
+            <div class="card-header pb-0">
+                <div class="d-flex justify-content-between">
+                    <h4 class="card-title mb-0">Planes de Membresias </h4> <br>
+                    <a href="javascript:void(0);" class="tx-inverse" data-bs-toggle="dropdown"><i class="mdi mdi-dots-horizontal text-gray"></i></a>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <a class="dropdown-item" href="javascript:void(0);">Action</a>
+                        <a class="dropdown-item" href="javascript:void(0);">Another Action</a>
+                        <a class="dropdown-item" href="javascript:void(0);">Something Else Here</a>
+                    </div>
+                </div>
+                <a href="" class="btn btn-primary rounded-pill btn-wave" data-bs-original-title="Añadir">
+                    <i class="bi bi-clipboard-check"></i> Añadir un nuevo plan
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="file-export" class="table table-bordered text-nowrap w-100">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Duración (meses)</th>
+                                <th>Precio</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($planes as $plan)
+                                <tr>
+                                    <td>{{ $plan->nombrePlan }}</td>
+                                    <td>
+                                        @if(strlen($plan->descripcion) > 70)
+                                            <a href="#" class="btn btn-info" data-toggle="modal" data-target="#modal-{{ $plan->idPlan }}">Leer más</a>
+                                        @else
+                                            {{ $plan->descripcion }}
+                                        @endif
+                                    </td>
+                                    <td>{{ $plan->duracion }}</td>
+                                    <td>{{ $plan->precio }}</td>
+                                    <td>
+                                        <a href="" class="btn btn-warning">Editar</a>
+                                        <form action="" method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div><!-- COL END -->
+</div>
+<!--End::row-1 -->
+
+@foreach($planes as $plan)
+    <div class="modal fade" id="modal-{{ $plan->idPlan }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ $plan->idPlan }}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel-{{ $plan->idPlan }}">{{ $plan->nombrePlan }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ $plan->descripcion }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endforeach
+@endsection

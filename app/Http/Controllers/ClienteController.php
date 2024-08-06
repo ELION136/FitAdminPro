@@ -43,7 +43,7 @@ class ClienteController extends Controller
         // Validar la solicitud
         $request->validate([
             'nombreUsuario' => 'required|unique:usuarios,nombreUsuario',
-            'email' => 'required|email|unique:usuarios,email',
+            'email' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'required',
             'telefono' => 'nullable',
             'image' => 'nullable|image',
