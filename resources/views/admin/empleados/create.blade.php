@@ -86,17 +86,6 @@
                                 @enderror
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="password" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
-                                @error('password')
-                                <small style="color:red">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="password_confirmation" class="form-label">Confirmar Contraseña</label>
-                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
-                            </div>
-                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                                 <label for="telefono" class="form-label">Teléfono</label>
                                 <input type="text" class="form-control @error('telefono') is-invalid @enderror" id="telefono" name="telefono" value="{{ old('telefono') }}">
                                 @error('telefono')
@@ -109,6 +98,24 @@
                                 @error('image')
                                 <small style="color:red">{{ $message }}</small>
                                 @enderror
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                                <label for="profesion" class="form-label">profesion</label>
+                                <input type="text" class="form-control @error('profesion') is-invalid @enderror" id="profesion" name="profesion" value="{{ old('profesion') }}" required>
+                                @error('profesion')
+                                <small style="color:red">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                                <label for="especialidad" class="form-label">especialidad</label>
+                                <input type="text" class="form-control @error('nombreUsuario') is-invalid @enderror" id="especialidad" name="especialidad" value="{{ old('especialidad') }}" >
+                                @error('especialidad')
+                                <small style="color:red">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                                <label for="descripcion" class="form-label">Descripcion</label>
+                                <textarea class="form-control" name="descripcion" rows="2"></textarea>
                             </div>
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 text-end">
                                 <button type="submit" class="btn btn-primary">Crear</button>

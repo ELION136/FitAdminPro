@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Exception;
-
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 class EmpleadoController extends Controller
 {
     /**
@@ -27,6 +28,12 @@ class EmpleadoController extends Controller
         return view('admin.empleados.create');
     }
 
+    private function generatePassword()
+    {
+        $prefix = 'fitadminpro';
+        $randomNumbers = rand(1000, 9999);
+        return $prefix . $randomNumbers;
+    }
     public function store(Request $request)
     {
         // Obtener el usuario autenticado
@@ -39,7 +46,6 @@ class EmpleadoController extends Controller
         $request->validate([
             'nombreUsuario' => 'required|unique:usuarios,nombreUsuario',
             'email' => 'required|email|unique:usuarios,email',
-            'password' => 'required',
             'telefono' => 'nullable',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'nombre' => 'required',
@@ -48,13 +54,20 @@ class EmpleadoController extends Controller
             'fechaNacimiento' => 'required|date',
             'genero' => 'required',
             'fechaContratacion' => 'required|date',
+            'profesion' => 'required|string|max:50',
+            'especialidad' => 'nullable|string|max:100',
+            'descripcion' => 'nullable|string|max:100',
         ]);
-    
+        
+        // Generar una contraseña temporal
+        $temporaryPassword = $this->generatePassword();
+
+
         // Crear el usuario
         $usuario = User::create([
             'nombreUsuario' => $request->nombreUsuario,
             'email' => $request->email,
-            'password' => hash::make($request->password),
+            'password' => hash::make($temporaryPassword),
             'telefono' => $request->telefono,
             'rol' => 'Empleado',
             'idAutor' => $user->idUsuario, // Utilizar 'idUsuario' del modelo autenticado
@@ -89,6 +102,9 @@ class EmpleadoController extends Controller
             'fechaNacimiento' => $request->fechaNacimiento,
             'genero' => $request->genero,
             'fechaContratacion' => $request->fechaContratacion,
+            'profesion' => $request->profesion,
+            'especialidad' => $request->especialidad,
+            'descripcion'=> $request->descripcion,
             'idAutor' => $user->idUsuario, // Utilizar 'idUsuario' del modelo autenticado
             'fechaCreacion' => now(),
         ]);
@@ -98,9 +114,12 @@ class EmpleadoController extends Controller
             return redirect()->back()->with('error', 'Error al crear el empleado');
         }
     
+        // Enviar el correo electrónico con la contraseña temporal
+        Mail::to($usuario->email)->send(new \App\Mail\TemporaryPasswordMail($usuario, $temporaryPassword));
+
         // Redirigir con un mensaje de éxito
-        return redirect()->route('admin.empleados.index')->with('mensaje', 'El registro fue realizado correctamente.')
-        ->with('icono', 'success');
+        return redirect()->route('admin.empleados.index')->with('mensaje', 'El registro fue realizado correctamente y se envió un correo electrónico al empleado.')->with('icono', 'success');
+    
     }
 
     // Mostrar el formulario para editar un empleado
