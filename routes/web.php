@@ -17,7 +17,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 */
 Route::get('/send-test-email', function () {
     Mail::raw('This is a test email.', function ($message) {
-        $message->to('fita29884@gmail.com')
+        $message->to('adonay202024@gmail.com')
                 ->subject('Test Email');
     });
 

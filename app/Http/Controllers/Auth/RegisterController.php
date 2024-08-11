@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Cliente;
+use Illuminate\Support\Facades\DB;
 
 class RegisterController extends Controller
 {
@@ -28,7 +30,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/admin/home';
 
     /**
      * Create a new controller instance.
@@ -49,9 +51,15 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'nombreUsuario' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'nombreUsuario' => ['required', 'string', 'max:50', 'unique:usuarios'],
+            'email' => ['required', 'string', 'email', 'max:100', 'unique:usuarios'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'nombre' => ['required', 'string', 'max:50'],
+            'primerApellido' => ['required', 'string', 'max:50'],
+            'segundoApellido' => ['nullable', 'string', 'max:50'],
+            'fechaNacimiento' => ['required', 'date'],
+            'genero' => ['required', 'in:Masculino,Femenino,Otro'],
+            'telefono' => ['nullable', 'string', 'max:255'],
         ]);
     }
 
@@ -63,10 +71,27 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        return DB::transaction(function () use ($data) {
+            $usuario = User::create([
+                'nombreUsuario' => $data['nombreUsuario'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'telefono' => $data['telefono'] ?? null,
+                'rol' => 'Cliente',
+                'eliminado' => 1,
+            ]);
+
+            Cliente::create([
+                'idUsuario' => $usuario->idUsuario,
+                'nombre' => $data['nombre'],
+                'primerApellido' => $data['primerApellido'],
+                'segundoApellido' => $data['segundoApellido'] ?? null,
+                'fechaNacimiento' => $data['fechaNacimiento'],
+                'genero' => $data['genero'],
+                'eliminado' => 1,
+            ]);
+
+            return $usuario;
+        });
     }
 }

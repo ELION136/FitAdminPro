@@ -22,7 +22,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.clientes.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.clientes.store') }}" method="POST" enctype="multipart/form-data" id="createClient">
                         @csrf
                         <div class="row gy-4">
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
@@ -79,17 +79,6 @@
                                 @enderror
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="password" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
-                                @error('password')
-                                <small style="color:red">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="password_confirmation" class="form-label">Confirmar Contraseña</label>
-                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
-                            </div>
-                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                                 <label for="telefono" class="form-label">Teléfono</label>
                                 <input type="text" class="form-control @error('telefono') is-invalid @enderror" id="telefono" name="telefono" value="{{ old('telefono') }}">
                                 @error('telefono')
@@ -104,7 +93,7 @@
                                 @enderror
                             </div>
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 text-end">
-                                <button type="submit" class="btn btn-primary">Crear</button>
+                                <button type="submit" class="btn btn-primary">Crear nuevo cliente</button>
                             </div>
                         </div>
                     </form>
@@ -113,4 +102,29 @@
             </div>
         </div>
     </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('createClient');
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+    
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "¡No podrás revertir esto!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, Crear Usuario!',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

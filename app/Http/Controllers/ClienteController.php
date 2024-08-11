@@ -9,8 +9,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+
 use Exception;
-class ClienteController extends Controller
+use Illuminate\Support\Facades\Mail;
+class ClienteController extends Controller 
 {
     /**
      * Display a listing of the resource.
@@ -21,6 +23,8 @@ class ClienteController extends Controller
         return view('admin.clientes.index', compact('clientes'));
     }
 
+
+    //ShouldQueue  este metodo hace colas
     /**
      * Show the form for creating a new resource.
      */
@@ -32,6 +36,17 @@ class ClienteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
+
+    private function generatePassword()
+    {
+        $prefix = 'fitadminpro';
+        $randomNumbers = rand(1000, 9999);
+        return $prefix . $randomNumbers;
+    }
+
+
+
     public function store(Request $request)
     {
         // Obtener el usuario autenticado
@@ -43,10 +58,9 @@ class ClienteController extends Controller
         // Validar la solicitud
         $request->validate([
             'nombreUsuario' => 'required|unique:usuarios,nombreUsuario',
-            'email' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'password' => 'required',
+            'email' => 'required|email|unique:usuarios,email',
             'telefono' => 'nullable',
-            'image' => 'nullable|image',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'nombre' => 'required',
             'primerApellido' => 'required',
             'segundoApellido' => 'nullable',
@@ -54,11 +68,13 @@ class ClienteController extends Controller
             'genero' => 'required|in:Masculino,Femenino,Otro',
         ]);
     
+
+        $temporaryPassword = $this->generatePassword();
         // Crear el usuario
         $usuario = User::create([
             'nombreUsuario' => $request->nombreUsuario,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => hash::make($temporaryPassword),
             'telefono' => $request->telefono,
             'rol' => 'Cliente',
             'idAutor' => $user->idUsuario, // Utilizar 'idUsuario' del modelo autenticado
@@ -84,7 +100,7 @@ class ClienteController extends Controller
             $usuario->save();
         }
     
-        // Crear el empleado asociado
+        // Crear el cliente asociado
         $cliente = Cliente::create([
             'idUsuario' => $usuario->idUsuario, // Utilizar 'idUsuario' del usuario creado
             'nombre' => $request->nombre,
@@ -100,9 +116,12 @@ class ClienteController extends Controller
         if (!$cliente) {
             return redirect()->back()->with('error', 'Error al crear el empleado');
         }
+
+
+        Mail::to($usuario->email)->send(new \App\Mail\TemporaryPasswordMail($usuario, $temporaryPassword));
     
         // Redirigir con un mensaje de éxito
-        return redirect()->route('admin.clientes.index')->with('mensaje', 'El registro fue realizado correctamente.')
+        return redirect()->route('admin.clientes.index')->with('mensaje',  'El registro fue realizado correctamente y se envió un correo electrónico al empleado.')
         ->with('icono', 'success');
     }
 
