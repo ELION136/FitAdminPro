@@ -7,12 +7,13 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>FitAdminPro</title>
-    
+    <meta name="Description" content="Bootstrap Responsive Admin Web Dashboard HTML5 Template">
+    <meta name="Author" content="Spruko Technologies Private Limited">
     <meta name="keywords"
         content="admin,admin dashboard,admin panel,admin template,bootstrap,clean,dashboard,flat,jquery,modern,responsive,premium admin templates,responsive admin,ui,ui kit.">
 
     <!-- Favicon -->
-    <link rel="icon" href="{{ url('assets/images/brand-logos/favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ url('assets/images/brand-logos/toggle-logo2.png') }}" type="image/x-icon">
 
     <!-- Main Theme Js -->
     <script src="{{ url('assets/js/authentication-main.js') }}"></script>
@@ -27,21 +28,11 @@
     <link href="{{ url('assets/css/icons.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #0a192f; /* Dark blue night color */
-        }
 
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            background-color: #0a192f; /* Dark blue night color */
-            z-index: -1;
-        }
+
+    
+    <style>
+        
         
         .custom-page {
             display: flex;
@@ -50,6 +41,12 @@
             min-height: 100vh;
             position: relative;
             z-index: 1;
+            background: linear-gradient(rgba(12, 54, 94, 0.5), rgba(9, 50, 73, 0.5)),
+                url('{{ url('styles/img/f3.jpg') }}') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            
+            
         }
 
         .card-sigin {
@@ -140,11 +137,11 @@
         }
 
         .text-primary {
-            color: #4a90e2 !important;
+            color: #83b4eb !important;
         }
 
         .form-check-label, .text-muted {
-            color: #a0aec0 !important;
+            color: #d9e7f8 !important;
         }
 
         a {
@@ -154,48 +151,37 @@
         a:hover {
             color: #3a7bd5;
         }
+
+        .logo-luminoso {
+        max-height: 40px; /* Ajusta la altura del logo */
+        vertical-align: middle;
+        filter: drop-shadow(0 0 10px rgba(74, 144, 226, 0.7)); /* Sombra luminosa alrededor del logo */
+        transition: all 0.3s ease; /* Transición suave para los efectos */
+        }
+
+        .logo-luminoso:hover {
+        filter: drop-shadow(0 0 20px rgba(74, 144, 226, 1)) brightness(1.2); /* Aumenta el brillo al pasar el cursor */
+        transform: scale(1.05); /* Pequeño efecto de zoom */
+        }
     </style>
 </head>
 
 <body>
-    <div id="particles-js"></div>
-    <main class="py-4">
+    
+    
+    <div class="container-fluid custom-page">
+        
+           
+    
     @yield('content')
-    </main>
+    
     <!-- Scripts -->
-    <!-- Scripts -->
+            
+      
+    </div>
+    
     <script src="{{ url('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            particlesJS("particles-js", {
-                particles: {
-                    number: { value: 80, density: { enable: true, value_area: 800 } },
-                    color: { value: "#4a90e2" },
-                    shape: { type: "circle", stroke: { width: 0, color: "#000000" }, polygon: { nb_sides: 5 } },
-                    opacity: { value: 0.5, random: false, anim: { enable: false, speed: 1, opacity_min: 0.1, sync: false } },
-                    size: { value: 3, random: true, anim: { enable: false, speed: 40, size_min: 0.1, sync: false } },
-                    line_linked: { enable: true, distance: 150, color: "#4a90e2", opacity: 0.4, width: 1 },
-                    move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out", bounce: false, attract: { enable: false, rotateX: 600, rotateY: 1200 } }
-                },
-                interactivity: {
-                    detect_on: "canvas",
-                    events: {
-                        onhover: { enable: true, mode: "repulse" },
-                        onclick: { enable: true, mode: "push" },
-                        resize: true
-                    },
-                    modes: {
-                        grab: { distance: 400, line_linked: { opacity: 1 } },
-                        bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 },
-                        repulse: { distance: 200, duration: 0.4 },
-                        push: { particles_nb: 4 },
-                        remove: { particles_nb: 2 }
-                    }
-                },
-                retina_detect: true
-            });
-        });
-    </script>
+    
+    
 </body>
 </html>

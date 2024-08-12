@@ -79,7 +79,11 @@ class RegisterController extends Controller
                 'telefono' => $data['telefono'] ?? null,
                 'rol' => 'Cliente',
                 'eliminado' => 1,
+                'idAutor' => null, // Temporalmente null
             ]);
+
+            // Actualizar el idAutor del usuario con su propio ID
+            $usuario->update(['idAutor' => $usuario->idUsuario]);
 
             Cliente::create([
                 'idUsuario' => $usuario->idUsuario,
@@ -89,6 +93,7 @@ class RegisterController extends Controller
                 'fechaNacimiento' => $data['fechaNacimiento'],
                 'genero' => $data['genero'],
                 'eliminado' => 1,
+                'idAutor' => $usuario->idUsuario,
             ]);
 
             return $usuario;

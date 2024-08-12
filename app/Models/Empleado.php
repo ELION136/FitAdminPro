@@ -11,8 +11,8 @@ class Empleado extends Model
     use HasFactory;
     
     public $timestamps = false;
-    protected $table = 'empleados';
-    protected $primaryKey = 'idEmpleado';
+    protected $table = 'empleados'; // en este caso posible mente cambie a entrenador
+    protected $primaryKey = 'idEmpleado';  //idEntrenador
 
     protected $fillable = [
         'idUsuario',
@@ -22,7 +22,7 @@ class Empleado extends Model
         'fechaNacimiento',
         'genero',
         'fechaContratacion',
-        'profesion',
+        'direccion',
         'especialidad',
         'descripcion',
         'idAutor',

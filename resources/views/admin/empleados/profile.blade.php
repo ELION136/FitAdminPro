@@ -44,7 +44,7 @@
                         <div class="d-flex justify-content-between mb-4">
                             <div>
                                 <h5 class="main-profile-name">{{ $user->nombreUsuario }}</h5>
-                                <p class="main-profile-name-text">{{ $empleado->profesion ?? 'No profession available' }}</p>
+                                <p class="main-profile-name-text">{{ $empleado->especialidad ?? 'No profession available' }}</p>
                             </div>
                         </div>
                         <h6 class="fs-14">Biografia</h6>
@@ -71,6 +71,13 @@
                         <div>                      
                             <p class="main-profile-name-text">
                                 {{ $empleado->fechaContratacion ? $empleado->fechaContratacion->format('d/m/Y') : 'No hiring date available' }}
+                            </p>
+                        </div>
+                        <hr class="border-1">
+                        <h6 class="fs-14">Direccion</h6>
+                        <div>                      
+                            <p class="main-profile-name-text">
+                                {{ $empleado->direccion ?? 'No definida' }}
                             </p>
                         </div>
                         <!--skill bar-->
@@ -173,20 +180,31 @@
                     <div class="form-group mb-3">
                         <div class="row">
                             <div class="col-md-3">
-                                <label class="form-label">Profesion <span style="color:red">*</span></label>
+                                <label class="form-label">direccion </label>
                             </div>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" name="profesion" value="{{ old('profesion', $empleado->profesion) }}">
+                                <input type="text" class="form-control" name="direccion" value="{{ old('direccion', $empleado->direccion) }}">
                             </div>
                         </div>
                     </div>
                     <div class="form-group mb-3">
                         <div class="row">
                             <div class="col-md-3">
-                                <label class="form-label">Especialidad </label>
+                                <label class="form-label">Especialidad <span style="color: red">*</span></label>
                             </div>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" name="especialidad" value="{{ old('especialidad', $empleado->especialidad) }}">
+                                <select class="form-control @error('especialidad') is-invalid @enderror" name="especialidad">
+                                    <option value="" disabled selected>Seleccione una especialidad</option>
+                                    <option value="Entrenamiento Personal" {{ old('especialidad', $empleado->especialidad) == 'Entrenamiento Personal' ? 'selected' : '' }}>Entrenamiento Personal</option>
+                                    <option value="Entrenamiento Cardiovascular" {{ old('especialidad', $empleado->especialidad) == 'Entrenamiento Cardiovascular' ? 'selected' : '' }}>Entrenamiento Cardiovascular</option>
+                                    <option value="Boxeo" {{ old('especialidad', $empleado->especialidad) == 'Boxeo' ? 'selected' : '' }}>Boxeo</option>
+                                    <option value="Entrenamiento de Resistencia" {{ old('especialidad', $empleado->especialidad) == 'Entrenamiento de Resistencia' ? 'selected' : '' }}>Entrenamiento de Resistencia</option>
+                                    <option value="Rehabilitación" {{ old('especialidad', $empleado->especialidad) == 'Rehabilitación' ? 'selected' : '' }}>Rehabilitación</option>
+                                    <option value="Nutrición y Bienestar" {{ old('especialidad', $empleado->especialidad) == 'Nutrición y Bienestar' ? 'selected' : '' }}>Nutrición y Bienestar</option>
+                                </select>
+                                @error('especialidad')
+                                <small style="color:red">{{ $message }}</small>
+                                @enderror
                             </div>
                         </div>
                     </div>

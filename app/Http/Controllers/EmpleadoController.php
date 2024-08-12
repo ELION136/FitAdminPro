@@ -48,14 +48,14 @@ class EmpleadoController extends Controller
             'email' => 'required|email|unique:usuarios,email',
             'telefono' => 'nullable',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'nombre' => 'required',
-            'primerApellido' => 'required',
-            'segundoApellido' => 'nullable',
+            'nombre' => 'required|string|max:50',
+            'primerApellido' => 'required|string|max:50',
+            'segundoApellido' => 'nullable|string|max:50',
             'fechaNacimiento' => 'required|date',
-            'genero' => 'required',
+            'genero' => 'required|in:Masculino,Femenino,Otro',
             'fechaContratacion' => 'required|date',
-            'profesion' => 'required|string|max:50',
-            'especialidad' => 'nullable|string|max:100',
+            'direccion' => 'nullable|string|max:50',
+            'especialidad' => 'required',
             'descripcion' => 'nullable|string|max:100',
         ]);
         
@@ -102,7 +102,7 @@ class EmpleadoController extends Controller
             'fechaNacimiento' => $request->fechaNacimiento,
             'genero' => $request->genero,
             'fechaContratacion' => $request->fechaContratacion,
-            'profesion' => $request->profesion,
+            'direccion' => $request->direccion,
             'especialidad' => $request->especialidad,
             'descripcion'=> $request->descripcion,
             'idAutor' => $user->idUsuario, // Utilizar 'idUsuario' del modelo autenticado
@@ -139,12 +139,13 @@ class EmpleadoController extends Controller
             'nombreUsuario' => 'required|unique:usuarios,nombreUsuario,' . $empleado->idUsuario . ',idUsuario',
             'email' => 'required|email|unique:usuarios,email,' . $empleado->idUsuario . ',idUsuario',
             'telefono' => 'nullable',
-            'nombre' => 'required',
-            'primerApellido' => 'required',
-            'segundoApellido' => 'nullable',
+            'nombre' => 'required|string|max:50',
+            'primerApellido' => 'required|string|max:50',
+            'segundoApellido' => 'nullable|string|max:50',
             'fechaNacimiento' => 'required|date',
-            'genero' => 'required',
+            'genero' => 'required|in:Masculino,Femenino,Otro',
             'fechaContratacion' => 'required|date',
+            'direccion' => 'nullable|string|max:50',
         ]);
 
         $usuario = User::findOrFail($empleado->idUsuario);
@@ -162,6 +163,7 @@ class EmpleadoController extends Controller
             'fechaNacimiento' => $request->fechaNacimiento,
             'genero' => $request->genero,
             'fechaContratacion' => $request->fechaContratacion,
+            'direccion' => $request->direccion,
             'idAutor' => $user->idUsuario
         ]);
 
@@ -223,8 +225,8 @@ class EmpleadoController extends Controller
         'fechaNacimiento' => 'required|date',
         'genero' => 'required|in:Masculino,Femenino,Otro',
         'fechaContratacion' => 'required|date',
-        'profesion' => 'required|string|max:50',
-        'especialidad' => 'nullable|string|max:100',
+        'direccion' => 'nullable|string|max:50',
+        'especialidad' => 'required',
         'descripcion' => 'nullable|string',
         'password' => 'nullable|string|min:8|confirmed',
     ]);
@@ -257,7 +259,7 @@ class EmpleadoController extends Controller
         $empleado->fechaNacimiento = $request->fechaNacimiento;
         $empleado->genero = $request->genero;
         $empleado->fechaContratacion = $request->fechaContratacion;
-        $empleado->profesion = $request->profesion;
+        $empleado->direccion = $request->direccion;
         $empleado->especialidad = $request->especialidad;
         $empleado->descripcion = $request->descripcion;
         $empleado->idAutor = Auth::id();

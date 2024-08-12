@@ -79,10 +79,10 @@
                                     <a href="{{route('admin.empleados.edit', $empleado->idEmpleado)}}"  class="btn btn-sm btn-info btn-b" data-bs-toggle="tooltip" title="" data-bs-original-title="Editar">
                                         <i class="bi bi-pen-fill"></i>
                                     </a>
-                                    <form action="{{ route('admin.empleados.destroy', $empleado->idEmpleado) }}" method="POST" style="display:inline;">
+                                    <form id="delete-form-{{ $empleado->idEmpleado }}" action="{{ route('admin.empleados.destroy', $empleado->idEmpleado) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="" data-bs-original-title="Eliminar">
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDeletion({{ $empleado->idEmpleado }})" data-bs-toggle="tooltip" title="Eliminar">
                                             <i class="bi bi-trash-fill"></i>
                                         </button>
                                     </form>
@@ -98,5 +98,23 @@
 </div>
 <!--End::row-1 -->
 
+<script>
+    function confirmDeletion(idEmpleado) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminarlo!',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + idEmpleado).submit();
+            }
+        });
+    }
+</script>
 
 @endsection
