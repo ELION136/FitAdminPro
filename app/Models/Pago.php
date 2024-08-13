@@ -18,7 +18,15 @@ class Pago extends Model
         'monto',
         'fechaPago',
         'metodoPago',
+        'fechaCreacion', 
+        'fechaModificacion', 
+        'idAutor', 
+        'eliminado'
     ];
+
+    public $timestamps = false;
+
+    protected $dates = ['fechaPago', 'fechaCreacion', 'fechaModificacion'];
 
     public function membresia()
     {

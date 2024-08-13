@@ -9,28 +9,21 @@ class Servicio extends Model
 {
     use HasFactory;
 
+    protected $table = 'servicios';
+    protected $primaryKey = 'idServicio';
     protected $fillable = [
-        'empleado_id',
-        'cliente_id',
-        'tipo',
-        'nombreServicio',
-        'descripcion',
-        'fechaInicio',
-        'fechaFin',
+        'nombre', 'codigo', 'descripcion', 'precioMensual', 
+        'precioSemanal', 'precioSeccion', 'idAutor', 
+        'fechaCreacion', 'fechaModificacion', 'eliminado'
     ];
 
-    public function empleado()
-    {
-        return $this->belongsTo(Empleado::class);
-    }
+    public $timestamps = false;
 
-    public function cliente()
-    {
-        return $this->belongsTo(Cliente::class);
-    }
+    protected $dates = ['fechaCreacion', 'fechaModificacion'];
 
-    public function detalles()
+    // Relaciones
+    public function horarios()
     {
-        return $this->hasMany(DetalleServicio::class);
+        return $this->belongsToMany(Horario::class, 'servicios_horarios', 'idServicio', 'idHorario');
     }
 }

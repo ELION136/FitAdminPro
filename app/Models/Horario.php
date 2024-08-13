@@ -17,10 +17,28 @@ class Horario extends Model
         'dia',
         'horaInicio',
         'horaFin',
+        'fechaCreacion', 
+        'fechaModificacion',
+        'idAutor',
+        'eliminado',
     ];
+
+    public $timestamps = false;
+
+    protected $dates = ['fechaCreacion', 'fechaModificacion'];
+
 
     public function empleado()
     {
         return $this->belongsTo(Empleado::class, 'idEmpleado');
     }
+
+
+    public function servicios()
+    {
+        return $this->belongsToMany(Servicio::class, 'servicios_horarios', 'idHorario', 'idServicio');
+    }
+
+
+
 }

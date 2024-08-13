@@ -17,7 +17,13 @@ class Asistencia extends Model
         'fecha',
         'horaEntrada',
         'horaSalida',
+        'idAutor',
+        'eliminado',
     ];
+
+    public $timestamps = false;
+
+    protected $dates = ['fecha'];
 
     public function cliente()
     {

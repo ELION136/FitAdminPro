@@ -93,6 +93,16 @@ Route::middleware(['auth'])->group(function () {
     });
 
 
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/admin/horarios', [App\Http\Controllers\HorarioController::class, 'index'])->name('admin.horarios.index');
+        //Route::get('/admin/planes/create', [App\Http\Controllers\PlanMembresiaController::class, 'create'])->name('admin.planes.create');
+        //Route::post('/admin/planes', [App\Http\Controllers\PlanMembresiaController::class, 'store'])->name('admin.planes.store');
+        //Route::get('/admin/planes/{id}/edit', [App\Http\Controllers\PlanMembresiaController::class, 'edit'])->name('admin.planes.edit');
+        //Route::put('/admin/planes/{id}', [App\Http\Controllers\PlanMembresiaController::class, 'update'])->name('admin.planes.update');
+        //Route::delete('/admin/planes/{id}', [App\Http\Controllers\PlanMembresiaController::class, 'destroy'])->name('admin.planes.destroy');
+        });
+
+
     //configuracion del envio de email
     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
         $request->fulfill();

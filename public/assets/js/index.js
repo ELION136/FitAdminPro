@@ -78,13 +78,19 @@ var options1 = {
         }
     }
 };
-document.getElementById('Sales-bar').innerHTML = ''
-var chart1 = new ApexCharts(document.querySelector("#Sales-bar"), options1);
-chart1.render();
-function salesReport() {
-    chart1.updateOptions({
-        colors: ["rgb(" + myVarVal + ")",  "#f93a5a", "#f7a556"],
-    })
+var salesBarElement = document.getElementById('Sales-bar');
+
+if (salesBarElement) {
+    salesBarElement.innerHTML = ''; // Limpia el contenido del elemento
+    var chart1 = new ApexCharts(salesBarElement, options1);
+    chart1.render();
+    function salesReport() {
+        chart1.updateOptions({
+            colors: ["rgb(" + myVarVal + ")",  "#f93a5a", "#f7a556"],
+        });
+    }
+} else {
+    console.error("El elemento con ID 'Sales-bar' no se encontró en el DOM.");
 }
 /* Sales Report Chart */
 (function () {

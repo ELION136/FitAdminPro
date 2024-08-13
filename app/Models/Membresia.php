@@ -18,6 +18,8 @@ class Membresia extends Model
         'fechaInicio',
         'fechaFin',
         'estado',
+        'idAutor',
+        'eliminado',
     ];
 
     public function cliente()

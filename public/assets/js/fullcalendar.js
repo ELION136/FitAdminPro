@@ -3,8 +3,8 @@
     //_____Calendar Events Intialization
   
     // sample calendar events data
-    var curYear = moment().format('YYYY');
-    var curMonth = moment().format('MM');
+    var curYear = new Date().getFullYear();
+    var curMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
     // Calendar Event Source
     var sptCalendarEvents = {
       id: 1,

@@ -47,8 +47,7 @@
 
     <!-- Jsvector Maps -->
     <link rel="stylesheet" href="{{ url('assets/libs/jsvectormap/css/jsvectormap.min.css') }}">
-    <!-- FlatPickr CSS -->
-    <link rel="stylesheet" href="{{ url('assets/libs/flatpickr/flatpickr.min.css') }}">
+    
 
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -56,6 +55,11 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.bootstrap5.min.css">
+
+
+    <!-- Full Calendar CSS -->
+    <link rel="stylesheet" href="{{url('assets/libs/fullcalendar/main.min.css')}}">
+
     <!--<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>-->
 
     <link href="{{ asset('package/dist/sweetalert2.min.css') }}" rel="stylesheet">
@@ -790,6 +794,17 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="slide">
+                            <a href="{{route('admin.horarios.index')}}" class="side-menu__item">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" width="24" height="24">
+                                    <path d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M12 1a11 11 0 1 0 11 11A11 11 0 0 0 12 1zm1 11h-4V7h2v4h2v1z"/>
+                                </svg>
+                                <span class="side-menu__label">Horarios</span>
+                            </a>
+                        </li>
+                        
+                        
                         
                         <!-- End::slide -->
                         <li class="slide has-sub">
@@ -967,17 +982,7 @@
     <script src="{{ url('assets/js/us-merc-en.js') }}"></script>
 
     <!-- Chartjs Chart JS -->
-    <script src="{{ url('assets/js/index.js') }}"></script>
-
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-
-    <!-- Custom-Switcher JS -->
-    <script src="{{ url('assets/js/custom-switcher.min.js') }}"></script>
-
+   
 
 
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
@@ -1000,6 +1005,10 @@
 
     <!-- Chartjs Chart JS -->
     <script src="{{ url('assets/libs/chart.js/chart.min.js') }}"></script>
+
+    <!-- Fullcalendar JS -->
+    <script src="{{ url('assets/libs/fullcalendar/main.min.js')}}"></script>
+    <script src="{{ url('assets/js/fullcalendar.js') }}"></script>
 
     <!-- Imternal Chartjs JS -->
     <script src="{{ url('assets/js/chartjs-charts.js') }}"></script>
