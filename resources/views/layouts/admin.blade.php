@@ -658,8 +658,8 @@
                                                 Miembro: 
                                                 @if (auth()->user()->rol === 'Administrador')
                                                     Administrador
-                                                @elseif (auth()->user()->rol === 'Empleado')
-                                                    Empleado
+                                                @elseif (auth()->user()->rol === 'Entrenador')
+                                                    Entrenador
                                                 @elseif (auth()->user()->rol === 'Cliente')
                                                     Cliente
                                                 @else
@@ -674,8 +674,8 @@
                                         ><i class="bx bx-cog fs-18 me-2 op-7"></i>
                                         </i>Perfil</a>
                                 </li>
-                            @elseif (auth()->user()->rol === 'Empleado')
-                                <li><a class="dropdown-item d-flex" href="{{ route('admin.empleados.profile') }}">
+                            @elseif (auth()->user()->rol === 'Entrenador')
+                                <li><a class="dropdown-item d-flex" href="{{ route('admin.entrenadores.profile') }}">
                                     <i class="bx bx-cog fs-18 me-2 op-7"></i>
                                             </i>Perfil</a></li>
                             @elseif (auth()->user()->rol === 'Cliente')
@@ -716,7 +716,7 @@
 
             <!-- Start::main-sidebar-header -->
             <div class="main-sidebar-header">
-                <a href="index.html" class="header-logo">
+                <a href="{{route('admin.home')}}" class="header-logo">
                     <img src="{{ url('assets/images/brand-logos/2desktop-logo-white.png') }}" alt="logo"
                         class="desktop-logo">
                     <img src="{{ url('assets/images/brand-logos/toggle-logo2-white.png') }}" alt="logo"
@@ -787,7 +787,7 @@
                                     <a href="javascript:void(0);">Usuarios</a>
                                 </li>
                                 <li class="slide">
-                                    <a href="{{ route('admin.empleados.index') }}" class="side-menu__item "></i>Empleados</a>
+                                    <a href="{{ route('admin.entrenadores.index') }}" class="side-menu__item "></i>Entrenadores</a>
                                 </li>
                                 <li class="slide">
                                     <a href="{{ route('admin.clientes.index') }}" class="side-menu__item "></i>Clientes</a>
@@ -859,7 +859,8 @@
                             </ul>
                         </li>
 
-
+                        @if(auth()->user()->rol === 'Administrador' || auth()->user()->rol === 'Entrenador')
+                        <!--vista admin vista empleado-->
                         <li class="slide has-sub">
                             <a href="javascript:void(0);" class="side-menu__item">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24">
@@ -885,6 +886,40 @@
                                 </li>
                             </ul>
                         </li>
+                        @endif
+
+
+                        @if(auth()->user()->rol === 'Cliente')
+                        <!--vista solo para clientes -->
+                        <li class="slide has-sub">
+                            <a href="javascript:void(0);" class="side-menu__item">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24">
+                                    <path d="M0 0h24v24H0V0z" fill="none" />
+                                    <path
+                                        d="M5 9h14V5H5v4zm2-3.5c.83 0 1.5.67 1.5 1.5S7.83 8.5 7 8.5 5.5 7.83 5.5 7 6.17 5.5 7 5.5zM5 19h14v-4H5v4zm2-3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5z"
+                                        opacity=".3" />
+                                    <path
+                                        d="M20 13H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1zm-1 6H5v-4h14v4zm-12-.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zM20 3H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zm-1 6H5V5h14v4zM7 8.5c.83 0 1.5-.67 1.5-1.5S7.83 5.5 7 5.5 5.5 6.17 5.5 7 6.17 8.5 7 8.5z" />
+                                </svg>
+                                <span class="side-menu__label">Mis asistencias</span>
+                                <i class="fe fe-chevron-right side-menu__angle"></i>
+                            </a>
+                            <ul class="slide-menu child1">
+                                <li class="slide side-menu__label1">
+                                    <a href="javascript:void(0);">Mis Asistencias</a>
+                                </li>
+                                <li class="slide">
+                                    <a href="grid-tables.html" class="side-menu__item">Control</a>
+                                </li>
+                                <li class="slide">
+                                    <a href="data-tables.html" class="side-menu__item">Registrar</a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endif
+
+
+
 
 
                     </ul>

@@ -28,9 +28,13 @@ class Horario extends Model
     protected $dates = ['fechaCreacion', 'fechaModificacion'];
 
 
-    public function empleado()
+    /*public function empleado()
     {
         return $this->belongsTo(Empleado::class, 'idEmpleado');
+    }*/
+    public function entrenador()
+    {
+        return $this->belongsTo(Entrenador::class, 'idEntrenador');
     }
 
 

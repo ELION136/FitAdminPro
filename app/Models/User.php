@@ -78,9 +78,13 @@ class User extends Authenticatable
     /**
      * Get the employee associated with the user.
      */
-    public function empleado()
+    /*public function empleado()
     {
         return $this->hasOne(Empleado::class, 'idUsuario', 'idUsuario');
+    }*/
+    public function entrenador()
+    {
+        return $this->hasOne(Entrenador::class, 'idUsuario', 'idUsuario');
     }
 
     /**

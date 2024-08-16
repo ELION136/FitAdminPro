@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
         $adminId = DB::table('usuarios')->insertGetId([
             'nombreUsuario' => 'admin',
             'password' => Hash::make('adminpassword'), // Cambia esta contraseña
-            'email' => 'admin@example.com',
+            'email' => 'admin@gmail.com',
             'rol' => 'Administrador',
             'idAutor' => 1, // Referenciando a sí mismo
             'fechaCreacion' => now(),
@@ -40,18 +40,18 @@ class DatabaseSeeder extends Seeder
         $empleadoIds = [];
         for ($i = 1; $i <= 2; $i++) {
             $userId = DB::table('usuarios')->insertGetId([
-                'nombreUsuario' => 'empleado'.$i,
-                'password' => Hash::make('empleadopassword'.$i), // Cambia esta contraseña
-                'email' => 'empleado'.$i.'@example.com',
-                'rol' => 'Empleado',
+                'nombreUsuario' => 'entrenador'.$i,
+                'password' => Hash::make('entrenadorpassword'.$i), // Cambia esta contraseña
+                'email' => 'entrenador'.$i.'@gmail.com',
+                'rol' => 'Entrenador',
                 'idAutor' => 1, // El administrador es el autor
                 'fechaCreacion' => now(),
                 'eliminado' => 1,
             ]);
 
-            $empleadoIds[] = DB::table('empleados')->insertGetId([
+            $empleadoIds[] = DB::table('entrenadores')->insertGetId([
                 'idUsuario' => $userId,
-                'nombre' => 'Empleado'.$i,
+                'nombre' => 'Entrenador'.$i,
                 'primerApellido' => 'Apellido'.$i,
                 'fechaNacimiento' => '1980-01-01',
                 'especialidad' => 'Entrenamiento Personal',
