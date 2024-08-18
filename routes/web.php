@@ -98,6 +98,19 @@ Route::middleware(['auth'])->group(function () {
         });
 
 
+        Route::middleware(['auth'])->group(function () {
+            Route::get('/cliente/asistencia', [App\Http\Controllers\AsistenciaController::class, 'show'])->name('cliente.asistencias.asistencia');
+            Route::post('/cliente/asistencia/registrar', [App\Http\Controllers\AsistenciaController::class, 'registrar'])->name('cliente.asistencias.registrar-asistencia');
+            Route::get('/cliente/asistencia/reporte', [App\Http\Controllers\AsistenciaController::class, 'reporte'])->name('cliente.asistencias.reporte-asistencia');
+            Route::put('/cliente/asistencia/{asistencia}', [App\Http\Controllers\AsistenciaController::class, 'corregirAsistencia'])->name('cliente.asistencias.corregir-asistencia');
+            Route::delete('/cliente/asistencia/{asistencia}', [App\Http\Controllers\AsistenciaController::class, 'eliminarAsistencia'])->name('cliente.asistencias.eliminar-asistencia');
+        });
+
+
+
+    
+
+
     //configuracion del envio de email
     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
         $request->fulfill();
