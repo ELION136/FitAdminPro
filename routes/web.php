@@ -85,6 +85,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/planes/{id}/edit', [App\Http\Controllers\PlanMembresiaController::class, 'edit'])->name('admin.planes.edit');
     Route::put('/admin/planes/{id}', [App\Http\Controllers\PlanMembresiaController::class, 'update'])->name('admin.planes.update');
     Route::delete('/admin/planes/{id}', [App\Http\Controllers\PlanMembresiaController::class, 'destroy'])->name('admin.planes.destroy');
+//asistencias 
+
+
     });
 
 
@@ -95,7 +98,15 @@ Route::middleware(['auth'])->group(function () {
         //Route::get('/admin/planes/{id}/edit', [App\Http\Controllers\PlanMembresiaController::class, 'edit'])->name('admin.planes.edit');
         //Route::put('/admin/planes/{id}', [App\Http\Controllers\PlanMembresiaController::class, 'update'])->name('admin.planes.update');
         //Route::delete('/admin/planes/{id}', [App\Http\Controllers\PlanMembresiaController::class, 'destroy'])->name('admin.planes.destroy');
-        });
+        
+    
+        //asistencias
+        Route::get('/admin/asistencias', [App\Http\Controllers\AsistenciaController::class, 'index'])->name('admin.asistencias.index');
+        Route::post('/admin/asistencias/registrar-manual', [App\Http\Controllers\AsistenciaController::class, 'registrarManualmente'])->name('admin.asistencias.registrar-manual');
+        Route::get('/admin/asistencias/estadisticas', [App\Http\Controllers\AsistenciaController::class, 'estadisticas'])->name('admin.asistencias.estadisticas');
+
+
+    });
 
 
         Route::middleware(['auth'])->group(function () {

@@ -145,9 +145,76 @@ class AsistenciaController extends Controller
         ));
     }
 
+    //para el panel del admin y el panel de usuaario
+
+    public function index(Request $request)
+    {
+        $query = Asistencia::with('cliente')
+            ->where('eliminado', 1);
+
+        // Filtros
+        if ($request->has('fecha')) {
+            $query->whereDate('fecha', $request->fecha);
+        }
+
+        if ($request->has('cliente')) {
+            $query->whereHas('cliente', function ($q) use ($request) {
+                $q->where('nombre', 'like', '%' . $request->cliente . '%');
+            });
+        }
+
+        $asistencias = $query->orderBy('fecha', 'desc')
+            ->orderBy('horaEntrada', 'desc')
+            ->paginate(15);
+
+        return view('admin.asistencias.index', compact('asistencias'));
+    }
+
+    public function registrarManualmente(Request $request)
+    {
+        $request->validate([
+            'idCliente' => 'required|exists:clientes,idCliente',
+            'fecha' => 'required|date',
+            'horaEntrada' => 'required|date_format:H:i',
+            'horaSalida' => 'nullable|date_format:H:i|after:horaEntrada',
+        ]);
+
+        Asistencia::create([
+            'idCliente' => $request->idCliente,
+            'fecha' => $request->fecha,
+            'horaEntrada' => $request->horaEntrada,
+            'horaSalida' => $request->horaSalida,
+            'idAutor' => auth()->id(),
+            'eliminado' => 1
+        ]);
+
+        return redirect()->back()->with('success', 'Asistencia registrada manualmente.');
+    }
+
+    public function estadisticas()
+    {
+        $totalAsistencias = Asistencia::where('eliminado', 1)->count();
+        $asistenciasPorDia = Asistencia::where('eliminado', 1)
+            ->select(DB::raw('DATE(fecha) as dia'), DB::raw('count(*) as total'))
+            ->groupBy('dia')
+            ->orderBy('dia', 'desc')
+            ->take(7)
+            ->get();
+
+        $clientesMasFrecuentes = Cliente::withCount(['asistencia' => function ($query) {
+                $query->where('eliminado', 1);
+            }])
+            ->orderBy('asistencia_count', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('admin.asistencias.estadisticas', compact('totalAsistencias', 'asistenciasPorDia', 'clientesMasFrecuentes'));
+    }
+
 
 
     //en considedacion
+    /*
     public function corregirAsistencia(Request $request, Asistencia $asistencia)
     {
         $this->authorize('update', $asistencia);
@@ -178,5 +245,5 @@ class AsistenciaController extends Controller
         $asistencia->delete();
 
         return redirect()->back()->with('message', 'Asistencia eliminada correctamente.');
-    }
+    }*/
 }

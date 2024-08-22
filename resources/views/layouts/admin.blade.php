@@ -914,10 +914,10 @@
                                         <a href="javascript:void(0);">Asistencias</a>
                                     </li>
                                     <li class="slide">
-                                        <a href="grid-tables.html" class="side-menu__item">Control</a>
+                                        <a href="{{route('admin.asistencias.index')}}" class="side-menu__item">Registro</a>
                                     </li>
                                     <li class="slide">
-                                        <a href="data-tables.html" class="side-menu__item">Registrar</a>
+                                        <a href="{{route('admin.asistencias.estadisticas')}}" class="side-menu__item">Estadisticas</a>
                                     </li>
                                 </ul>
                             </li>
