@@ -41,7 +41,7 @@ class EmpleadoController extends Controller
         if (!$user) {
             return redirect()->route('login')->with('error', 'Usuario no autenticado');
         }
-    
+
         // Validar la solicitud
         $request->validate([
             'nombreUsuario' => 'required|unique:usuarios,nombreUsuario',
@@ -58,7 +58,7 @@ class EmpleadoController extends Controller
             'especialidad' => 'required',
             'descripcion' => 'nullable|string|max:100',
         ]);
-        
+
         // Generar una contraseña temporal
         $temporaryPassword = $this->generatePassword();
 
@@ -73,17 +73,17 @@ class EmpleadoController extends Controller
             'idAutor' => $user->idUsuario, // Utilizar 'idUsuario' del modelo autenticado
             'fechaCreacion' => now(),
         ]);
-    
+
         // Verificar que el usuario se ha creado correctamente
         if (!$usuario) {
             return redirect()->back()->with('error', 'Error al crear el usuario');
         }
-    
+
         // Verificar que el ID del usuario no es null
         if (is_null($usuario->idUsuario)) {
             return redirect()->back()->with('error', 'El ID del usuario es null');
         }
-    
+
         // Subir y guardar la imagen si existe
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -92,7 +92,7 @@ class EmpleadoController extends Controller
             $usuario->image = $imageName;
             $usuario->save();
         }
-    
+
         // Crear el empleado asociado
         $empleado = Empleado::create([
             'idUsuario' => $usuario->idUsuario, // Utilizar 'idUsuario' del usuario creado
@@ -104,22 +104,22 @@ class EmpleadoController extends Controller
             'fechaContratacion' => $request->fechaContratacion,
             'direccion' => $request->direccion,
             'especialidad' => $request->especialidad,
-            'descripcion'=> $request->descripcion,
+            'descripcion' => $request->descripcion,
             'idAutor' => $user->idUsuario, // Utilizar 'idUsuario' del modelo autenticado
             'fechaCreacion' => now(),
         ]);
-    
+
         // Verificar que el empleado se ha creado correctamente
         if (!$empleado) {
             return redirect()->back()->with('error', 'Error al crear el empleado');
         }
-    
+
         // Enviar el correo electrónico con la contraseña temporal
         Mail::to($usuario->email)->send(new \App\Mail\TemporaryPasswordMail($usuario, $temporaryPassword));
 
         // Redirigir con un mensaje de éxito
         return redirect()->route('admin.empleados.index')->with('mensaje', 'El registro fue realizado correctamente y se envió un correo electrónico al empleado.')->with('icono', 'success');
-    
+
     }
 
     // Mostrar el formulario para editar un empleado
@@ -167,8 +167,8 @@ class EmpleadoController extends Controller
             'idAutor' => $user->idUsuario
         ]);
 
-        return redirect()->route('admin.empleados.index') ->with('mensaje', 'Se actualizó el registro correctamente.')
-        ->with('icono', 'success');
+        return redirect()->route('admin.empleados.index')->with('mensaje', 'Se actualizó el registro correctamente.')
+            ->with('icono', 'success');
     }
 
     // Eliminación lógica de un empleado
@@ -179,22 +179,22 @@ class EmpleadoController extends Controller
         if (!$user) {
             return redirect()->route('login')->with('error', 'Usuario no autenticado');
         }
-    
+
         $empleado = Empleado::findOrFail($id);
-    
+
         // Actualizar la tabla empleados
         $empleado->update([
             'eliminado' => 0, // Marcando como eliminado
             'idAutor' => $user->idUsuario,
         ]);
-    
+
         // Actualizar la tabla usuarios
         $usuario = User::findOrFail($empleado->idUsuario);
         $usuario->update([
             'eliminado' => 0, // Marcando como eliminado
             'idAutor' => $user->idUsuario,
         ]);
-    
+
         return redirect()->route('admin.empleados.index')->with('mensaje', 'Empleado eliminado con éxito')->with('icono', 'success');
     }
 
@@ -210,68 +210,100 @@ class EmpleadoController extends Controller
     // Actualiza el perfil del usuario autenticado
     public function updateProfile(Request $request)
     {
-    $user = Auth::user();
-    $empleado = $user->empleado;
+        $user = Auth::user();
+        $empleado = $user->empleado;
 
-    // Validar los datos del request de forma básica
-    $request->validate([
-        'nombreUsuario' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:usuarios,email,' . $user->idUsuario . ',idUsuario',
-        'telefono' => 'nullable|string|max:15',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'nombre' => 'required|string|max:50',
-        'primerApellido' => 'required|string|max:50',
-        'segundoApellido' => 'nullable|string|max:50',
-        'fechaNacimiento' => 'required|date',
-        'genero' => 'required|in:Masculino,Femenino,Otro',
-        'fechaContratacion' => 'required|date',
-        'direccion' => 'nullable|string|max:50',
-        'especialidad' => 'required',
-        'descripcion' => 'nullable|string',
-        'password' => 'nullable|string|min:8|confirmed',
-    ]);
+        // Validar los datos del request de forma básica
+        $request->validate([
+            'nombreUsuario' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:usuarios,email,' . $user->idUsuario . ',idUsuario',
+            'telefono' => 'nullable|string|max:15',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'nombre' => 'required|string|max:50',
+            'primerApellido' => 'required|string|max:50',
+            'segundoApellido' => 'nullable|string|max:50',
+            'fechaNacimiento' => 'required|date',
+            'genero' => 'required|in:Masculino,Femenino,Otro',
+            'fechaContratacion' => 'required|date',
+            'direccion' => 'nullable|string|max:50',
+            'especialidad' => 'required',
+            'descripcion' => 'nullable|string',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
 
-    DB::beginTransaction();
+        DB::beginTransaction();
 
-    try {
-        $user->nombreUsuario = $request->nombreUsuario;
-        $user->email = $request->email;
-        $user->telefono = $request->telefono;
-        $user->idAutor = Auth::id();
+        try {
+            $user->nombreUsuario = $request->nombreUsuario;
+            $user->email = $request->email;
+            $user->telefono = $request->telefono;
+            $user->idAutor = Auth::id();
 
-        if ($request->hasFile('image')) {
-            if ($user->image) {
-                Storage::disk('public')->delete($user->image);
+            if ($request->hasFile('image')) {
+                if ($user->image) {
+                    Storage::disk('public')->delete($user->image);
+                }
+                $path = $request->file('image')->store('profile_images', 'public');
+                $user->image = $path;
             }
-            $path = $request->file('image')->store('profile_images', 'public');
-            $user->image = $path;
+
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+
+            $user->save();
+
+            $empleado->nombre = $request->nombre;
+            $empleado->primerApellido = $request->primerApellido;
+            $empleado->segundoApellido = $request->segundoApellido;
+            $empleado->fechaNacimiento = $request->fechaNacimiento;
+            $empleado->genero = $request->genero;
+            $empleado->fechaContratacion = $request->fechaContratacion;
+            $empleado->direccion = $request->direccion;
+            $empleado->especialidad = $request->especialidad;
+            $empleado->descripcion = $request->descripcion;
+            $empleado->idAutor = Auth::id();
+
+            $empleado->save();
+
+            DB::commit();
+
+            return redirect()->route('admin.empleados.profile')->with('success', 'Perfil actualizado con éxito.')->with('icono', 'success');
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Hubo un error al actualizar el perfil. Por favor, inténtalo nuevamente.');
+        }
+    }
+
+
+    //opciones adicionales
+    public function show($id)
+    {
+        $empleado = Empleado::with('usuario')->findOrFail($id);
+        return response()->json($empleado);
+    }
+
+    public function forceDestroy($id)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Usuario no autenticado');
         }
 
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-        }
+        $empleado = Empleado::findOrFail($id);
 
-        $user->save();
+        // Eliminar el usuario asociado
+        $usuario = User::findOrFail($empleado->idUsuario);
+        $usuario->delete();
 
-        $empleado->nombre = $request->nombre;
-        $empleado->primerApellido = $request->primerApellido;
-        $empleado->segundoApellido = $request->segundoApellido;
-        $empleado->fechaNacimiento = $request->fechaNacimiento;
-        $empleado->genero = $request->genero;
-        $empleado->fechaContratacion = $request->fechaContratacion;
-        $empleado->direccion = $request->direccion;
-        $empleado->especialidad = $request->especialidad;
-        $empleado->descripcion = $request->descripcion;
-        $empleado->idAutor = Auth::id();
+        // Eliminar el empleado
+        $empleado->delete();
 
-        $empleado->save();
-
-        DB::commit();
-
-        return redirect()->route('admin.empleados.profile')->with('success', 'Perfil actualizado con éxito.')->with('icono', 'success');
-    } catch (Exception $e) {
-        DB::rollBack();
-        return redirect()->back()->with('error', 'Hubo un error al actualizar el perfil. Por favor, inténtalo nuevamente.');
+        return redirect()->route('admin.empleados.index')->with('mensaje', 'Empleado eliminado permanentemente con éxito')->with('icono', 'success');
     }
-    }
+
+
+
+
 }

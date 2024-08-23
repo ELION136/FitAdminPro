@@ -63,7 +63,11 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/admin/entrenadores/{id}', [App\Http\Controllers\EntrenadorController::class, 'destroy'])->name('admin.entrenadores.destroy');
     Route::get('/admin/entrenadores/profile', [App\Http\Controllers\EntrenadorController::class, 'profile'])->name('admin.entrenadores.profile');
     Route::put('/admin/entrenadores/profile/update', [App\Http\Controllers\EntrenadorController::class, 'updateProfile'])->name('admin.entrenadores.updateProfile');
-    
+   // Route::get('/admin/entrenadores/{id}/show', [App\Http\Controllers\EntrenadorController::class, 'show'])->name('admin.entrenadores.show');
+    Route::delete('/admin/entrenadores/{id}/force', [App\Http\Controllers\EntrenadorController::class, 'forceDestroy'])->name('admin.entrenadores.forceDestroy');
+    Route::patch('/admin/entrenadores/{id}/restore', [App\Http\Controllers\EntrenadorController::class, 'restore'])->name('admin.entrenadores.restore');
+    Route::get('/admin/entrenadores/eliminados', [App\Http\Controllers\EntrenadorController::class, 'eliminados'])->name('admin.entrenadores.eliminados');
+    Route::get('admin/entrenadores/pdf', [App\Http\Controllers\EntrenadorController::class, 'exportPDF'])->name('admin.entrenadores.pdf');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -75,6 +79,13 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/admin/clientes/{id}', [App\Http\Controllers\ClienteController::class, 'destroy'])->name('admin.clientes.destroy');
     Route::get('/admin/clientes/profile', [App\Http\Controllers\ClienteController::class, 'profile'])->name('admin.clientes.profile');
     Route::put('/admin/clientes/profile/update', [App\Http\Controllers\ClienteController::class, 'updateProfile'])->name('admin.clientes.updateProfile');
+    Route::delete('/admin/clientes/{id}/force', [App\Http\Controllers\ClienteController::class, 'forceDestroy'])->name('admin.clientes.forceDestroy');
+    Route::patch('/admin/clientes/{id}/restore', [App\Http\Controllers\ClienteController::class, 'restore'])->name('admin.clientes.restore');
+    Route::get('/admin/clientes/eliminados', [App\Http\Controllers\ClienteController::class, 'eliminados'])->name('admin.clientes.eliminados');
+    Route::get('admin/clientes/pdf', [App\Http\Controllers\ClienteController::class, 'exportPDF'])->name('admin.clientes.pdf');
+
+
+
 });
 
 
@@ -102,10 +113,14 @@ Route::middleware(['auth'])->group(function () {
     
         //asistencias
         Route::get('/admin/asistencias', [App\Http\Controllers\AsistenciaController::class, 'index'])->name('admin.asistencias.index');
-        Route::post('/admin/asistencias/registrar-manual', [App\Http\Controllers\AsistenciaController::class, 'registrarManualmente'])->name('admin.asistencias.registrar-manual');
+        Route::post('/admin/asistencias/registrar', [App\Http\Controllers\AsistenciaController::class, 'registrar'])->name('admin.asistencias.registrar');
+        //Route::post('/admin/asistencias/registrar-salida', [App\Http\Controllers\AsistenciaController::class, 'registrarSalida'])->name('admin.asistencias.registrar-salida');
         Route::get('/admin/asistencias/estadisticas', [App\Http\Controllers\AsistenciaController::class, 'estadisticas'])->name('admin.asistencias.estadisticas');
-
-
+        Route::get('/admin/asistencias/{id}/edit', [App\Http\Controllers\AsistenciaController::class, 'edit'])->name('admin.asistencias.edit');
+        Route::delete('/admin/asistencias/{id}', [App\Http\Controllers\AsistenciaController::class, 'destroy'])->name('admin.asistencias.destroy');
+        
+        Route::put('admin/asistencias/{id}', [App\Http\Controllers\AsistenciaController::class, 'update'])->name('admin.asistencias.update');
+ 
     });
 
 

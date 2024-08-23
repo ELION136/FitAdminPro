@@ -50,9 +50,12 @@
                         data-bs-original-title="Añadir">
                         <i class="bi bi-clipboard-check"></i> Añadir un nuevo Cliente
                     </a>
-                    <a href="{{ route('admin.clientes.create') }}" class="btn btn-warning rounded-pill btn-wave"
+                    <a href="{{ route('admin.clientes.eliminados') }}" class="btn btn-warning rounded-pill btn-wave"
                         data-bs-original-title="Añadir">
                         <i class="bi bi-archive"></i> Habilitar
+                    </a>
+                    <a href="{{ route('admin.clientes.pdf') }}" class="btn btn-danger">
+                        <i class="fas fa-file-pdf"></i> Exportar PDF
                     </a>
                 </div>
                 <div class="card-body">
@@ -98,11 +101,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{ route('admin.clientes.edit', $cliente->idCliente) }}"
-                                                class="btn btn-sm btn-success btn-b" data-bs-toggle="tooltip" title=""
-                                                data-bs-original-title="Ver">
-                                                <i class="bi bi-search"></i>
-                                            </a>
+
                                             <a href="{{ route('admin.clientes.edit', $cliente->idCliente) }}"
                                                 class="btn btn-sm btn-info btn-b" data-bs-toggle="tooltip" title=""
                                                 data-bs-original-title="Editar">
@@ -110,25 +109,28 @@
                                             </a>
 
                                             <!--boton de habilitado y deshabilitado-->
-                                            <form action="{{ route('admin.clientes.destroy', $cliente->idCliente) }}"
+                                            <!-- Botón para deshabilitar (Eliminación lógica) -->
+                                            <form id="disable-form-{{ $cliente->idCliente }}"
+                                                action="{{ route('admin.clientes.destroy', $cliente->idCliente) }}"
                                                 method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-warning"
-                                                    data-bs-toggle="tooltip" title=""
-                                                    data-bs-original-title="Desabilitar">
+                                                <button type="button" class="btn btn-sm btn-warning"
+                                                    data-bs-toggle="tooltip" title="Deshabilitar"
+                                                    onclick="confirmDisable({{ $cliente->idCliente }})">
                                                     <i class="bi bi-folder-x"></i>
                                                 </button>
                                             </form>
 
-
-                                            <form action="{{ route('admin.clientes.destroy', $cliente->idCliente) }}"
+                                            <!-- Botón para eliminar permanentemente -->
+                                            <form id="force-delete-form-{{ $cliente->idCliente }}"
+                                                action="{{ route('admin.clientes.forceDestroy', $cliente->idCliente) }}"
                                                 method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger"
-                                                    data-bs-toggle="tooltip" title=""
-                                                    data-bs-original-title="Eliminar">
+                                                <button type="button" class="btn btn-sm btn-danger"
+                                                    data-bs-toggle="tooltip" title="Eliminar"
+                                                    onclick="confirmForceDelete({{ $cliente->idCliente }})">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </form>
@@ -144,4 +146,41 @@
         </div><!-- COL END -->
     </div>
     <!--End::row-1 -->
+
+    <script>
+        function confirmDisable(idCliente) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¡El cliente será deshabilitado y podrás restaurarlo más tarde!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, deshabilitarlo!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('disable-form-' + idCliente).submit();
+                }
+            });
+        }
+    
+        function confirmForceDelete(idCliente) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¡El cliente será eliminado permanentemente y no podrás restaurarlo!",
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminarlo!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('force-delete-form-' + idCliente).submit();
+                }
+            });
+        }
+    </script>
+    
 @endsection

@@ -51,8 +51,12 @@
                         data-bs-original-title="Añadir">
                         <i class="bi bi-clipboard-check"></i> Añadir un nuevo Empleado
                     </a>
-                    <a href=" " class="btn btn-warning rounded-pill btn-wave" data-bs-original-title="Añadir">
+                    <a href="{{ route('admin.entrenadores.eliminados') }}" class="btn btn-warning rounded-pill btn-wave"
+                        data-bs-original-title="Añadir">
                         <i class="bi bi-archive"></i> Habilitar
+                    </a>
+                    <a href="{{ route('admin.entrenadores.pdf') }}" class="btn btn-danger">
+                        <i class="fas fa-file-pdf"></i> Exportar PDF
                     </a>
                 </div>
                 <div class="card-body">
@@ -67,7 +71,7 @@
                                     <th><span>Género</span></th>
                                     <th><span>Edad</span></th>
                                     <th><span>Estado</span></th>
-                                    
+
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -97,13 +101,8 @@
                                                 <span class="text-danger">Inactivo</span>
                                             @endif
                                         </td>
-                                        
+
                                         <td>
-                                            <a href="{{ route('admin.entrenadores.edit', $entrenador->idEntrenador) }}"
-                                                class="btn btn-sm btn-success btn-b" data-bs-toggle="tooltip" title=""
-                                                data-bs-original-title="Ver">
-                                                <i class="bi bi-search"></i>
-                                            </a>
 
                                             <a href="{{ route('admin.entrenadores.edit', $entrenador->idEntrenador) }}"
                                                 class="btn btn-sm btn-info btn-b" data-bs-toggle="tooltip" title=""
@@ -113,19 +112,22 @@
 
 
                                             <!--boton de habilitado y deshabilitado-->
-                                            <form action="{{ route('admin.entrenadores.destroy', $entrenador->idEntrenador) }}"
+                                            <!-- Botón para deshabilitar (Eliminación lógica) -->
+                                            <form id="disable-form-{{ $entrenador->idEntrenador }}"
+                                                action="{{ route('admin.entrenadores.destroy', $entrenador->idEntrenador) }}"
                                                 method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-warning"
-                                                    data-bs-toggle="tooltip" title=""
-                                                    data-bs-original-title="Desabilitar">
+                                                <button type="button" class="btn btn-sm btn-warning"
+                                                    data-bs-toggle="tooltip" title="Deshabilitar"
+                                                    onclick="confirmDisable({{ $entrenador->idEntrenador }})">
                                                     <i class="bi bi-folder-x"></i>
                                                 </button>
                                             </form>
 
+                                            <!-- Botón para eliminar permanentemente -->
                                             <form id="delete-form-{{ $entrenador->idEntrenador }}"
-                                                action="{{ route('admin.entrenadores.destroy', $entrenador->idEntrenador) }}"
+                                                action="{{ route('admin.entrenadores.forceDestroy', $entrenador->idEntrenador) }}"
                                                 method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
@@ -148,11 +150,28 @@
     <!--End::row-1 -->
 
     <script>
+        function confirmDisable(idEntrenador) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¡El entrenador será deshabilitado y podrás restaurarlo más tarde!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, deshabilitarlo!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('disable-form-' + idEntrenador).submit();
+                }
+            });
+        }
+    
         function confirmDeletion(idEntrenador) {
             Swal.fire({
                 title: '¿Estás seguro?',
-                text: "¡No podrás revertir esto!",
-                icon: 'warning',
+                text: "¡El entrenador será eliminado permanentemente y no podrás restaurarlo!",
+                icon: 'error',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
@@ -165,4 +184,5 @@
             });
         }
     </script>
+    
 @endsection

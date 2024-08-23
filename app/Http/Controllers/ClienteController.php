@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Support\Facades\Mail;
 class ClienteController extends Controller 
@@ -280,6 +280,77 @@ class ClienteController extends Controller
         DB::rollBack();
         return redirect()->back()->with('error', 'Hubo un error al actualizar el perfil. Por favor, inténtalo nuevamente.');
     }
+    }
+
+
+    
+    public function forceDestroy($id)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Usuario no autenticado');
+        }
+
+        $cliente = Cliente::findOrFail($id);
+
+        // Eliminar el usuario asociado
+        $usuario = User::findOrFail($cliente->idUsuario);
+        $usuario->delete();
+
+        // Eliminar el empleado
+        $cliente->delete();
+
+        return redirect()->route('admin.clientes.index')->with('mensaje', 'Cliente eliminado permanentemente con éxito')->with('icono', 'success');
+    }
+
+
+    public function eliminados()
+    {
+        $eliminados = Cliente::with('usuario')->where('eliminado', 0)->get();
+        return view('admin.clientes.eliminados', compact('eliminados'));
+    }
+
+
+
+    public function restore($id)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Usuario no autenticado');
+        }
+
+        $cliente = Cliente::findOrFail($id);
+
+        // Cambiar el estado de 'eliminado' de 0 a 1
+        $cliente->update([
+            'eliminado' => 1,
+            'idAutor' => $user->idUsuario,
+        ]);
+
+        // Actualizar la tabla usuarios asociada
+        $usuario = User::findOrFail($cliente->idUsuario);
+        $usuario->update([
+            'eliminado' => 1,
+            'idAutor' => $user->idUsuario,
+        ]);
+
+        return redirect()->route('admin.clientes.index')->with('mensaje', 'Cliente restaurado con éxito')->with('icono', 'success');
+    }
+
+
+    public function exportPDF()
+    {
+        $clientes = Cliente::with('usuario')->where('eliminado', 1)->get();
+        $pdf = Pdf::loadView('admin.clientes.pdf', compact('clientes'));
+        
+        // Personaliza el PDF
+        $pdf->setPaper('a4', 'landscape');
+        $pdf->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+    
+        //return $pdf->download('entrenadores.pdf');
+        return $pdf->stream('clientes.pdf');
     }
 
 }

@@ -26,49 +26,14 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         
           // Crear Usuario Administrador
-        $adminId = DB::table('usuarios')->insertGetId([
-            'nombreUsuario' => 'admin',
-            'password' => Hash::make('adminpassword'), // Cambia esta contraseña
-            'email' => 'admin@gmail.com',
-            'rol' => 'Administrador',
-            'idAutor' => 1, // Referenciando a sí mismo
-            'fechaCreacion' => now(),
-            'eliminado' => 1,
-        ]);
-
-        // Crear Usuarios Empleados
-        $empleadoIds = [];
-        for ($i = 1; $i <= 2; $i++) {
-            $userId = DB::table('usuarios')->insertGetId([
-                'nombreUsuario' => 'entrenador'.$i,
-                'password' => Hash::make('entrenadorpassword'.$i), // Cambia esta contraseña
-                'email' => 'entrenador'.$i.'@gmail.com',
-                'rol' => 'Entrenador',
-                'idAutor' => 1, // El administrador es el autor
-                'fechaCreacion' => now(),
-                'eliminado' => 1,
-            ]);
-
-            $empleadoIds[] = DB::table('entrenadores')->insertGetId([
-                'idUsuario' => $userId,
-                'nombre' => 'Entrenador'.$i,
-                'primerApellido' => 'Apellido'.$i,
-                'fechaNacimiento' => '1980-01-01',
-                'especialidad' => 'Entrenamiento Personal',
-                'genero' => 'Masculino',
-                'fechaContratacion' => now(),
-                'idAutor' => 1, // El administrador es el autor
-                'fechaCreacion' => now(),
-                'eliminado' => 1,
-            ]);
-        }
+      
 
         // Crear Usuarios Clientes
-        for ($i = 1; $i <= 2; $i++) {
+        for ($i = 1; $i <= 4; $i++) {
             $userId = DB::table('usuarios')->insertGetId([
-                'nombreUsuario' => 'cliente'.$i,
-                'password' => Hash::make('clientepassword'.$i), // Cambia esta contraseña
-                'email' => 'cliente'.$i.'@example.com',
+                'nombreUsuario' => 'client'.$i,
+                'password' => Hash::make('clientpassword'.$i), // Cambia esta contraseña
+                'email' => 'client'.$i.'@gmail.com',
                 'rol' => 'Cliente',
                 'idAutor' => 1, // El administrador es el autor
                 'fechaCreacion' => now(),
@@ -77,10 +42,10 @@ class DatabaseSeeder extends Seeder
 
             DB::table('clientes')->insert([
                 'idUsuario' => $userId,
-                'nombre' => 'Cliente'.$i,
+                'nombre' => 'Client'.$i,
                 'primerApellido' => 'Apellido'.$i,
                 'fechaNacimiento' => '1990-01-01',
-                'genero' => 'Femenino',
+                'genero' => 'Masculino',
                 'idAutor' => 1, // El administrador es el autor
                 'fechaCreacion' => now(),
                 'eliminado' => 1,

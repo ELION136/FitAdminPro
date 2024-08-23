@@ -2,72 +2,118 @@
 
 @section('content')
 <div class="container mt-4">
-    <h1 class="mb-4">Gestión de Asistencias</h1>
-
-    <!-- Formulario de filtros -->
-    <form action="{{ route('admin.asistencias.index') }}" method="GET" class="mb-4">
-        <div class="row">
-            <div class="col-md-4">
-                <input type="date" name="fecha" class="form-control" value="{{ request('fecha') }}" placeholder="Filtrar por fecha">
-            </div>
-            <div class="col-md-4">
-                <input type="text" name="cliente" class="form-control" placeholder="Buscar por cliente" value="{{ request('cliente') }}">
-            </div>
-            <div class="col-md-4">
-                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+    <div class="container">
+        <h1 class="mb-4">Registro de Asistencia</h1>
+    
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <h2 id="reloj" class="display-4 font-weight-bold mb-2"></h2>
+                <p id="fecha" class="lead text-muted"></p>
             </div>
         </div>
-    </form>
-
-    <!-- Formulario para registro manual -->
-    <form action="{{ route('admin.asistencias.registrar-manual') }}" method="POST" class="mb-5">
-        @csrf
-        <div class="row">
-            <div class="col-md-3">
-                <input type="text" name="idCliente" class="form-control" placeholder="ID del Cliente" required>
+    
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
             </div>
-            <div class="col-md-3">
-                <input type="date" name="fecha" class="form-control" required>
+        @endif
+    
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
             </div>
-            <div class="col-md-3">
-                <input type="time" name="horaEntrada" class="form-control" required>
+        @endif
+    
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Registrar Asistencia</h5>
             </div>
-            <div class="col-md-3">
-                <input type="time" name="horaSalida" class="form-control" placeholder="Hora de Salida (Opcional)">
+            <div class="card-body">
+                <form action="{{ route('admin.asistencias.registrar') }}" method="POST">
+                    @csrf
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="nombreUsuario">Nombre de Usuario:</label>
+                            <input type="text" name="nombreUsuario" id="nombreUsuario" class="form-control" value="{{ old('nombreUsuario') }}" required>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 col-6 mx-auto">
+                            <button type="submit" name="accion" value="entrada" class="btn btn-info btn-wave">Registrar Entrada</button>  
+                            <button type="submit" name="accion" value="salida" class="btn btn-danger btn-wave">Registrar Salida</button>
+                    </div>
+                </form>
             </div>
         </div>
-        <div class="mt-3">
-            <button type="submit" class="btn btn-success">Registrar Asistencia</button>
-        </div>
-    </form>
-
-    <!-- Tabla de asistencias -->
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Cliente</th>
-                    <th>Fecha</th>
-                    <th>Hora Entrada</th>
-                    <th>Hora Salida</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($asistencias as $asistencia)
+        <!-- Tabla de asistencias -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Asistencias</h5>
+            </div>
+        
+            <table class="table table-hover"">
+                <thead>
                     <tr>
-                        <td>{{ $asistencia->cliente->nombre }}</td>
-                        <td>{{ $asistencia->fecha }}</td>
-                        <td>{{ $asistencia->horaEntrada }}</td>
-                        <td>{{ $asistencia->horaSalida ?? 'No registrada' }}</td>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Hora Entrada</th>
+                        <th>Hora Salida</th>
+                        <th>Acciones</th> <!-- Nueva columna para los botones de acción -->
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    @foreach($asistencias as $asistencia)
+                        <tr>
+                            <td>{{ $asistencia->cliente->nombre }}</td>
+                            <td>{{ $asistencia->fecha }}</td>
+                            <td>{{ $asistencia->horaEntrada }}</td>
+                            <td>{{ $asistencia->horaSalida ?? 'No registrada' }}</td>
+                            <td>
+                                <!-- Botón de Editar -->
+                                <a href="{{ route('admin.asistencias.edit', $asistencia->idAsistencia) }}" class="btn btn-sm btn-warning">
+                                    Editar
+                                </a>
+                                
+                                <!-- Botón de Eliminar -->
+                                <form action="{{ route('admin.asistencias.destroy', $asistencia->idAsistencia) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta asistencia?');">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        
+        </div>
 
-    <!-- Paginación -->
-    <div class="d-flex justify-content-center mt-4">
-        {{ $asistencias->links() }}
+        <!-- Paginación -->
+        <div class="d-flex justify-content-center mt-4">
+            {{ $asistencias->links() }}
+        </div>
     </div>
 </div>
+
+<script>
+    function actualizarReloj() {
+        var ahora = new Date();
+        var hora = ahora.getHours().toString().padStart(2, '0');
+        var minutos = ahora.getMinutes().toString().padStart(2, '0');
+        var segundos = ahora.getSeconds().toString().padStart(2, '0');
+        document.getElementById('reloj').textContent = hora + ":" + minutos + ":" + segundos;
+    }
+
+    function actualizarFecha() {
+        var ahora = new Date();
+        var opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        var fechaFormateada = ahora.toLocaleDateString('es-ES', opcionesFecha);
+        document.getElementById('fecha').textContent = fechaFormateada;
+    }
+    
+    setInterval(actualizarReloj, 1000);
+    actualizarReloj();
+    actualizarFecha();
+</script>
 @endsection

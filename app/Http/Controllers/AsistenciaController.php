@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Asistencia;
 use App\Models\Cliente;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -44,43 +45,6 @@ class AsistenciaController extends Controller
 
     }
 
-    public function registrar(Request $request)
-    {
-        $usuario = Auth::user();
-        $cliente = Cliente::where('idUsuario', $usuario->idUsuario)->first();
-
-        if (!$cliente) {
-            return redirect()->back()->with('error', 'No se encontró el perfil de cliente asociado.');
-        }
-
-        $ultimaAsistencia = Asistencia::where('idCliente', $cliente->idCliente)
-            ->where('fecha', today())
-            ->whereNull('horaSalida')
-            ->where('eliminado', 1)
-            ->first();
-
-        if ($ultimaAsistencia) {
-            // Registrar salida
-            $ultimaAsistencia->update([
-                'horaSalida' => now()->toTimeString(),
-                'idAutor' => $usuario->idUsuario
-            ]);
-            $mensaje = 'Salida registrada correctamente.';
-        } else {
-            // Registrar entrada
-            Asistencia::create([
-                'idCliente' => $cliente->idCliente,
-                'fecha' => today(),
-                'horaEntrada' => now()->toTimeString(),
-                'idAutor' => $usuario->idUsuario,
-                'eliminado' => 1
-            ]);
-            $mensaje = 'Entrada registrada correctamente.';
-        }
-
-        return redirect()->route('cliente.asistencias.asistencia')->with('message', $mensaje);
-
-    }
 
     public function reporte(Request $request)
     {
@@ -167,83 +131,145 @@ class AsistenciaController extends Controller
             ->orderBy('horaEntrada', 'desc')
             ->paginate(15);
 
-        return view('admin.asistencias.index', compact('asistencias'));
+        //return view('admin.asistencias.index', compact('asistencias'));
+        $fecha = Carbon::now()->toDateString();
+        $hora = Carbon::now()->toTimeString();
+        $usuarios = User::where('eliminado', 1)->get(); // Obtener usuarios activos
+        return view('admin.asistencias.index', compact('fecha', 'hora', 'usuarios', 'asistencias'));
     }
-
-    public function registrarManualmente(Request $request)
+    public function registrar(Request $request)
     {
         $request->validate([
-            'idCliente' => 'required|exists:clientes,idCliente',
-            'fecha' => 'required|date',
-            'horaEntrada' => 'required|date_format:H:i',
-            'horaSalida' => 'nullable|date_format:H:i|after:horaEntrada',
+            'nombreUsuario' => 'required|string|exists:usuarios,nombreUsuario',
         ]);
 
-        Asistencia::create([
-            'idCliente' => $request->idCliente,
-            'fecha' => $request->fecha,
-            'horaEntrada' => $request->horaEntrada,
-            'horaSalida' => $request->horaSalida,
-            'idAutor' => auth()->id(),
-            'eliminado' => 1
-        ]);
+        $usuario = User::where('nombreUsuario', $request->nombreUsuario)->first();
+        $cliente = Cliente::where('idUsuario', $usuario->idUsuario)->first();
 
-        return redirect()->back()->with('success', 'Asistencia registrada manualmente.');
+        if (!$cliente) {
+            return back()->with('error', 'Cliente no encontrado.');
+        }
+
+        $hoy = Carbon::now()->format('Y-m-d');
+        $asistencia = Asistencia::where('idCliente', $cliente->idCliente)
+            ->where('fecha', $hoy)
+            ->first();
+
+        if ($request->accion == 'entrada') {
+            if ($asistencia && $asistencia->horaEntrada && !$asistencia->horaSalida) {
+                return back()->with('error', 'Ya tienes una asistencia en curso.');
+            }
+
+            Asistencia::create([
+                'idCliente' => $cliente->idCliente,
+                'fecha' => $hoy,
+                'horaEntrada' => Carbon::now('America/La_Paz')->toTimeString(),
+                'idAutor' => auth()->id(),
+                'eliminado' => 1,
+            ]);
+
+            return back()->with('success', 'Entrada registrada exitosamente.');
+        }
+
+        if ($request->accion == 'salida') {
+            if (!$asistencia || ($asistencia && !$asistencia->horaEntrada)) {
+                return back()->with('error', 'Primero debes registrar una entrada.');
+            }
+
+            if ($asistencia->horaSalida) {
+                return back()->with('error', 'La salida ya ha sido registrada.');
+            }
+
+            $asistencia->update([
+                'horaSalida' => Carbon::now('America/La_Paz')->toTimeString(),
+                'idAutor' => auth()->id(),
+            ]);
+
+            return back()->with('success', 'Salida registrada exitosamente.');
+        }
+
+        return back()->with('error', 'Acción no válida.');
     }
 
-    public function estadisticas()
+
+    public function estadisticas(Request $request)
+{
+    // Obtener las fechas del filtro, o establecer valores predeterminados
+    $fechaInicio = $request->input('fecha_inicio', now()->subMonth()->format('Y-m-d'));
+    $fechaFin = $request->input('fecha_fin', now()->format('Y-m-d'));
+
+    // Consulta de asistencias totales
+    $totalAsistencias = Asistencia::where('eliminado', 1)
+        ->whereBetween('fecha', [$fechaInicio, $fechaFin])
+        ->count();
+
+    // Asistencias por día en el rango de fechas
+    $asistenciasPorDia = Asistencia::where('eliminado', 1)
+        ->whereBetween('fecha', [$fechaInicio, $fechaFin])
+        ->select(DB::raw('DATE(fecha) as dia'), DB::raw('count(*) as total'))
+        ->groupBy('dia')
+        ->orderBy('dia', 'desc')
+        ->take(7)
+        ->get();
+
+    // Clientes más frecuentes en el rango de fechas
+    $clientesMasFrecuentes = Cliente::withCount([
+        'asistencia' => function ($query) use ($fechaInicio, $fechaFin) {
+            $query->where('eliminado', 1)
+                ->whereBetween('fecha', [$fechaInicio, $fechaFin]);
+        }
+    ])
+    ->orderBy('asistencia_count', 'desc')
+    ->take(5)
+    ->get();
+
+    // Asistencias detalladas por cliente en el rango de fechas
+    $asistenciasFiltradas = Asistencia::where('eliminado', 1)
+        ->whereBetween('fecha', [$fechaInicio, $fechaFin])
+        ->with('cliente') // Asumiendo que existe una relación 'cliente' en el modelo Asistencia
+        ->get();
+
+    return view('admin.asistencias.estadisticas', compact('totalAsistencias', 'asistenciasPorDia', 'clientesMasFrecuentes', 'asistenciasFiltradas', 'fechaInicio', 'fechaFin'));
+}
+
+
+
+
+    public function edit($id)
+{
+    $asistencia = Asistencia::findOrFail($id);
+    return view('admin.asistencias.edit', compact('asistencia'));
+}
+
+public function update(Request $request, $id)
+{
+    $asistencia = Asistencia::findOrFail($id);
+
+    // Validación de los datos ingresados
+    $request->validate([
+        'fecha' => 'required|date',
+        'hora_entrada' => 'required|date_format:H:i',
+        'hora_salida' => 'nullable|date_format:H:i',
+        // Agregar aquí más reglas de validación según los campos de la tabla Asistencia
+    ]);
+
+    // Actualización de los datos de la asistencia
+    $asistencia->fecha = $request->input('fecha');
+    $asistencia->hora_entrada = $request->input('hora_entrada');
+    $asistencia->hora_salida = $request->input('hora_salida');
+    // Guardar otros campos si es necesario
+
+    $asistencia->save();
+
+    // Redireccionar con un mensaje de éxito
+    return redirect()->route('admin.asistencias.index')->with('success', 'Asistencia actualizada correctamente.');
+}
+    public function destroy($id)
     {
-        $totalAsistencias = Asistencia::where('eliminado', 1)->count();
-        $asistenciasPorDia = Asistencia::where('eliminado', 1)
-            ->select(DB::raw('DATE(fecha) as dia'), DB::raw('count(*) as total'))
-            ->groupBy('dia')
-            ->orderBy('dia', 'desc')
-            ->take(7)
-            ->get();
-
-        $clientesMasFrecuentes = Cliente::withCount(['asistencia' => function ($query) {
-                $query->where('eliminado', 1);
-            }])
-            ->orderBy('asistencia_count', 'desc')
-            ->take(5)
-            ->get();
-
-        return view('admin.asistencias.estadisticas', compact('totalAsistencias', 'asistenciasPorDia', 'clientesMasFrecuentes'));
+        $asistencia = Asistencia::findOrFail($id);
+        $asistencia->update(['eliminado' => 0]); // Marcando como eliminado, según tu lógica
+        return back()->with('success', 'Asistencia eliminada correctamente.');
     }
 
 
-
-    //en considedacion
-    /*
-    public function corregirAsistencia(Request $request, Asistencia $asistencia)
-    {
-        $this->authorize('update', $asistencia);
-
-        $request->validate([
-            'horaEntrada' => 'required|date_format:H:i',
-            'horaSalida' => 'nullable|date_format:H:i|after:horaEntrada',
-        ]);
-
-        $horaEntrada = Carbon::createFromFormat('Y-m-d H:i', $asistencia->fecha->format('Y-m-d') . ' ' . $request->horaEntrada);
-        $horaSalida = $request->horaSalida ? Carbon::createFromFormat('Y-m-d H:i', $asistencia->fecha->format('Y-m-d') . ' ' . $request->horaSalida) : null;
-
-        $duracion = $horaSalida ? $horaSalida->diffInHours($horaEntrada) : null;
-
-        $asistencia->update([
-            'horaEntrada' => $horaEntrada,
-            'horaSalida' => $horaSalida,
-            'duracion' => $duracion,
-        ]);
-
-        return redirect()->back()->with('message', 'Asistencia corregida correctamente.');
-    }
-
-    public function eliminarAsistencia(Asistencia $asistencia)
-    {
-        $this->authorize('delete', $asistencia);
-
-        $asistencia->delete();
-
-        return redirect()->back()->with('message', 'Asistencia eliminada correctamente.');
-    }*/
 }
