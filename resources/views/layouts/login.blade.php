@@ -53,10 +53,10 @@
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             padding: 2rem;
-            max-width: 400px;
+            max-width: 800px;
             width: 100%;
             margin: 20px;
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: rgba(22, 41, 75, 0.076);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -67,9 +67,9 @@
         }
 
         .form-control {
-            border-radius: 8px;
-            padding: 1.25rem;
-            font-size: 16px;
+            border-radius: 6px;
+            padding: 1rem;
+            font-size: 12px;
             background-color: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #ffffff;
@@ -89,7 +89,7 @@
             background-color: transparent;
             padding: 0 0.25rem;
             transition: all 0.2s;
-            color: #a0aec0;
+            color: #f4f5f7;
         }
 
         .form-control:focus + .form-label,

@@ -67,9 +67,9 @@
         }
 
         .form-control {
-            border-radius: 8px;
-            padding: 1.25rem;
-            font-size: 16px;
+            border-radius: 6px;
+            padding: 1rem;
+            font-size: 12px;
             background-color: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #ffffff;
@@ -89,7 +89,7 @@
             background-color: transparent;
             padding: 0 0.25rem;
             transition: all 0.2s;
-            color: #a0aec0;
+            color: #edf0f3;
         }
 
         .form-control:focus + .form-label,
@@ -137,11 +137,11 @@
         }
 
         .text-primary {
-            color: #83b4eb !important;
+            color: #7d96f1 !important;
         }
 
         .form-check-label, .text-muted {
-            color: #d9e7f8 !important;
+            color: #e3e8ee !important;
         }
 
         a {

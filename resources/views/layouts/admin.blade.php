@@ -822,7 +822,7 @@
                                         <path d="M0 0h24v24H0z" fill="none" />
                                     </svg>
                                     <span class="side-menu__label">Usuarios</span>
-                                    <i class="bi bi-chevron-right side-menu__angle"></i>
+                                    <i class="fe fe-chevron-right side-menu__angle"></i>
                                 </a>
                                 <ul class="slide-menu child1">
                                     <li class="slide side-menu__label1">
