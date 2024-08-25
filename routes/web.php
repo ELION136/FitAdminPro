@@ -118,7 +118,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/asistencias/estadisticas', [App\Http\Controllers\AsistenciaController::class, 'estadisticas'])->name('admin.asistencias.estadisticas');
         Route::get('/admin/asistencias/{id}/edit', [App\Http\Controllers\AsistenciaController::class, 'edit'])->name('admin.asistencias.edit');
         Route::delete('/admin/asistencias/{id}', [App\Http\Controllers\AsistenciaController::class, 'destroy'])->name('admin.asistencias.destroy');
-        
+        Route::get('/admin/autocomplete-clientes', [App\Http\Controllers\AsistenciaController::class, 'autocompleteClientes'])->name('admin.autocomplete.clientes');
         Route::put('admin/asistencias/{id}', [App\Http\Controllers\AsistenciaController::class, 'update'])->name('admin.asistencias.update');
  
     });

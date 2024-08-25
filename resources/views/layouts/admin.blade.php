@@ -55,7 +55,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.bootstrap5.min.css">
-
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <!-- Full Calendar CSS -->
     <link rel="stylesheet" href="{{ url('assets/libs/fullcalendar/main.min.css') }}">
@@ -64,6 +64,10 @@
 
     <link href="{{ asset('package/dist/sweetalert2.min.css') }}" rel="stylesheet">
     <script src="{{ asset('package/dist/sweetalert2.all.min.js') }}"></script>
+    
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    
+
 
 
 </head>
@@ -1075,8 +1079,10 @@
 
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
-        integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+
 
     @stack('scripts')
     <!-- Scroll To Top -->
@@ -1142,14 +1148,15 @@
     <script src="{{ url('assets/js/custom-switcher.min.js') }}"></script>
 
     <!-- Chartjs Chart JS -->
-    <script src="{{ url('assets/libs/chart.js/chart.min.js') }}"></script>
+    
+
 
     <!-- Fullcalendar JS -->
     <script src="{{ url('assets/libs/fullcalendar/main.min.js') }}"></script>
     <script src="{{ url('assets/js/fullcalendar.js') }}"></script>
 
     <!-- Imternal Chartjs JS -->
-    <script src="{{ url('assets/js/chartjs-charts.js') }}"></script>
+    
     
 
 

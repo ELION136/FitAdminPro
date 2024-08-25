@@ -140,44 +140,58 @@ class AsistenciaController extends Controller
     public function registrar(Request $request)
     {
         $request->validate([
-            'nombreUsuario' => 'required|string|exists:usuarios,nombreUsuario',
+            'nombreUsuario' => 'required|string',
+            'accion' => 'required|in:entrada,salida',
         ]);
 
+        // Buscar el usuario por nombreUsuario
         $usuario = User::where('nombreUsuario', $request->nombreUsuario)->first();
-        $cliente = Cliente::where('idUsuario', $usuario->idUsuario)->first();
 
+        if (!$usuario) {
+            return redirect()->back()->with('error', 'El usuario ingresado no existe.');
+        }
+
+        // Verificar si el usuario es un cliente
+        $cliente = Cliente::where('idUsuario', $usuario->idUsuario)->first();
         if (!$cliente) {
-            return back()->with('error', 'Cliente no encontrado.');
+            return redirect()->back()->with('error', 'El usuario ingresado no es un cliente.');
         }
 
         $hoy = Carbon::now()->format('Y-m-d');
         $asistencia = Asistencia::where('idCliente', $cliente->idCliente)
-            ->where('fecha', $hoy)
+            ->whereDate('fecha', $hoy)
             ->first();
 
         if ($request->accion == 'entrada') {
-            if ($asistencia && $asistencia->horaEntrada && !$asistencia->horaSalida) {
-                return back()->with('error', 'Ya tienes una asistencia en curso.');
+            if ($asistencia && $asistencia->horaEntrada) {
+                return redirect()->back()->with('error', 'Ya se ha registrado una entrada para este cliente hoy.');
             }
 
-            Asistencia::create([
-                'idCliente' => $cliente->idCliente,
-                'fecha' => $hoy,
-                'horaEntrada' => Carbon::now('America/La_Paz')->toTimeString(),
-                'idAutor' => auth()->id(),
-                'eliminado' => 1,
-            ]);
+            if ($asistencia) {
+                $asistencia->update([
+                    'horaEntrada' => Carbon::now('America/La_Paz')->toTimeString(),
+                    'idAutor' => auth()->id(),
+                ]);
+            } else {
+                Asistencia::create([
+                    'idCliente' => $cliente->idCliente,
+                    'fecha' => $hoy,
+                    'horaEntrada' => Carbon::now('America/La_Paz')->toTimeString(),
+                    'idAutor' => auth()->id(),
+                    'eliminado' => 1,
+                ]);
+            }
 
             return back()->with('success', 'Entrada registrada exitosamente.');
         }
 
         if ($request->accion == 'salida') {
-            if (!$asistencia || ($asistencia && !$asistencia->horaEntrada)) {
-                return back()->with('error', 'Primero debes registrar una entrada.');
+            if (!$asistencia || !$asistencia->horaEntrada) {
+                return back()->with('error', 'No se puede registrar la salida sin una entrada previa.');
             }
 
             if ($asistencia->horaSalida) {
-                return back()->with('error', 'La salida ya ha sido registrada.');
+                return back()->with('error', 'Ya se ha registrado una salida para este cliente hoy.');
             }
 
             $asistencia->update([
@@ -190,80 +204,97 @@ class AsistenciaController extends Controller
 
         return back()->with('error', 'Acción no válida.');
     }
+    public function autocompleteClientes(Request $request)
+    {
+        $term = $request->get('term');
 
+        $clientes = Cliente::whereHas('usuario', function ($query) use ($term) {
+            $query->where('nombreUsuario', 'LIKE', '%' . $term . '%')
+                ->where('eliminado', 1);
+        })->with('usuario')
+            ->get()
+            ->map(function ($cliente) {
+                return [
+                    'value' => $cliente->usuario->nombreUsuario,
+                    'label' => $cliente->usuario->nombreUsuario . ' - ' . $cliente->nombre
+                ];
+            });
+
+        return response()->json($clientes);
+    }
 
     public function estadisticas(Request $request)
-{
-    // Obtener las fechas del filtro, o establecer valores predeterminados
-    $fechaInicio = $request->input('fecha_inicio', now()->subMonth()->format('Y-m-d'));
-    $fechaFin = $request->input('fecha_fin', now()->format('Y-m-d'));
+    {
+        // Obtener las fechas del filtro, o establecer valores predeterminados
+        $fechaInicio = $request->input('fecha_inicio', now()->subMonth()->format('Y-m-d'));
+        $fechaFin = $request->input('fecha_fin', now()->format('Y-m-d'));
 
-    // Consulta de asistencias totales
-    $totalAsistencias = Asistencia::where('eliminado', 1)
-        ->whereBetween('fecha', [$fechaInicio, $fechaFin])
-        ->count();
+        // Consulta de asistencias totales
+        $totalAsistencias = Asistencia::where('eliminado', 1)
+            ->whereBetween('fecha', [$fechaInicio, $fechaFin])
+            ->count();
 
-    // Asistencias por día en el rango de fechas
-    $asistenciasPorDia = Asistencia::where('eliminado', 1)
-        ->whereBetween('fecha', [$fechaInicio, $fechaFin])
-        ->select(DB::raw('DATE(fecha) as dia'), DB::raw('count(*) as total'))
-        ->groupBy('dia')
-        ->orderBy('dia', 'desc')
-        ->take(7)
-        ->get();
+        // Asistencias por día en el rango de fechas
+        $asistenciasPorDia = Asistencia::where('eliminado', 1)
+            ->whereBetween('fecha', [$fechaInicio, $fechaFin])
+            ->select(DB::raw('DATE(fecha) as dia'), DB::raw('count(*) as total'))
+            ->groupBy('dia')
+            ->orderBy('dia', 'desc')
+            ->take(7)
+            ->get();
 
-    // Clientes más frecuentes en el rango de fechas
-    $clientesMasFrecuentes = Cliente::withCount([
-        'asistencia' => function ($query) use ($fechaInicio, $fechaFin) {
-            $query->where('eliminado', 1)
-                ->whereBetween('fecha', [$fechaInicio, $fechaFin]);
-        }
-    ])
-    ->orderBy('asistencia_count', 'desc')
-    ->take(5)
-    ->get();
+        // Clientes más frecuentes en el rango de fechas
+        $clientesMasFrecuentes = Cliente::withCount([
+            'asistencia' => function ($query) use ($fechaInicio, $fechaFin) {
+                $query->where('eliminado', 1)
+                    ->whereBetween('fecha', [$fechaInicio, $fechaFin]);
+            }
+        ])
+            ->orderBy('asistencia_count', 'desc')
+            ->take(5)
+            ->get();
 
-    // Asistencias detalladas por cliente en el rango de fechas
-    $asistenciasFiltradas = Asistencia::where('eliminado', 1)
-        ->whereBetween('fecha', [$fechaInicio, $fechaFin])
-        ->with('cliente') // Asumiendo que existe una relación 'cliente' en el modelo Asistencia
-        ->get();
+        // Asistencias detalladas por cliente en el rango de fechas
+        $asistenciasFiltradas = Asistencia::where('eliminado', 1)
+            ->whereBetween('fecha', [$fechaInicio, $fechaFin])
+            ->with('cliente') // Asumiendo que existe una relación 'cliente' en el modelo Asistencia
+            ->get();
 
-    return view('admin.asistencias.estadisticas', compact('totalAsistencias', 'asistenciasPorDia', 'clientesMasFrecuentes', 'asistenciasFiltradas', 'fechaInicio', 'fechaFin'));
-}
+        return view('admin.asistencias.estadisticas', compact('totalAsistencias', 'asistenciasPorDia', 'clientesMasFrecuentes', 'asistenciasFiltradas', 'fechaInicio', 'fechaFin'));
+    }
 
 
 
 
     public function edit($id)
-{
-    $asistencia = Asistencia::findOrFail($id);
-    return view('admin.asistencias.edit', compact('asistencia'));
-}
+    {
+        $asistencia = Asistencia::findOrFail($id);
+        return view('admin.asistencias.edit', compact('asistencia'));
+    }
 
-public function update(Request $request, $id)
-{
-    $asistencia = Asistencia::findOrFail($id);
+    public function update(Request $request, $id)
+    {
+        $asistencia = Asistencia::findOrFail($id);
 
-    // Validación de los datos ingresados
-    $request->validate([
-        'fecha' => 'required|date',
-        'hora_entrada' => 'required|date_format:H:i',
-        'hora_salida' => 'nullable|date_format:H:i',
-        // Agregar aquí más reglas de validación según los campos de la tabla Asistencia
-    ]);
+        // Validación de los datos ingresados
+        $request->validate([
+            'fecha' => 'required|date',
+            'hora_entrada' => 'required|date_format:H:i',
+            'hora_salida' => 'nullable|date_format:H:i',
+            // Agregar aquí más reglas de validación según los campos de la tabla Asistencia
+        ]);
 
-    // Actualización de los datos de la asistencia
-    $asistencia->fecha = $request->input('fecha');
-    $asistencia->hora_entrada = $request->input('hora_entrada');
-    $asistencia->hora_salida = $request->input('hora_salida');
-    // Guardar otros campos si es necesario
+        // Actualización de los datos de la asistencia
+        $asistencia->fecha = $request->input('fecha');
+        $asistencia->hora_entrada = $request->input('hora_entrada');
+        $asistencia->hora_salida = $request->input('hora_salida');
+        // Guardar otros campos si es necesario
 
-    $asistencia->save();
+        $asistencia->save();
 
-    // Redireccionar con un mensaje de éxito
-    return redirect()->route('admin.asistencias.index')->with('success', 'Asistencia actualizada correctamente.');
-}
+        // Redireccionar con un mensaje de éxito
+        return redirect()->route('admin.asistencias.index')->with('success', 'Asistencia actualizada correctamente.');
+    }
     public function destroy($id)
     {
         $asistencia = Asistencia::findOrFail($id);

@@ -11,17 +11,30 @@
                 <p id="fecha" class="lead text-muted"></p>
             </div>
         </div>
-    
+
+        <!-- Mensajes de éxito y error usando SweetAlert -->
         @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            </script>
         @endif
     
         @if(session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '{{ session('error') }}',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            </script>
         @endif
     
         <div class="card">
@@ -34,7 +47,7 @@
                     <div class="form-row">
                         <div class="form-group col-md-12">
                             <label for="nombreUsuario">Nombre de Usuario:</label>
-                            <input type="text" name="nombreUsuario" id="nombreUsuario" class="form-control" value="{{ old('nombreUsuario') }}" required>
+                            <input type="text" name="nombreUsuario" id="nombreUsuario" class="form-control" required>
                         </div>
                     </div>
                     <div class="d-grid gap-2 col-6 mx-auto">
@@ -50,7 +63,7 @@
                 <h5 class="card-title mb-0">Asistencias</h5>
             </div>
         
-            <table class="table table-hover"">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Cliente</th>
@@ -73,14 +86,8 @@
                                     Editar
                                 </a>
                                 
-                                <!-- Botón de Eliminar -->
-                                <form action="{{ route('admin.asistencias.destroy', $asistencia->idAsistencia) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta asistencia?');">
-                                        Eliminar
-                                    </button>
-                                </form>
+                                <!-- Botón de Eliminar con SweetAlert -->
+                                <button class="btn btn-sm btn-danger" onclick="confirmDelete('{{ route('admin.asistencias.destroy', $asistencia->idAsistencia) }}')">Eliminar</button>
                             </td>
                         </tr>
                     @endforeach
@@ -96,6 +103,8 @@
     </div>
 </div>
 
+<!-- Incluir jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function actualizarReloj() {
         var ahora = new Date();
@@ -116,4 +125,49 @@
     actualizarReloj();
     actualizarFecha();
 </script>
+
+<!-- Script de autocompletar -->
+<script>
+    $(document).ready(function() {
+    $("#nombreUsuario").autocomplete({
+        source: function(request, response) {
+            $.ajax({
+                url: "{{ route('admin.autocomplete.clientes') }}",
+                dataType: "json",
+                data: {
+                    term: request.term
+                },
+                success: function(data) {
+                    response(data);
+                }
+            });
+        },
+        minLength: 2,
+        select: function(event, ui) {
+            $("#nombreUsuario").val(ui.item.value);
+            return false;
+        }
+    });
+});
+
+// Función para confirmar eliminación usando SweetAlert
+function confirmDelete(url) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¡Esta acción no se puede deshacer!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Si se confirma, redirigir a la URL de eliminación
+            window.location.href = url;
+        }
+    });
+}
+</script>
+
 @endsection
