@@ -17,58 +17,28 @@
     <!-- Favicon -->
     <link rel="icon" href="{{ url('assets/images/brand-logos/toggle-logo2.png') }}" type="image/x-icon">
 
-    <!-- Choices JS -->
-    <script src="{{ url('assets/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script>
-
-    <!-- Main Theme Js -->
-    <script src="{{ url('assets/js/main.js') }}"></script>
-
-    <!-- Bootstrap Css -->
+    <!-- CSS Libraries -->
     <link id="style" href="{{ url('assets/libs/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-
-    <!-- Style Css -->
     <link href="{{ url('assets/css/styles.min.css') }}" rel="stylesheet">
-
-    <!-- Icons Css -->
     <link href="{{ url('assets/css/icons.css') }}" rel="stylesheet">
-
-    <!-- Node Waves Css -->
     <link href="{{ url('assets/libs/node-waves/waves.min.css') }}" rel="stylesheet">
-
-    <!-- Simplebar Css -->
     <link href="{{ url('assets/libs/simplebar/simplebar.min.css') }}" rel="stylesheet">
-
-    <!-- Color Picker Css -->
     <link rel="stylesheet" href="{{ url('assets/libs/flatpickr/flatpickr.min.css') }}">
     <link rel="stylesheet" href="{{ url('assets/libs/@simonwep/pickr/themes/nano.min.css') }}">
-
-    <!-- Choices Css -->
     <link rel="stylesheet" href="{{ url('assets/libs/choices.js/public/assets/styles/choices.min.css') }}">
-
-    <!-- Jsvector Maps -->
     <link rel="stylesheet" href="{{ url('assets/libs/jsvectormap/css/jsvectormap.min.css') }}">
-
-
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.bootstrap5.min.css">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
-    <!-- Full Calendar CSS -->
+    
     <link rel="stylesheet" href="{{ url('assets/libs/fullcalendar/main.min.css') }}">
-
-    <!--<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>-->
-
     <link href="{{ asset('package/dist/sweetalert2.min.css') }}" rel="stylesheet">
     <script src="{{ asset('package/dist/sweetalert2.all.min.js') }}"></script>
-    
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
-    
-
-
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+   
 
 </head>
 
@@ -549,7 +519,6 @@
     </div>
     <!-- End Switcher -->
 
-
     <!-- Loader -->
     <div id="loader">
         <img src="{{ url('assets/images/media/loader.svg') }}" alt="">
@@ -602,29 +571,7 @@
                 <!-- Start::header-content-right -->
                 <div class="header-content-right">
 
-                    <div class="header-element Search-element d-block d-lg-none">
-                        <!-- Start::header-link|dropdown-toggle -->
-                        <a href="javascript:void(0);" class="header-link dropdown-toggle"
-                            data-bs-auto-close="outside" data-bs-toggle="dropdown">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"
-                                class="header-link-icon">
-                                <path
-                                    d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
-                            </svg>
-                        </a>
-                        <!-- End::header-link|dropdown-toggle -->
-                        <ul class="main-header-dropdown dropdown-menu dropdown-menu-end Search-element-dropdown"
-                            data-popper-placement="none">
-                            <li>
-                                <div class="input-group w-100 p-2">
-                                    <input type="text" class="form-control" placeholder="Search....">
-                                    <div class="btn btn-primary">
-                                        <i class="fa fa-search" aria-hidden="true"></i>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
+                    
 
 
                     <!-- Start::header-element -->
@@ -918,10 +865,16 @@
                                         <a href="javascript:void(0);">Asistencias</a>
                                     </li>
                                     <li class="slide">
-                                        <a href="{{route('admin.asistencias.index')}}" class="side-menu__item">Registro</a>
+                                        <a href="{{ route('admin.asistencias.cliente') }}"
+                                            class="side-menu__item">Registrar</a>
                                     </li>
                                     <li class="slide">
-                                        <a href="{{route('admin.asistencias.estadisticas')}}" class="side-menu__item">Estadisticas</a>
+                                        <a href="{{ route('admin.asistencias.index') }}"
+                                            class="side-menu__item">Asistencias</a>
+                                    </li>
+                                    <li class="slide">
+                                        <a href="{{ route('admin.asistencias.estadisticas') }}"
+                                            class="side-menu__item">Estadisticas</a>
                                     </li>
                                 </ul>
                             </li>
@@ -1016,10 +969,12 @@
                                         <a href="javascript:void(0);">Mis Asistencias</a>
                                     </li>
                                     <li class="slide">
-                                        <a href="{{route('cliente.asistencias.asistencia')}}" class="side-menu__item">Registrar</a>
+                                        <a href="{{ route('cliente.asistencias.asistencia') }}"
+                                            class="side-menu__item">Registrar</a>
                                     </li>
                                     <li class="slide">
-                                        <a href="{{route('cliente.asistencias.reporte-asistencia')}}" class="side-menu__item">Mi histarial</a>
+                                        <a href="{{ route('cliente.asistencias.reporte-asistencia') }}"
+                                            class="side-menu__item">Mi histarial</a>
                                     </li>
                                 </ul>
                             </li>
@@ -1078,91 +1033,44 @@
         <!-- Footer End -->
 
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
-
-
-    @stack('scripts')
     <!-- Scroll To Top -->
     <div class="scrollToTop">
         <span class="arrow"><i class="las la-angle-double-up"></i></span>
     </div>
     <div id="responsive-overlay"></div>
-    <!-- Scroll To Top -->
-
-    <!-- Popper JS -->
+   
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
     <script src="{{ url('assets/libs/@popperjs/core/umd/popper.min.js') }}"></script>
-
-    <!-- Bootstrap JS -->
     <script src="{{ url('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
-    <!-- Defaultmenu JS -->
     <script src="{{ url('assets/js/defaultmenu.min.js') }}"></script>
-
-    <!-- Node Waves JS-->
     <script src="{{ url('assets/libs/node-waves/waves.min.js') }}"></script>
-
-    <!-- Sticky JS -->
     <script src="{{ url('assets/js/sticky.js') }}"></script>
-
-    <!-- Simplebar JS -->
     <script src="{{ url('assets/libs/simplebar/simplebar.min.js') }}"></script>
     <script src="{{ url('assets/js/simplebar.js') }}"></script>
-
-    <!-- Color Picker JS -->
     <script src="{{ url('assets/libs/@simonwep/pickr/pickr.es5.min.js') }}"></script>
-
-
-    <!-- Apex Charts JS -->
     <script src="{{ url('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
-
-    <!-- JSVector Maps JS -->
     <script src="{{ url('assets/libs/jsvectormap/js/jsvectormap.min.js') }}"></script>
-
-    <!-- JSVector Maps MapsJS -->
     <script src="{{ url('assets/libs/jsvectormap/maps/world-merc.js') }}"></script>
     <script src="{{ url('assets/js/us-merc-en.js') }}"></script>
-
-    <!-- Chartjs Chart JS -->
-
-
-
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.6/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <!-- Internal Datatables JS -->
     <script src="{{ url('assets/js/datatables.js') }}"></script>
-
-    <!-- Custom JS -->
     <script src="{{ url('assets/js/custom.js') }}"></script>
-
-    <!-- Custom-Switcher JS -->
     <script src="{{ url('assets/js/custom-switcher.min.js') }}"></script>
-
-    <!-- Chartjs Chart JS -->
-    
-
-
-    <!-- Fullcalendar JS -->
     <script src="{{ url('assets/libs/fullcalendar/main.min.js') }}"></script>
     <script src="{{ url('assets/js/fullcalendar.js') }}"></script>
-
-    <!-- Imternal Chartjs JS -->
-    
-    
-
-
-
-
-
+   
+    <script src="{{ url('assets/js/main.js') }}"></script>
+    @stack('scripts')
 </body>
 
 </html>

@@ -1,173 +1,167 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mt-4">
-    <div class="container">
-        <h1 class="mb-4">Registro de Asistencia</h1>
-    
-        <div class="card mb-4">
-            <div class="card-body text-center">
-                <h2 id="reloj" class="display-4 font-weight-bold mb-2"></h2>
-                <p id="fecha" class="lead text-muted"></p>
-            </div>
+    <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
+        <div class="my-auto">
+            <h5 class="page-title fs-21 mb-1">Asistencias</h5>
+            <nav>
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a>Incio</a></li><i class="bi bi-three-dots-vertical"></i>
+                    <li aria-current="page">Asistencias</li>
+                </ol>
+            </nav>
         </div>
+        <div class="d-flex my-xl-auto right-content align-items-center">
 
-        <!-- Mensajes de éxito y error usando SweetAlert -->
-        @if(session('success'))
-            <script>
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Éxito!',
-                    text: '{{ session('success') }}',
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-            </script>
-        @endif
-    
-        @if(session('error'))
-            <script>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: '{{ session('error') }}',
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-            </script>
-        @endif
-    
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Registrar Asistencia</h5>
+            <div class="mb-xl-0">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuDate"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        14 Aug 2019
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuDate">
+                        <li><a class="dropdown-item" href="javascript:void(0);">2015</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0);">2016</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0);">2017</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0);">2018</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="card-body">
-                <form action="{{ route('admin.asistencias.registrar') }}" method="POST">
-                    @csrf
-                    <div class="form-row">
-                        <div class="form-group col-md-12">
-                            <label for="nombreUsuario">Nombre de Usuario:</label>
-                            <input type="text" name="nombreUsuario" id="nombreUsuario" class="form-control" required>
-                        </div>
-                    </div>
-                    <div class="d-grid gap-2 col-6 mx-auto">
-                            <button type="submit" name="accion" value="entrada" class="btn btn-info btn-wave">Registrar Entrada</button>  
-                            <button type="submit" name="accion" value="salida" class="btn btn-danger btn-wave">Registrar Salida</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <!-- Tabla de asistencias -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Asistencias</h5>
-            </div>
-        
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Cliente</th>
-                        <th>Fecha</th>
-                        <th>Hora Entrada</th>
-                        <th>Hora Salida</th>
-                        <th>Acciones</th> <!-- Nueva columna para los botones de acción -->
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($asistencias as $asistencia)
-                        <tr>
-                            <td>{{ $asistencia->cliente->nombre }}</td>
-                            <td>{{ $asistencia->fecha }}</td>
-                            <td>{{ $asistencia->horaEntrada }}</td>
-                            <td>{{ $asistencia->horaSalida ?? 'No registrada' }}</td>
-                            <td>
-                                <!-- Botón de Editar -->
-                                <a href="{{ route('admin.asistencias.edit', $asistencia->idAsistencia) }}" class="btn btn-sm btn-warning">
-                                    Editar
-                                </a>
-                                
-                                <!-- Botón de Eliminar con SweetAlert -->
-                                <button class="btn btn-sm btn-danger" onclick="confirmDelete('{{ route('admin.asistencias.destroy', $asistencia->idAsistencia) }}')">Eliminar</button>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        
-        </div>
-
-        <!-- Paginación -->
-        <div class="d-flex justify-content-center mt-4">
-            {{ $asistencias->links() }}
         </div>
     </div>
-</div>
+    <div class="container mt-4">
+        <div class="container">
 
-<!-- Incluir jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    function actualizarReloj() {
-        var ahora = new Date();
-        var hora = ahora.getHours().toString().padStart(2, '0');
-        var minutos = ahora.getMinutes().toString().padStart(2, '0');
-        var segundos = ahora.getSeconds().toString().padStart(2, '0');
-        document.getElementById('reloj').textContent = hora + ":" + minutos + ":" + segundos;
-    }
 
-    function actualizarFecha() {
-        var ahora = new Date();
-        var opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        var fechaFormateada = ahora.toLocaleDateString('es-ES', opcionesFecha);
-        document.getElementById('fecha').textContent = fechaFormateada;
-    }
-    
-    setInterval(actualizarReloj, 1000);
-    actualizarReloj();
-    actualizarFecha();
-</script>
 
-<!-- Script de autocompletar -->
-<script>
-    $(document).ready(function() {
-    $("#nombreUsuario").autocomplete({
-        source: function(request, response) {
-            $.ajax({
-                url: "{{ route('admin.autocomplete.clientes') }}",
-                dataType: "json",
-                data: {
-                    term: request.term
-                },
-                success: function(data) {
-                    response(data);
-                }
-            });
-        },
-        minLength: 2,
-        select: function(event, ui) {
-            $("#nombreUsuario").val(ui.item.value);
-            return false;
-        }
-    });
-});
 
-// Función para confirmar eliminación usando SweetAlert
-function confirmDelete(url) {
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: "¡Esta acción no se puede deshacer!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Si se confirma, redirigir a la URL de eliminación
-            window.location.href = url;
-        }
-    });
-}
-</script>
+            <!-- Mensajes de éxito y error usando SweetAlert -->
+            @if (session('success'))
+                <script>
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: '{{ session('success') }}',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                </script>
+            @endif
 
+            @if (session('error'))
+                <script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: '{{ session('error') }}',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                </script>
+            @endif
+
+            <!-- Tabla de asistencias -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Asistencias</h5>
+                </div>
+
+                <div class="card-body">
+                    <table class="table table-bordered text-nowrap w-100" id="miTabla">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Fecha</th>
+                                <th>Hora Entrada</th>
+                                <th>Hora Salida</th>
+                                <th>Acciones</th> <!-- Nueva columna para los botones de acción -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($asistencias as $asistencia)
+                                <tr>
+                                    <td>{{ $asistencia->cliente->nombre }}</td>
+                                    <td>{{ $asistencia->fecha }}</td>
+                                    <td>{{ $asistencia->horaEntrada }}</td>
+                                    <td>{{ $asistencia->horaSalida ?? 'No registrada' }}</td>
+                                    <td>
+                                        <!-- Botón de Editar -->
+                                        <a href="{{ route('admin.asistencias.edit', $asistencia->idAsistencia) }}"
+                                            class="btn btn-sm btn-warning">
+                                            Editar
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- Paginación -->
+            <div class="d-flex justify-content-center mt-4">
+                {{ $asistencias->links() }}
+            </div>
+        </div>
+    </div>
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#miTabla').DataTable({
+                dom: 'Bfrtip',
+                buttons: [{
+                        extend: 'copyHtml5',
+                        text: '<i class="fas fa-copy"></i> Copiar',
+                        className: 'btn btn-primary'
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fas fa-file-excel"></i> Excel',
+                        className: 'btn btn-success'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fas fa-file-pdf"></i> PDF',
+                        className: 'btn btn-danger'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print"></i> Imprimir',
+                        className: 'btn btn-info'
+                    }
+                ],
+                language: {
+                    decimal: "",
+                    emptyTable: "No hay datos disponibles en la tabla",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                    infoEmpty: "Mostrando 0 a 0 de 0 entradas",
+                    infoFiltered: "(filtrado de _MAX_ entradas totales)",
+                    infoPostFix: "",
+                    thousands: ",",
+                    lengthMenu: "Mostrar _MENU_ entradas",
+                    loadingRecords: "Cargando...",
+                    processing: "Procesando...",
+                    search: "Buscar:",
+                    zeroRecords: "No se encontraron registros coincidentes",
+                    paginate: {
+                        first: "Primero",
+                        last: "Último",
+                        next: "Siguiente",
+                        previous: "Anterior"
+                    },
+                    aria: {
+                        sortAscending: ": activar para ordenar la columna de manera ascendente",
+                        sortDescending: ": activar para ordenar la columna de manera descendente"
+                    }
+                },
+                lengthMenu: [
+                    [10, 25, 50, 100],
+                    [10, 25, 50, 100]
+                ]
+            });
+        });
+    </script>
+@endpush

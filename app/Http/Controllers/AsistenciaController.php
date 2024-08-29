@@ -116,6 +116,22 @@ class AsistenciaController extends Controller
         $query = Asistencia::with('cliente')
             ->where('eliminado', 1);
 
+
+            $asistencias = $query->orderBy('fecha', 'desc')
+            ->orderBy('horaEntrada', 'desc')
+            ->paginate(15);
+        
+        $usuarios = User::where('eliminado', 1)->get(); // Obtener usuarios activos
+        return view('admin.asistencias.index', compact('usuarios', 'asistencias'));
+    }
+
+
+
+    public function registro(Request $request)
+    {
+        $query = Asistencia::with('cliente')
+            ->where('eliminado', 1);
+
         // Filtros
         if ($request->has('fecha')) {
             $query->whereDate('fecha', $request->fecha);
@@ -135,7 +151,7 @@ class AsistenciaController extends Controller
         $fecha = Carbon::now()->toDateString();
         $hora = Carbon::now()->toTimeString();
         $usuarios = User::where('eliminado', 1)->get(); // Obtener usuarios activos
-        return view('admin.asistencias.index', compact('fecha', 'hora', 'usuarios', 'asistencias'));
+        return view('admin.asistencias.registrar', compact('fecha', 'hora', 'usuarios', 'asistencias'));
     }
     public function registrar(Request $request)
     {

@@ -55,7 +55,7 @@
                         data-bs-original-title="Añadir">
                         <i class="bi bi-archive"></i> Habilitar
                     </a>
-                    <a href="{{ route('admin.entrenadores.pdf') }}" class="btn btn-danger">
+                    <a href="{{ route('admin.entrenadores.pdf') }}" class="btn btn-danger rounded-pill btn-wave">
                         <i class="fas fa-file-pdf"></i> Exportar PDF
                     </a>
                 </div>
