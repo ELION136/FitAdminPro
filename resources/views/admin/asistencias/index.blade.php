@@ -112,6 +112,9 @@
         $(document).ready(function() {
             $('#miTabla').DataTable({
                 dom: 'Bfrtip',
+                responsive: true, // Para asegurar que la tabla sea responsive
+                lengthMenu: [5,10, 25, 50, 75, 100], // Opción para seleccionar la cantidad de registros por página
+                pageLength: 5,
                 buttons: [{
                         extend: 'copyHtml5',
                         text: '<i class="fas fa-copy"></i> Copiar',
@@ -134,6 +137,7 @@
                     }
                 ],
                 language: {
+                    lengthMenu: "Mostrar _MENU_ registros por página",
                     decimal: "",
                     emptyTable: "No hay datos disponibles en la tabla",
                     info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
@@ -157,10 +161,6 @@
                         sortDescending: ": activar para ordenar la columna de manera descendente"
                     }
                 },
-                lengthMenu: [
-                    [10, 25, 50, 100],
-                    [10, 25, 50, 100]
-                ]
             });
         });
     </script>

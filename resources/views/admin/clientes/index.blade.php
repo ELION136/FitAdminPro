@@ -60,7 +60,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered text-nowrap w-100" id="miTabla">
+                        <table class="table table-bordered text-nowrap w-100 datatable" id="miTabla">
                             <thead>
                                 <tr>
                                     <th><span>#</span></th>
@@ -184,38 +184,6 @@
     </script>
     
 @endsection
-@push('scripts')
-    <script>
-        $(document).ready(function() {
-            $('table').DataTable({
-                dom: 'Bfrtip',
-                buttons: [{
-                        extend: 'copyHtml5',
-                        text: '<i class="fas fa-copy"></i> Copiar',
-                        className: 'btn btn-primary'
-                    },
-                    {
-                        extend: 'excelHtml5',
-                        text: '<i class="fas fa-file-excel"></i> Excel',
-                        className: 'btn btn-success'
-                    },
-                    {
-                        extend: 'pdfHtml5',
-                        text: '<i class="fas fa-file-pdf"></i> PDF',
-                        className: 'btn btn-danger'
-                    },
-                    {
-                        extend: 'print',
-                        text: '<i class="fas fa-print"></i> Imprimir',
-                        className: 'btn btn-info'
-                    }
-                ],
-                language: {
-                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/Spanish.json"
-                }
-            });
-        });
-    </script>
-@endpush
+@include('partials.datatables-scripts')
 
 

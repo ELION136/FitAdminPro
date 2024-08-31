@@ -27,18 +27,14 @@
     <link rel="stylesheet" href="{{ url('assets/libs/@simonwep/pickr/themes/nano.min.css') }}">
     <link rel="stylesheet" href="{{ url('assets/libs/choices.js/public/assets/styles/choices.min.css') }}">
     <link rel="stylesheet" href="{{ url('assets/libs/jsvectormap/css/jsvectormap.min.css') }}">
-
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.bootstrap5.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-
-    
     <link rel="stylesheet" href="{{ url('assets/libs/fullcalendar/main.min.css') }}">
     <link href="{{ asset('package/dist/sweetalert2.min.css') }}" rel="stylesheet">
     <script src="{{ asset('package/dist/sweetalert2.all.min.js') }}"></script>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
-   
 
 </head>
 
@@ -571,7 +567,7 @@
                 <!-- Start::header-content-right -->
                 <div class="header-content-right">
 
-                    
+
 
 
                     <!-- Start::header-element -->
@@ -839,10 +835,12 @@
                                         <a href="javascript:void(0);">Inscripcion</a>
                                     </li>
                                     <li class="slide">
-                                        <a href="grid-tables.html" class="side-menu__item">inscripcion a membresias</a>
+                                        <a href="grid-tables.html" class="side-menu__item">inscripcion a
+                                            membresias</a>
                                     </li>
                                     <li class="slide">
-                                        <a href="data-tables.html" class="side-menu__item">Historial de inscripciones</a>
+                                        <a href="data-tables.html" class="side-menu__item">Historial de
+                                            inscripciones</a>
                                     </li>
                                 </ul>
                             </li>
@@ -1065,7 +1063,8 @@
         <span class="arrow"><i class="las la-angle-double-up"></i></span>
     </div>
     <div id="responsive-overlay"></div>
-   
+
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
     <script src="{{ url('assets/libs/@popperjs/core/umd/popper.min.js') }}"></script>
@@ -1085,7 +1084,6 @@
     <script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.6/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
@@ -1095,7 +1093,6 @@
     <script src="{{ url('assets/js/custom-switcher.min.js') }}"></script>
     <script src="{{ url('assets/libs/fullcalendar/main.min.js') }}"></script>
     <script src="{{ url('assets/js/fullcalendar.js') }}"></script>
-   
     <script src="{{ url('assets/js/main.js') }}"></script>
     @stack('scripts')
 </body>

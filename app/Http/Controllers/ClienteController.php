@@ -350,7 +350,8 @@ class ClienteController extends Controller
         $pdf->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
     
         //return $pdf->download('entrenadores.pdf');
-        return $pdf->stream('clientes.pdf');
+        //return $pdf->stream('clientes.pdf');
+        return $pdf->download('clientes.pdf');
     }
 
 }

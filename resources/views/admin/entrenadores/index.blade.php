@@ -61,11 +61,11 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="file-export" class="table table-bordered text-nowrap w-100">
+                        <table class="table table-bordered text-nowrap w-100 datatable" id="miTabla">
                             <thead>
                                 <tr>
                                     <th><span>#</span></th>
-                                    <th><span>Foto de Perfil</span></th>
+                                    <th><span>Imagen</span></th>
                                     <th><span>Nombre</span></th>
                                     <th><span>Correo Electronico</span></th>
                                     <th><span>Género</span></th>
@@ -186,3 +186,4 @@
     </script>
     
 @endsection
+@include('partials.datatables-scripts')
