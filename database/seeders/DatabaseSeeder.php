@@ -24,32 +24,45 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
-        
-          // Crear Usuario Administrador
-      
+
+        // Crear Usuario Administrador
+        DB::table('planesMembresia')->insert([
+            [
+                'nombrePlan' => 'Plan Básico',
+                'descripcion' => 'Acceso al gimnasio de lunes a viernes en horario reducido.',
+                'duracion' => 30, // 30 días
+                'precio' => 19.99,
+                'idAutor' => 1, // Usuario que realiza la acción
+                'eliminado' => 1, // Activo
+            ],
+            [
+                'nombrePlan' => 'Plan Estándar',
+                'descripcion' => 'Acceso completo al gimnasio todos los días.',
+                'duracion' => 30, // 30 días
+                'precio' => 29.99,
+                'idAutor' => 1,
+                'eliminado' => 1,
+            ],
+            [
+                'nombrePlan' => 'Plan Premium',
+                'descripcion' => 'Acceso completo al gimnasio, clases especiales, y entrenador personal.',
+                'duracion' => 30, // 30 días
+                'precio' => 49.99,
+                'idAutor' => 1,
+                'eliminado' => 1,
+            ],
+            [
+                'nombrePlan' => 'Plan Anual',
+                'descripcion' => 'Acceso completo al gimnasio durante todo el año.',
+                'duracion' => 365, // 365 días
+                'precio' => 299.99,
+                'idAutor' => 1,
+                'eliminado' => 1,
+            ],
+        ]);
+
 
         // Crear Usuarios Clientes
-        for ($i = 1; $i <= 4; $i++) {
-            $userId = DB::table('usuarios')->insertGetId([
-                'nombreUsuario' => 'client'.$i,
-                'password' => Hash::make('clientpassword'.$i), // Cambia esta contraseña
-                'email' => 'client'.$i.'@gmail.com',
-                'rol' => 'Cliente',
-                'idAutor' => 1, // El administrador es el autor
-                'fechaCreacion' => now(),
-                'eliminado' => 1,
-            ]);
 
-            DB::table('clientes')->insert([
-                'idUsuario' => $userId,
-                'nombre' => 'Client'.$i,
-                'primerApellido' => 'Apellido'.$i,
-                'fechaNacimiento' => '1990-01-01',
-                'genero' => 'Masculino',
-                'idAutor' => 1, // El administrador es el autor
-                'fechaCreacion' => now(),
-                'eliminado' => 1,
-            ]);
-        }
     }
 }

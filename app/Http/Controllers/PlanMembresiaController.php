@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\PlanMembresia;
 
+use Auth;
+
+
 class PlanMembresiaController extends Controller
 {
     /**
@@ -16,51 +19,45 @@ class PlanMembresiaController extends Controller
         return view('admin.planes.index', compact('planes'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombrePlan' => 'required|max:50',
+            'descripcion' => 'nullable|max:255',
+            'duracion' => 'required|integer|min:1',
+            'precio' => 'required|numeric|min:0.01',
+        ]);
+
+        $plan = new PlanMembresia($request->all());
+        $plan->idAutor = auth()->id();
+        $plan->save();
+
+        return redirect()->route('admin.planes.index')->with('success', 'El plan ha sido creado exitosamente');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(Request $request, $idPlan)
     {
-        //
+        $request->validate([
+            'nombrePlan' => 'required|max:50',
+            'descripcion' => 'nullable|max:255',
+            'duracion' => 'required|integer|min:1',
+            'precio' => 'required|numeric|min:0.01',
+        ]);
+
+        $plan = PlanMembresia::findOrFail($idPlan);
+        $plan->update($request->all());
+        $plan->idAutor = auth()->id();
+        $plan->save();
+
+        return redirect()->route('admin.planes.index')->with('success', 'El plan ha sido actualizado exitosamente');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy($idPlan)
     {
-        //
-    }
+        $plan = PlanMembresia::findOrFail($idPlan);
+        $plan->eliminado = 0;  // Eliminación lógica
+        $plan->save();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('admin.planes.index')->with('success', 'El plan ha sido eliminado exitosamente');
     }
 }
