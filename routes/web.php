@@ -96,6 +96,12 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/admin/planes/{id}', [App\Http\Controllers\PlanMembresiaController::class, 'update'])->name('admin.planes.update');
     Route::delete('/admin/planes/{id}', [App\Http\Controllers\PlanMembresiaController::class, 'destroy'])->name('admin.planes.destroy');
 
+    //modulo de inscripciones 
+    Route::get('/admin/inscripciones/crear', [App\Http\Controllers\InscripcionController::class, 'create'])->name('admin.inscripciones.create');
+
+    // Ruta para almacenar la inscripción y el pago
+    Route::post('/admin/inscripciones', [App\Http\Controllers\InscripcionController::class, 'store'])->name('admin.inscripciones.store');
+
     });
 
 

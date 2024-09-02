@@ -35,6 +35,7 @@
     <link rel="stylesheet" href="{{ url('assets/libs/fullcalendar/main.min.css') }}">
     <link href="{{ asset('package/dist/sweetalert2.min.css') }}" rel="stylesheet">
     <script src="{{ asset('package/dist/sweetalert2.all.min.js') }}"></script>
+    <link rel="stylesheet" href="{{url('assets/libs/flatpickr/flatpickr.min.css')}}">
 
 </head>
 
@@ -791,6 +792,34 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon"
                                         viewBox="0 0 24 24">
                                         <path d="M0 0h24v24H0V0z" fill="none" />
+                                        <path d="M13 4H6v16h12V9h-5V4zm3 14H8v-2h8v2zm0-6v2H8v-2h8z" opacity=".3" />
+                                        <path
+                                            d="M8 16h8v2H8zm0-4h8v2H8zm6-10H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
+                                    </svg>
+                                    <span class="side-menu__label">Inscripciones</span>
+                                    <i class="fe fe-chevron-right side-menu__angle"></i>
+                                </a>
+                                <ul class="slide-menu child1">
+                                    <li class="slide side-menu__label1">
+                                        <a href="javascript:void(0);">Inscripciones</a>
+                                    </li>
+                                    <li class="slide">
+                                        <a href="{{ route('admin.inscripciones.create') }}" class="side-menu__item">inscripcion a
+                                            membresias</a>
+                                    </li>
+                                    <li class="slide">
+                                        <a href="data-tables.html" class="side-menu__item">Historial de
+                                            inscripciones</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+
+                            <li class="slide has-sub">
+                                <a href="javascript:void(0);" class="side-menu__item">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon"
+                                        viewBox="0 0 24 24">
+                                        <path d="M0 0h24v24H0V0z" fill="none" />
                                         <path d="M5 5h15v3H5zm12 5h3v9h-3zm-7 0h5v9h-5zm-5 0h3v9H5z" opacity=".3" />
                                         <path
                                             d="M20 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8 19H5v-9h3v9zm7 0h-5v-9h5v9zm5 0h-3v-9h3v9zm0-11H5V5h15v3z" />
@@ -818,32 +847,7 @@
 
 
 
-                            <li class="slide has-sub">
-                                <a href="javascript:void(0);" class="side-menu__item">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon"
-                                        viewBox="0 0 24 24">
-                                        <path d="M0 0h24v24H0V0z" fill="none" />
-                                        <path d="M13 4H6v16h12V9h-5V4zm3 14H8v-2h8v2zm0-6v2H8v-2h8z" opacity=".3" />
-                                        <path
-                                            d="M8 16h8v2H8zm0-4h8v2H8zm6-10H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
-                                    </svg>
-                                    <span class="side-menu__label">Inscripcion</span>
-                                    <i class="fe fe-chevron-right side-menu__angle"></i>
-                                </a>
-                                <ul class="slide-menu child1">
-                                    <li class="slide side-menu__label1">
-                                        <a href="javascript:void(0);">Inscripcion</a>
-                                    </li>
-                                    <li class="slide">
-                                        <a href="grid-tables.html" class="side-menu__item">inscripcion a
-                                            membresias</a>
-                                    </li>
-                                    <li class="slide">
-                                        <a href="data-tables.html" class="side-menu__item">Historial de
-                                            inscripciones</a>
-                                    </li>
-                                </ul>
-                            </li>
+
 
                             <li class="slide has-sub">
                                 <a href="javascript:void(0);" class="side-menu__item">
@@ -1067,7 +1071,7 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
-    
+
     <script src="{{ url('assets/libs/@popperjs/core/umd/popper.min.js') }}"></script>
     <script src="{{ url('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url('assets/js/defaultmenu.min.js') }}"></script>
@@ -1090,11 +1094,15 @@
     <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="{{ url('assets/js/datatables.js') }}"></script>
-    <script src="{{ url('assets/js/custom.js') }}"></script>
-    <script src="{{ url('assets/js/custom-switcher.min.js') }}"></script>
+    <script src="{{url('assets/libs/@simonwep/pickr/pickr.es5.min.js')}}"></script>
+    <script src="{{url('assets/libs/flatpickr/flatpickr.min.js')}}"></script>
+    <script src="{{url('assets/js/date&time_pickers.js')}}"></script>
+    
     <script src="{{ url('assets/libs/fullcalendar/main.min.js') }}"></script>
     <script src="{{ url('assets/js/fullcalendar.js') }}"></script>
     <script src="{{ url('assets/js/main.js') }}"></script>
+    <script src="{{ url('assets/js/custom-switcher.min.js') }}"></script>
+    <script src="{{ url('assets/js/custom.js') }}"></script>
     @stack('scripts')
 </body>
 
