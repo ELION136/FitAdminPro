@@ -837,10 +837,7 @@
                                             Membresias</a>
                                     </li>
                                     <li class="slide">
-                                        <a href="grid-tables.html" class="side-menu__item">Miembros</a>
-                                    </li>
-                                    <li class="slide">
-                                        <a href="data-tables.html" class="side-menu__item">Pagos</a>
+                                        <a href="{{ route('admin.pagos.index') }}" class="side-menu__item">Pagos</a>
                                     </li>
                                 </ul>
                             </li>
@@ -866,11 +863,9 @@
                                         <a href="javascript:void(0);">Servicios</a>
                                     </li>
                                     <li class="slide">
-                                        <a href="grid-tables.html" class="side-menu__item">Planes de dieta</a>
+                                        <a href="grid-tables.html" class="side-menu__item">detalle servicios</a>
                                     </li>
-                                    <li class="slide">
-                                        <a href="data-tables.html" class="side-menu__item">Secciones Ejercicio</a>
-                                    </li>
+                                    
                                 </ul>
                             </li>
 

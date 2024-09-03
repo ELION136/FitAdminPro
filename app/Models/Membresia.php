@@ -22,6 +22,10 @@ class Membresia extends Model
         'idAutor',
         'eliminado',
     ];
+    protected $casts = [
+        'fechaInicio' => 'datetime',
+        'fechaFin' => 'datetime',
+    ];
 
     public function cliente()
     {

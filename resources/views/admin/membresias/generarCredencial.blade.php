@@ -2,105 +2,118 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Credencial de Membresía</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credencial de Gimnasio</title>
     <style>
-        @page {
-            margin: 0;
-        }
         body {
-            font-family: 'Arial', sans-serif;
-            width: 350px;
-            height: 220px;
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 10px;
-            border: 2px solid #000;
-            position: relative;
-            background-color: #f4f4f4;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        .credential {
+            width: 350px;
+            height: 450px;
+            background-color: #ffffff;
             border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #000;
-            padding-bottom: 5px;
-        }
-        .logo {
-            width: 60px;
-        }
-        .titulo {
-            font-size: 20px;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #333;
-        }
-        .foto {
-            width: 90px;
-            height: 110px;
-            border: 2px solid #000;
-            background-color: #fff;
-            margin-top: 10px;
-            position: absolute;
-            top: 60px;
-            left: 20px;
-            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 50px auto;
             overflow: hidden;
         }
-        .datos {
-            margin-left: 130px;
-            margin-top: 10px;
-            font-size: 14px;
-            color: #333;
-        }
-        .datos p {
-            margin: 5px 0;
-        }
-        .datos p strong {
-            color: #000;
-        }
-        .firma {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: 120px;
-            border-top: 1px solid #000;
+
+        .header {
+            background-color: #3498db;
+            color: white;
+            padding: 10px;
             text-align: center;
-            font-size: 12px;
-            color: #333;
+            font-size: 18px;
+            font-weight: bold;
         }
-        .qr {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
+
+        .content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .photo {
+            width: 120px;
+            height: 120px;
+            background-color: #ddd;
+            border-radius: 50%;
+            margin: 0 auto;
+        }
+
+        .info {
+            margin-top: 20px;
+        }
+
+        .name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .member-info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .plan-info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .dates {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+            margin-top: 20px;
+        }
+
+        .firma {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <img src="{{ public_path('images/logo.png') }}" class="logo" alt="Logo">
-        <div class="titulo">Membresía</div>
-    </div>
-    <div class="foto">
-        @if($membresia->cliente->foto)
-            <img src="{{ public_path('storage/' . $membresia->cliente->foto) }}" style="width:100%; height:100%;" alt="Foto">
-        @else
-            <p style="text-align:center; padding-top:40px;">Sin Foto</p>
-        @endif
-    </div>
-    <div class="datos">
-        <p><strong>Nombre:</strong> {{ $membresia->cliente->nombre }} {{ $membresia->cliente->primerApellido }} {{ $membresia->cliente->segundoApellido }}</p>
-        <p><strong>Plan:</strong> {{ $membresia->planMembresia->nombrePlan }}</p>
-        <p><strong>Inicio:</strong> {{ \Carbon\Carbon::parse($membresia->fechaInicio)->format('d/m/Y') }}</p>
-        <p><strong>Fin:</strong> {{ \Carbon\Carbon::parse($membresia->fechaFin)->format('d/m/Y') }}</p>
-    </div>
-    <div class="firma">
-        Firma
-    </div>
-    <div class="qr">
-        <!-- Aquí puedes colocar el código QR -->
+    <div class="credential">
+        <div class="header">FitAdminPro</div>
+        <div class="content">
+            <div class="photo">
+                @if ($membresia->cliente->foto)
+                    <img src="{{ public_path('storage/' . $membresia->cliente->foto) }}"
+                    alt="Foto" style="width: 100%; height: 100%; border-radius: 50%;">
+                @else
+                    <p style="text-align:center; padding-top:50px;">Sin Foto</p>
+                @endif
+            </div>
+            <div class="info">
+                <p class="name">{{ $membresia->cliente->nombre }} {{ $membresia->cliente->primerApellido }} {{ $membresia->cliente->segundoApellido }}</p>
+                
+                <p class="plan-info">Plan: {{ $membresia->planMembresia->nombrePlan }}</p>
+                <p class="dates">Inicio: {{ \Carbon\Carbon::parse($membresia->fechaInicio)->format('d/m/Y') }} - Fin: {{ \Carbon\Carbon::parse($membresia->fechaFin)->format('d/m/Y') }}</p>
+            </div>
+            <div class="logo">FitAdminPro</div>
+            <div class="firma">Firma</div>
+        </div>
     </div>
 </body>
 </html>
