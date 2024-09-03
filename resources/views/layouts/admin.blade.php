@@ -808,7 +808,7 @@
                                             membresias</a>
                                     </li>
                                     <li class="slide">
-                                        <a href="data-tables.html" class="side-menu__item">Historial de
+                                        <a href="{{route('admin.membresias.historial')}}" class="side-menu__item">Historial de
                                             inscripciones</a>
                                     </li>
                                 </ul>
