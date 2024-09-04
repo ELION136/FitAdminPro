@@ -776,10 +776,16 @@
                                     <li class="slide side-menu__label1">
                                         <a href="javascript:void(0);">Usuarios</a>
                                     </li>
+
+
+                                    @if (auth()->user()->rol === 'Administrador')
                                     <li class="slide">
                                         <a href="{{ route('admin.entrenadores.index') }}"
                                             class="side-menu__item "></i>Entrenadores</a>
                                     </li>
+
+                                    @endif
+                        
                                     <li class="slide">
                                         <a href="{{ route('admin.clientes.index') }}"
                                             class="side-menu__item "></i>Clientes</a>
@@ -789,12 +795,9 @@
 
                             <li class="slide has-sub">
                                 <a href="javascript:void(0);" class="side-menu__item">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon"
-                                        viewBox="0 0 24 24">
-                                        <path d="M0 0h24v24H0V0z" fill="none" />
-                                        <path d="M13 4H6v16h12V9h-5V4zm3 14H8v-2h8v2zm0-6v2H8v-2h8z" opacity=".3" />
-                                        <path
-                                            d="M8 16h8v2H8zm0-4h8v2H8zm6-10H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" width="24" height="24">
+                                        <path d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M10 2v2H5v14h14V4h-5V2h7v18H3V2h7zm5 4v2h-2v2h-2V8H9V6h2V4h2v2h2z"/>
                                     </svg>
                                     <span class="side-menu__label">Inscripciones</span>
                                     <i class="fe fe-chevron-right side-menu__angle"></i>
@@ -803,10 +806,13 @@
                                     <li class="slide side-menu__label1">
                                         <a href="javascript:void(0);">Inscripciones</a>
                                     </li>
+                                    @if (auth()->user()->rol === 'Administrador')
                                     <li class="slide">
                                         <a href="{{ route('admin.inscripciones.create') }}" class="side-menu__item">inscripcion a
                                             membresias</a>
                                     </li>
+                                    @endif
+
                                     <li class="slide">
                                         <a href="{{route('admin.membresias.historial')}}" class="side-menu__item">Historial de
                                             inscripciones</a>
@@ -817,12 +823,9 @@
 
                             <li class="slide has-sub">
                                 <a href="javascript:void(0);" class="side-menu__item">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon"
-                                        viewBox="0 0 24 24">
-                                        <path d="M0 0h24v24H0V0z" fill="none" />
-                                        <path d="M5 5h15v3H5zm12 5h3v9h-3zm-7 0h5v9h-5zm-5 0h3v9H5z" opacity=".3" />
-                                        <path
-                                            d="M20 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8 19H5v-9h3v9zm7 0h-5v-9h5v9zm5 0h-3v-9h3v9zm0-11H5V5h15v3z" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" width="24" height="24">
+                                        <path d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M20 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm-1 16H5V5h14v14zm-7-5a3 3 0 1 0-3-3h6a3 3 0 1 0-3 3z"/>
                                     </svg>
                                     <span class="side-menu__label">Membresias</span>
                                     <i class="fe fe-chevron-right side-menu__angle"></i>
@@ -863,7 +866,7 @@
                                         <a href="javascript:void(0);">Servicios</a>
                                     </li>
                                     <li class="slide">
-                                        <a href="grid-tables.html" class="side-menu__item">detalle servicios</a>
+                                        <a href="{{route('admin.servicios.index')}}" class="side-menu__item">detalles servicios</a>
                                     </li>
                                     
                                 </ul>
@@ -872,15 +875,10 @@
                             <!--vista admin vista empleado-->
                             <li class="slide has-sub">
                                 <a href="javascript:void(0);" class="side-menu__item">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon"
-                                        viewBox="0 0 24 24">
-                                        <path d="M0 0h24v24H0V0z" fill="none" />
-                                        <path
-                                            d="M5 9h14V5H5v4zm2-3.5c.83 0 1.5.67 1.5 1.5S7.83 8.5 7 8.5 5.5 7.83 5.5 7 6.17 5.5 7 5.5zM5 19h14v-4H5v4zm2-3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5z"
-                                            opacity=".3" />
-                                        <path
-                                            d="M20 13H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1zm-1 6H5v-4h14v4zm-12-.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zM20 3H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zm-1 6H5V5h14v4zM7 8.5c.83 0 1.5-.67 1.5-1.5S7.83 5.5 7 5.5 5.5 6.17 5.5 7 6.17 8.5 7 8.5z" />
-                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" width="24" height="24">
+                                        <path d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm-1 14l-4-4 1.4-1.4 2.6 2.6 6.6-6.6L18 8z"/>
+                                    </svg>                                    
                                     <span class="side-menu__label">Asistencias</span>
                                     <i class="fe fe-chevron-right side-menu__angle"></i>
                                 </a>
@@ -902,17 +900,47 @@
                                     </li>
                                 </ul>
                             </li>
+                            <li class="slide has-sub">
+                                <a href="javascript:void(0);" class="side-menu__item">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" width="24" height="24">
+                                        <path d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M12 1C5.92 1 1 5.92 1 12s4.92 11 11 11 11-4.92 11-11S18.08 1 12 1zm0 20c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9-4.03 9-9 9zm1-13h-2v6h6v-2h-4z"/>
+                                    </svg>
+                                    <span class="side-menu__label">Horarios</span>
+                                    <i class="fe fe-chevron-right side-menu__angle"></i>
+                                </a>
+                                <ul class="slide-menu child1">
+                                    <li class="slide side-menu__label1">
+                                        <a href="javascript:void(0);">Horarios</a>
+                                    </li>
+                                    <li class="slide">
+                                        <a href="{{ route('admin.horarios.index') }}"
+                                           class="side-menu__item">Asignar Servicios a Horarios</a>
+                                    </li>
+                                    <li class="slide">
+                                        <a href="{{ route('admin.horarios2.index') }}"
+                                            class="side-menu__item">Horarios de Entrenadores</a>
+                                    </li>
+                                    
+                                </ul>
+                            </li>
+                            <li class="slide">
+                                <a href="" class="side-menu__item">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" width="24" height="24">
+                                        <path d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M4 4h16v2H4zm0 4h10v2H4zm0 4h13v2H4zm0 4h16v2H4z"/>
+                                        <path d="M16 12V4m4 0V12" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    
+                                    <span class="side-menu__label">roportes</span>
+                                </a>
+                            </li>
+
+
+
+
                         @endif
-                        <li class="slide">
-                            <a href="{{ route('admin.horarios.index') }}" class="side-menu__item">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24"
-                                    width="24" height="24">
-                                    <path d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M12 1a11 11 0 1 0 11 11A11 11 0 0 0 12 1zm1 11h-4V7h2v4h2v1z" />
-                                </svg>
-                                <span class="side-menu__label">Horarios</span>
-                            </a>
-                        </li>
+                        
 
                         @if (auth()->user()->rol === 'Cliente')
                             <!--vista solo para clientes -->
@@ -937,9 +965,7 @@
                                         <a href="{{ route('admin.planes.index') }}" class="side-menu__item">Planes de
                                             Membresias</a>
                                     </li>
-                                    <li class="slide">
-                                        <a href="grid-tables.html" class="side-menu__item">Miembros</a>
-                                    </li>
+                                    
                                     <li class="slide">
                                         <a href="data-tables.html" class="side-menu__item">Pagos</a>
                                     </li>

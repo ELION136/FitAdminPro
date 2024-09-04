@@ -107,6 +107,8 @@
                                                 data-bs-original-title="Editar">
                                                 <i class="bi bi-pen-fill"></i>
                                             </a>
+                                               
+                                            @if (auth()->user()->rol === 'Administrador')
 
                                             <!--boton de habilitado y deshabilitado-->
                                             <!-- Botón para deshabilitar (Eliminación lógica) -->
@@ -134,6 +136,7 @@
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </form>
+                                            @endif
 
                                         </td>
                                     </tr>

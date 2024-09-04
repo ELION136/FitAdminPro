@@ -13,76 +13,56 @@ class ServiciosController extends Controller
         return view('admin.servicios.index', compact('servicios'));
     }
 
-    // Muestra el formulario para crear un nuevo servicio
-    public function create()
-    {
-        return view('admin.servicios.create');
-    }
-
-    // Almacena un nuevo servicio en la base de datos
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:100',
-            'descripcion' => 'required|string',
-            'duracion' => 'required|integer',
+            'nombre' => 'required|max:100',
+            'descripcion' => 'required',
+            'duracion' => 'required|integer|min:1',
             'tipoServicio' => 'required|in:Individual,Grupal,Online,Presencial',
             'categoria' => 'required|in:Entrenamiento,Nutrición,Rehabilitación,Otro',
         ]);
 
-        Servicio::create([
-            'nombre' => $request->nombre,
-            'descripcion' => $request->descripcion,
-            'duracion' => $request->duracion,
-            'tipoServicio' => $request->tipoServicio,
-            'categoria' => $request->categoria,
-            'idAutor' => auth()->user()->idUsuario, // Suponiendo que estás guardando el ID del autor
-            'eliminado' => 1,
-        ]);
+        $servicio = new Servicio($request->all());
+        $servicio->idAutor = auth()->id();
+        $servicio->save();
 
-        return redirect()->route('admin.servicios.index')->with('success', 'Servicio creado exitosamente.');
+        return redirect()->route('admin.servicios.index')->with('success', 'El servicio ha sido creado exitosamente');
     }
 
-    // Muestra un servicio específico
-    public function show(Servicio $servicio)
-    {
-        return view('admin.servicios.show', compact('servicio'));
-    }
-
-    // Muestra el formulario para editar un servicio existente
-    public function edit(Servicio $servicio)
-    {
-        return view('admin.servicios.edit', compact('servicio'));
-    }
-
-    // Actualiza un servicio existente en la base de datos
-    public function update(Request $request, Servicio $servicio)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, $idServicio)
     {
         $request->validate([
-            'nombre' => 'required|string|max:100',
-            'descripcion' => 'required|string',
-            'duracion' => 'required|integer',
+            'nombre' => 'required|max:100',
+            'descripcion' => 'required',
+            'duracion' => 'required|integer|min:1',
             'tipoServicio' => 'required|in:Individual,Grupal,Online,Presencial',
             'categoria' => 'required|in:Entrenamiento,Nutrición,Rehabilitación,Otro',
         ]);
 
-        $servicio->update([
-            'nombre' => $request->nombre,
-            'descripcion' => $request->descripcion,
-            'duracion' => $request->duracion,
-            'tipoServicio' => $request->tipoServicio,
-            'categoria' => $request->categoria,
-            'idAutor' => auth()->user()->idUsuario, // Actualizando el autor de la modificación
-        ]);
+        $servicio = Servicio::findOrFail($idServicio);
+        $servicio->update($request->all());
+        $servicio->idAutor = auth()->id();
+        $servicio->save();
 
-        return redirect()->route('admin.servicios.index')->with('success', 'Servicio actualizado exitosamente.');
+        return redirect()->route('admin.servicios.index')->with('success', 'El servicio ha sido actualizado exitosamente');
     }
 
-    // Elimina (lógicamente) un servicio
-    public function destroy(Servicio $servicio)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($idServicio)
     {
-        $servicio->update(['eliminado' => 0]);
+        $servicio = Servicio::findOrFail($idServicio);
+        $servicio->eliminado = 0;  // Eliminación lógica
+        $servicio->save();
 
-        return redirect()->route('admin.servicios.index')->with('success', 'Servicio eliminado exitosamente.');
+        return redirect()->route('admin.servicios.index')->with('success', 'El servicio ha sido eliminado exitosamente');
     }
 }

@@ -95,7 +95,20 @@ Route::middleware(['auth'])->group(function () {
 
 
 Route::middleware(['auth'])->group(function () {
+
     Route::get('/admin/horarios', [App\Http\Controllers\HorarioController::class, 'index'])->name('admin.horarios.index');
+    Route::post('/admin/horarios/asignar', [App\Http\Controllers\HorarioController::class, 'asignarServicio'])->name('admin.horarios.asignarServicio');
+    Route::get('/admin/horarios/{idEntrenador}', [App\Http\Controllers\HorarioController::class, 'getHorarios'])->name('admin.horarios.getHorarios');
+    
+    Route::get('/admin/horarios2', [App\Http\Controllers\Horario2Controller::class, 'index'])->name('admin.horarios2.index');
+    Route::put('/admin/horarios2/{idHorario}', [App\Http\Controllers\Horario2Controller::class, 'update'])->name('admin.horarios2.update');
+    Route::delete('/admin/horarios2/{idHorario}', [App\Http\Controllers\Horario2Controller::class, 'destroy'])->name('admin.horarios2.destroy');
+
+
+
+
+
+
     Route::get('/admin/asistencias', [App\Http\Controllers\AsistenciaController::class, 'index'])->name('admin.asistencias.index');
     Route::get('/admin/asistencias/registrar-cliente', [App\Http\Controllers\AsistenciaController::class, 'registro'])->name('admin.asistencias.cliente');
     Route::post('/admin/asistencias/registrar', [App\Http\Controllers\AsistenciaController::class, 'registrar'])->name('admin.asistencias.registrar');
@@ -113,6 +126,18 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/cliente/asistencia/{asistencia}', [App\Http\Controllers\AsistenciaController::class, 'corregirAsistencia'])->name('cliente.asistencias.corregir-asistencia');
     Route::delete('/cliente/asistencia/{asistencia}', [App\Http\Controllers\AsistenciaController::class, 'eliminarAsistencia'])->name('cliente.asistencias.eliminar-asistencia');
 });
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/servicios', [App\Http\Controllers\ServiciosController::class, 'index'])->name('admin.servicios.index');
+    Route::post('/admin/servicios', [App\Http\Controllers\ServiciosController::class, 'store'])->name('admin.servicios.store');
+    Route::get('/admin/servicios/{servicio}/edit', [App\Http\Controllers\ServiciosController::class, 'edit'])->name('admin.servicios.edit');
+    Route::put('/admin/servicios/{servicio}', [App\Http\Controllers\ServiciosController::class, 'update'])->name('admin.servicios.update');
+    Route::delete('/admin/servicios/{servicio}', [App\Http\Controllers\ServiciosController::class, 'destroy'])->name('admin.servicios.destroy');
+});
+
+
+
 //configuracion del envio de email
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();

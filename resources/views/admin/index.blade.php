@@ -43,8 +43,8 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="mt-0 text-center">
-                                        <span class="text-fixed-white">Sales</span>
-                                        <h3 class="text-fixed-white mb-0">854</h3>
+                                        <span class="text-fixed-white">totalAsistencias</span>
+                                        <h3 class="text-fixed-white mb-0">{{ $totalAsistencias }}</h3>
                                     </div>
                                 </div>
                             </div>
@@ -62,8 +62,8 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="mt-0 text-center">
-                                        <span class="text-fixed-white">Profits</span>
-                                        <h3 class="text-fixed-white mb-0">98K</h3>
+                                        <span class="text-fixed-white">Planes de Membresía</span>
+                                        <h3 class="text-fixed-white mb-0">{{ $totalPlanes }}</h3>
                                     </div>
                                 </div>
                             </div>
@@ -81,8 +81,8 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="mt-0 text-center">
-                                        <span class="text-fixed-white">Taxes</span>
-                                        <h3 class="text-fixed-white mb-0">876</h3>
+                                        <span class="text-fixed-white">Clientes con Membresía Activa</span>
+                                        <h3 class="text-fixed-white mb-0">{{ $clientesConMembresia }}</h3>
                                     </div>
                                 </div>
                             </div>

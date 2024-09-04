@@ -13,12 +13,11 @@ class Horario extends Model
     protected $primaryKey = 'idHorario';
 
     protected $fillable = [
-        'idEmpleado',
+        'idEntrenador',
         'dia',
         'horaInicio',
         'horaFin',
-        'fechaCreacion', 
-        'fechaModificacion',
+        'capacidad',
         'idAutor',
         'eliminado',
     ];

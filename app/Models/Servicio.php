@@ -12,9 +12,13 @@ class Servicio extends Model
     protected $table = 'servicios';
     protected $primaryKey = 'idServicio';
     protected $fillable = [
-        'nombre', 'codigo', 'descripcion', 'precioMensual', 
-        'precioSemanal', 'precioSeccion', 'idAutor', 
-        'fechaCreacion', 'fechaModificacion', 'eliminado'
+        'nombre',
+        'descripcion',
+        'duracion',
+        'tipoServicio',
+        'categoria',
+        'idAutor',
+        'eliminado',
     ];
 
     public $timestamps = false;

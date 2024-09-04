@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Asistencia;
+use App\Models\PlanMembresia;
+use App\Models\Membresia;
 use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
@@ -11,7 +14,10 @@ class AdminController extends Controller
     public function index(){
         $total = User::count(); 
         $userName = Auth::user()->nombreUsuario;
-        return view('admin.index', compact('total','userName'));
+        $totalAsistencias = Asistencia::count();
+        $totalPlanes = PlanMembresia::count();
+        $clientesConMembresia = Membresia::where('estado', 'activa')->count();
+        return view('admin.index', compact('total','userName','totalAsistencias', 'totalPlanes', 'clientesConMembresia'));
         
 
     } 
