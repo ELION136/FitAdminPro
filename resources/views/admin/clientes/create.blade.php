@@ -85,13 +85,7 @@
                                 <small style="color:red">{{ $message }}</small>
                                 @enderror
                             </div>
-                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="image" class="form-label">Imagen</label>
-                                <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image">
-                                @error('image')
-                                <small style="color:red">{{ $message }}</small>
-                                @enderror
-                            </div>
+                            
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 text-end">
                                 <button type="submit" class="btn btn-primary">Crear nuevo cliente</button>
                             </div>

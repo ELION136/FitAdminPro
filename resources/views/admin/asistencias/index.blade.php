@@ -1,167 +1,98 @@
 @extends('layouts.admin')
-
 @section('content')
-    <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
-        <div class="my-auto">
-            <h5 class="page-title fs-21 mb-1">Asistencias</h5>
-            <nav>
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a>Incio</a></li><i class="bi bi-three-dots-vertical"></i>
-                    <li aria-current="page">Asistencias</li>
-                </ol>
-            </nav>
-        </div>
-        <div class="d-flex my-xl-auto right-content align-items-center">
-
-            <div class="mb-xl-0">
-                <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuDate"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        14 Aug 2019
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuDate">
-                        <li><a class="dropdown-item" href="javascript:void(0);">2015</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0);">2016</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0);">2017</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0);">2018</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="container mt-4">
-        <div class="container">
-
-
-
-
-            <!-- Mensajes de éxito y error usando SweetAlert -->
-            @if (session('success'))
-                <script>
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Éxito!',
-                        text: '{{ session('success') }}',
-                        timer: 3000,
-                        showConfirmButton: false
-                    });
-                </script>
-            @endif
-
-            @if (session('error'))
-                <script>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: '{{ session('error') }}',
-                        timer: 3000,
-                        showConfirmButton: false
-                    });
-                </script>
-            @endif
-
-            <!-- Tabla de asistencias -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Asistencias</h5>
-                </div>
-
-                <div class="card-body">
-                    <table class="table table-bordered text-nowrap w-100" id="miTabla">
-                        <thead>
-                            <tr>
-                                <th>Cliente</th>
-                                <th>Fecha</th>
-                                <th>Hora Entrada</th>
-                                <th>Hora Salida</th>
-                                <th>Acciones</th> <!-- Nueva columna para los botones de acción -->
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($asistencias as $asistencia)
-                                <tr>
-                                    <td>{{ $asistencia->cliente->nombre }}</td>
-                                    <td>{{ $asistencia->fecha }}</td>
-                                    <td>{{ $asistencia->horaEntrada }}</td>
-                                    <td>{{ $asistencia->horaSalida ?? 'No registrada' }}</td>
-                                    <td>
-                                        <!-- Botón de Editar -->
-                                        <a href="{{ route('admin.asistencias.edit', $asistencia->idAsistencia) }}"
-                                            class="btn btn-sm btn-warning">
-                                            Editar
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-
+        <!-- Card Contenedor -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Reportes de Asistencias</h2>
             </div>
+            <div class="card-body">
+                <!-- Filtros -->
+                <form method="GET" action="{{ route('admin.asistencias.index') }}" class="mb-4">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="cliente_id" class="form-label">Cliente</label>
+                            <select name="cliente_id" class="form-select">
+                                <option value="">Todos los clientes</option>
+                                @foreach($clientes as $cliente)
+                                    <option value="{{ $cliente->idCliente }}" {{ request('cliente_id') == $cliente->idCliente ? 'selected' : '' }}>
+                                        {{ $cliente->nombre }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="fechaInicio" class="form-label">Fecha Inicio</label>
+                            <input type="date" name="fechaInicio" class="form-control" value="{{ request('fechaInicio', $fechaInicio) }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="fechaFin" class="form-label">Fecha Fin</label>
+                            <input type="date" name="fechaFin" class="form-control" value="{{ request('fechaFin', $fechaFin) }}">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Filtrar</button>
+                </form>
 
-            <!-- Paginación -->
-            <div class="d-flex justify-content-center mt-4">
-                {{ $asistencias->links() }}
+                <!-- Cards de asistencias -->
+                <div class="row">
+                    @foreach($asistencias as $asistencia)
+                        <div class="col-md-4">
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">{{ $asistencia->cliente->nombre }}</h5>
+                                    <p class="card-text"><strong>Fecha:</strong> {{ $asistencia->fecha }}</p>
+                                    <p class="card-text"><strong>Hora Entrada:</strong> {{ $asistencia->horaEntrada }}</p>
+                                    <p class="card-text"><strong>Hora Salida:</strong> {{ $asistencia->horaSalida ?? 'No registrada' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Gráfico de asistencias -->
+                <div class="mt-4">
+                    <h5 class="mb-3">Frecuencia de Asistencias</h5>
+                    <canvas id="asistenciaChart"></canvas>
+                </div>
+
+                <!-- Botones de exportación -->
+                <div class="mt-4 d-flex justify-content-end">
+                    <a href="{{ route('admin.asistencias.asistencias-pdf', request()->query()) }}" class="btn btn-danger me-2">
+                        <i class="fas fa-file-pdf"></i> Exportar PDF
+                    </a>
+                    <a href="" class="btn btn-success">
+                        <i class="fas fa-file-excel"></i> Exportar Excel
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 @endsection
 
 @push('scripts')
+    <!-- Asegúrate de tener FontAwesome para los iconos en los botones -->
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        $(document).ready(function() {
-            $('#miTabla').DataTable({
-                dom: 'Bfrtip',
-                responsive: true, // Para asegurar que la tabla sea responsive
-                lengthMenu: [5,10, 25, 50, 75, 100], // Opción para seleccionar la cantidad de registros por página
-                pageLength: 5,
-                buttons: [{
-                        extend: 'copyHtml5',
-                        text: '<i class="fas fa-copy"></i> Copiar',
-                        className: 'btn btn-primary'
-                    },
-                    {
-                        extend: 'excelHtml5',
-                        text: '<i class="fas fa-file-excel"></i> Excel',
-                        className: 'btn btn-success'
-                    },
-                    {
-                        extend: 'pdfHtml5',
-                        text: '<i class="fas fa-file-pdf"></i> PDF',
-                        className: 'btn btn-danger'
-                    },
-                    {
-                        extend: 'print',
-                        text: '<i class="fas fa-print"></i> Imprimir',
-                        className: 'btn btn-info'
-                    }
-                ],
-                language: {
-                    lengthMenu: "Mostrar _MENU_ registros por página",
-                    decimal: "",
-                    emptyTable: "No hay datos disponibles en la tabla",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-                    infoEmpty: "Mostrando 0 a 0 de 0 entradas",
-                    infoFiltered: "(filtrado de _MAX_ entradas totales)",
-                    infoPostFix: "",
-                    thousands: ",",
-                    lengthMenu: "Mostrar _MENU_ entradas",
-                    loadingRecords: "Cargando...",
-                    processing: "Procesando...",
-                    search: "Buscar:",
-                    zeroRecords: "No se encontraron registros coincidentes",
-                    paginate: {
-                        first: "Primero",
-                        last: "Último",
-                        next: "Siguiente",
-                        previous: "Anterior"
-                    },
-                    aria: {
-                        sortAscending: ": activar para ordenar la columna de manera ascendente",
-                        sortDescending: ": activar para ordenar la columna de manera descendente"
-                    }
-                },
-            });
+        var ctx = document.getElementById('asistenciaChart').getContext('2d');
+        var asistenciaChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($fechas) !!},
+                datasets: [{
+                    label: 'Frecuencia de Asistencias',
+                    data: {!! json_encode($frecuenciaAsistencias) !!},
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
         });
     </script>
 @endpush

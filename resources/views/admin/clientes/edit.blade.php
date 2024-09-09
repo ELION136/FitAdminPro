@@ -27,35 +27,35 @@
                         @method('PUT')
                         <div class="row gy-4">
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="nombre" class="form-label">Nombre</label>
+                                <label for="nombre" class="form-label">Nombre <span style="color:red">*</span></label>
                                 <input type="text" class="form-control @error('nombre') is-invalid @enderror" id="nombre" name="nombre" value="{{ old('nombre', $cliente->nombre) }}" required>
                                 @error('nombre')
                                     <small style="color:red">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="primerApellido" class="form-label">Primer Apellido</label>
+                                <label for="primerApellido" class="form-label">Primer Apellido <span style="color:red">*</span></label>
                                 <input type="text" class="form-control @error('primerApellido') is-invalid @enderror" id="primerApellido" name="primerApellido" value="{{ old('primerApellido', $cliente->primerApellido) }}" required>
                                 @error('primerApellido')
                                     <small style="color:red">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="segundoApellido" class="form-label">Segundo Apellido</label>
+                                <label for="segundoApellido" class="form-label">Segundo Apellido </label>
                                 <input type="text" class="form-control @error('segundoApellido') is-invalid @enderror" id="segundoApellido" name="segundoApellido" value="{{ old('segundoApellido', $cliente->segundoApellido) }}">
                                 @error('segundoApellido')
                                     <small style="color:red">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+                                <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento <span style="color:red">*</span></label>
                                 <input type="date" class="form-control @error('fechaNacimiento') is-invalid @enderror" id="fechaNacimiento" name="fechaNacimiento" value="{{ old('fechaNacimiento', \Carbon\Carbon::parse($cliente->fechaNacimiento)->format('Y-m-d')) }}" required>
                                 @error('fechaNacimiento')
                                     <small style="color:red">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="genero" class="form-label">Género</label>
+                                <label for="genero" class="form-label">Género <span style="color:red">*</span></label>
                                 <select class="form-control @error('genero') is-invalid @enderror" id="genero" name="genero" required>
                                     <option value="" disabled>Seleccione</option>
                                     <option value="Masculino" {{ old('genero', $cliente->genero) == 'Masculino' ? 'selected' : '' }}>Masculino</option>
@@ -66,14 +66,14 @@
                                 @enderror
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="email" class="form-label">Email</label>
+                                <label for="email" class="form-label">Email <span style="color:red">*</span></label>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $usuario->email) }}" required>
                                 @error('email')
                                     <small style="color:red">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="nombreUsuario" class="form-label">Nombre de Usuario</label>
+                                <label for="nombreUsuario" class="form-label">Nombre de Usuario <span style="color:red">*</span></label>
                                 <input type="text" class="form-control @error('nombreUsuario') is-invalid @enderror" id="nombreUsuario" name="nombreUsuario" value="{{ old('nombreUsuario', $usuario->nombreUsuario) }}" required>
                                 @error('nombreUsuario')
                                     <small style="color:red">{{ $message }}</small>
@@ -86,13 +86,7 @@
                                     <small style="color:red">{{ $message }}</small>
                                 @enderror
                             </div>
-                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="image" class="form-label">Imagen</label>
-                                <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image">
-                                @error('image')
-                                    <small style="color:red">{{ $message }}</small>
-                                @enderror
-                            </div>
+                            
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 text-end">
                                 <button type="submit" class="btn btn-primary">Actualizar</button>
                             </div>

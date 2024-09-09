@@ -47,8 +47,10 @@
                             <a class="dropdown-item" href="javascript:void(0);">Something Else Here</a>
                         </div>
                     </div>
+                    @if (auth()->user()->rol === 'Administrador')
                     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createPlanModal">Crear nuevo
                         plan</button>
+                        @endif
 
                 </div>
                 <div class="card-body">
@@ -61,7 +63,9 @@
                                     <th>Descripción</th>
                                     <th>Duración(dias)</th>
                                     <th>Precio(Bs)</th>
+                                    @if (auth()->user()->rol === 'Administrador')
                                     <th>Acciones</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -78,7 +82,9 @@
                                         </td>
                                         <td>{{ $plan->duracion }}</td>
                                         <td>{{ $plan->precio }}</td>
+                                        @if (auth()->user()->rol === 'Administrador')
                                         <td>
+                                            
                                             <!-- Botón para abrir el modal de edición -->
                                             <button type="button" class="btn btn-warning" data-bs-toggle="modal"
                                                 data-bs-target="#editPlanModal{{ $plan->idPlan }}">
@@ -94,7 +100,9 @@
                                                     Eliminar
                                                 </button>
                                             </form>
+
                                         </td>
+                                        @endif
                                     </tr>
 
                                     <!--End::row-1 -->

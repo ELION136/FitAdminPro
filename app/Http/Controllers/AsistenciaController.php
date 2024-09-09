@@ -8,12 +8,42 @@ use App\Models\Asistencia;
 use App\Models\Cliente;
 use App\Models\User;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 
 
 
 class AsistenciaController extends Controller
 {
+    public function asistencias(Request $request)
+    {
+        // Obtener el cliente autenticado (suponiendo que hay un sistema de autenticación)
+        $clienteId = auth()->user()->cliente->idCliente;
+
+        // Filtros de fecha (si no se seleccionan, se muestran los últimos 30 días por defecto)
+        $fechaInicio = $request->input('fechaInicio', Carbon::now()->subDays(30)->format('Y-m-d'));
+        $fechaFin = $request->input('fechaFin', Carbon::now()->format('Y-m-d'));
+
+        // Obtener asistencias del cliente en el rango de fechas
+        $asistencias = Asistencia::where('idCliente', $clienteId)
+            ->whereBetween('fecha', [$fechaInicio, $fechaFin])
+            ->orderBy('fecha', 'asc')
+            ->get();
+
+        // Para el gráfico: obtener las fechas y frecuencias de asistencias
+        $fechas = $asistencias->pluck('fecha')->unique();
+        $frecuenciaAsistencias = $fechas->map(function ($fecha) use ($asistencias) {
+            return $asistencias->where('fecha', $fecha)->count();
+        });
+
+        // Comprobar ausencias prolongadas
+        $diasSinAsistir = Carbon::now()->diffInDays(Carbon::parse($asistencias->last()->fecha ?? Carbon::now()));
+
+        return view('cliente.asistencias.asistencia', compact('asistencias', 'fechas', 'frecuenciaAsistencias', 'diasSinAsistir'));
+    }
+
+
+
     public function show()
     {
         $usuario = Auth::user();
@@ -109,21 +139,73 @@ class AsistenciaController extends Controller
         ));
     }
 
+
+
     //para el panel del admin y el panel de usuaario
 
     public function index(Request $request)
     {
-        $query = Asistencia::with('cliente')
-            ->where('eliminado', 1);
+        // Obtener las fechas de los filtros (o establecer valores por defecto)
+        // Obtener las fechas de los filtros (o establecer valores por defecto)
+        $fechaInicio = $request->input('fechaInicio', Carbon::now()->subDays(30)->format('Y-m-d'));
+        $fechaFin = $request->input('fechaFin', Carbon::now()->format('Y-m-d'));
 
+        // Obtener los clientes para el filtro
+        $clientes = Cliente::all();
 
-            $asistencias = $query->orderBy('fecha', 'desc')
-            ->orderBy('horaEntrada', 'desc')
-            ->paginate(15);
-        
-        $usuarios = User::where('eliminado', 1)->get(); // Obtener usuarios activos
-        return view('admin.asistencias.index', compact('usuarios', 'asistencias'));
+        // Filtrar asistencias según cliente y fechas
+        $asistencias = Asistencia::when($request->cliente_id, function ($query) use ($request) {
+            return $query->where('idCliente', $request->cliente_id);
+        })
+            ->whereBetween('fecha', [$fechaInicio, $fechaFin])
+            ->orderBy('fecha', 'asc')
+            ->get();
+
+        // Obtener las fechas únicas de asistencias
+        $fechas = $asistencias->pluck('fecha')->unique();
+
+        // Calcular la frecuencia de asistencias por fecha
+        $frecuenciaAsistencias = $fechas->map(function ($fecha) use ($asistencias) {
+            return $asistencias->where('fecha', $fecha)->count();
+        });
+
+        // Retornar la vista con los datos
+        return view('admin.asistencias.index', compact('clientes', 'asistencias', 'fechaInicio', 'fechaFin', 'fechas', 'frecuenciaAsistencias'));
+
     }
+
+    public function exportarPDF(Request $request)
+    {
+        $asistencias = $this->getAsistenciasFiltradas($request);
+
+        // Pasar el objeto request a la vista
+        $pdf = PDF::loadView('admin.asistencias.asistencias-pdf', [
+            'asistencias' => $asistencias,
+            'request' => $request
+        ]);
+
+        // Descargar el PDF
+        return $pdf->download('reporte_asistencias.pdf');
+    }
+
+
+
+    // Función para obtener las asistencias filtradas (usada en PDF/Excel)
+    private function getAsistenciasFiltradas(Request $request)
+    {
+        $clienteId = $request->input('idCliente');
+        $fechaInicio = $request->input('fechaInicio', Carbon::now()->subMonth()->format('Y-m-d'));
+        $fechaFin = $request->input('fechaFin', Carbon::now()->format('Y-m-d'));
+
+        return Asistencia::with('cliente')
+            ->when($clienteId, function ($query) use ($clienteId) {
+                return $query->where('idCliente', $clienteId);
+            })
+            ->whereBetween('fecha', [$fechaInicio, $fechaFin])
+            ->orderBy('fecha', 'asc')
+            ->get();
+    }
+
 
 
 
@@ -153,6 +235,8 @@ class AsistenciaController extends Controller
         $usuarios = User::where('eliminado', 1)->get(); // Obtener usuarios activos
         return view('admin.asistencias.registrar', compact('fecha', 'hora', 'usuarios', 'asistencias'));
     }
+
+
     public function registrar(Request $request)
     {
         $request->validate([
@@ -173,28 +257,31 @@ class AsistenciaController extends Controller
             return redirect()->back()->with('error', 'El usuario ingresado no es un cliente.');
         }
 
-        $hoy = Carbon::now()->format('Y-m-d');
+        $hoy = Carbon::now('America/La_Paz')->format('Y-m-d');
         $asistencia = Asistencia::where('idCliente', $cliente->idCliente)
             ->whereDate('fecha', $hoy)
             ->first();
 
         if ($request->accion == 'entrada') {
+            // Verifica si ya tiene entrada registrada hoy
             if ($asistencia && $asistencia->horaEntrada) {
                 return redirect()->back()->with('error', 'Ya se ha registrado una entrada para este cliente hoy.');
             }
 
-            if ($asistencia) {
-                $asistencia->update([
-                    'horaEntrada' => Carbon::now('America/La_Paz')->toTimeString(),
-                    'idAutor' => auth()->id(),
-                ]);
-            } else {
+            // Si no hay asistencia registrada hoy, registrar la entrada
+            if (!$asistencia) {
                 Asistencia::create([
                     'idCliente' => $cliente->idCliente,
                     'fecha' => $hoy,
                     'horaEntrada' => Carbon::now('America/La_Paz')->toTimeString(),
                     'idAutor' => auth()->id(),
                     'eliminado' => 1,
+                ]);
+            } else {
+                // Si ya hay un registro de asistencia pero sin entrada, actualiza con la hora de entrada
+                $asistencia->update([
+                    'horaEntrada' => Carbon::now('America/La_Paz')->toTimeString(),
+                    'idAutor' => auth()->id(),
                 ]);
             }
 
@@ -210,6 +297,7 @@ class AsistenciaController extends Controller
                 return back()->with('error', 'Ya se ha registrado una salida para este cliente hoy.');
             }
 
+            // Registrar la hora de salida
             $asistencia->update([
                 'horaSalida' => Carbon::now('America/La_Paz')->toTimeString(),
                 'idAutor' => auth()->id(),
@@ -220,6 +308,8 @@ class AsistenciaController extends Controller
 
         return back()->with('error', 'Acción no válida.');
     }
+
+
     public function autocompleteClientes(Request $request)
     {
         $term = $request->get('term');
@@ -238,6 +328,10 @@ class AsistenciaController extends Controller
 
         return response()->json($clientes);
     }
+
+
+
+
 
     public function estadisticas(Request $request)
     {

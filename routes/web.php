@@ -110,6 +110,8 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::get('/admin/asistencias', [App\Http\Controllers\AsistenciaController::class, 'index'])->name('admin.asistencias.index');
+    Route::get('/admin/asistencias/exportar-pdf', [App\Http\Controllers\AsistenciaController::class, 'exportarPDF'])->name('admin.asistencias.asistencias-pdf');
+
     Route::get('/admin/asistencias/registrar-cliente', [App\Http\Controllers\AsistenciaController::class, 'registro'])->name('admin.asistencias.cliente');
     Route::post('/admin/asistencias/registrar', [App\Http\Controllers\AsistenciaController::class, 'registrar'])->name('admin.asistencias.registrar');
     //Route::post('/admin/asistencias/registrar-salida', [App\Http\Controllers\AsistenciaController::class, 'registrarSalida'])->name('admin.asistencias.registrar-salida');
@@ -120,7 +122,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/autocomplete-clientes', [App\Http\Controllers\AsistenciaController::class, 'autocompleteClientes'])->name('admin.autocomplete.clientes');
 });
 Route::middleware(['auth'])->group(function () {
-    Route::get('/cliente/asistencia', [App\Http\Controllers\AsistenciaController::class, 'show'])->name('cliente.asistencias.asistencia');
+
+    Route::get('/cliente/asistencia', [App\Http\Controllers\AsistenciaController::class, 'asistencias'])->name('cliente.asistencias.asistencia');
     Route::post('/cliente/asistencia/registrar', [App\Http\Controllers\AsistenciaController::class, 'registrar'])->name('cliente.asistencias.registrar-asistencia');
     Route::get('/cliente/asistencia/reporte', [App\Http\Controllers\AsistenciaController::class, 'reporte'])->name('cliente.asistencias.reporte-asistencia');
     Route::put('/cliente/asistencia/{asistencia}', [App\Http\Controllers\AsistenciaController::class, 'corregirAsistencia'])->name('cliente.asistencias.corregir-asistencia');

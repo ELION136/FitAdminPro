@@ -60,7 +60,6 @@ class ClienteController extends Controller
             'nombreUsuario' => 'required|unique:usuarios,nombreUsuario',
             'email' => 'required|email|unique:usuarios,email',
             'telefono' => 'nullable',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'nombre' => 'required',
             'primerApellido' => 'required',
             'segundoApellido' => 'nullable',
@@ -91,14 +90,7 @@ class ClienteController extends Controller
             return redirect()->back()->with('error', 'El ID del usuario es null');
         }
     
-        // Subir y guardar la imagen si existe
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            Storage::disk('public')->put($imageName, file_get_contents($image));
-            $usuario->image = $imageName;
-            $usuario->save();
-        }
+        
     
         // Crear el cliente asociado
         $cliente = Cliente::create([
