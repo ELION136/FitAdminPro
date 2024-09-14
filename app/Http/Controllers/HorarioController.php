@@ -8,53 +8,69 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Servicio;
 use App\Models\ServicioHorario;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Entrenador;
 
 class HorarioController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    // Mostrar la vista del calendario con los horarios del entrenador
+    // Mostrar los horarios con entrenadores
     public function index()
     {
-        // Obtener todos los entrenadores y servicios
+        $horarios = Horario::with('entrenador')->where('eliminado', 1)->get();
         $entrenadores = Entrenador::all();
-        $servicios = Servicio::all();
-
-        // Retornar la vista con los datos necesarios
-        return view('admin.horarios.index', compact('entrenadores', 'servicios'));
+        return view('admin.horarios.index', compact('horarios', 'entrenadores'));
     }
 
-
-
-    public function getHorarios($idEntrenador)
+    // Crear horario
+    public function store(Request $request)
     {
-        // Obtener los horarios del entrenador seleccionado
-        $horarios = Horario::where('idEntrenador', $idEntrenador)->get();
-
-        if ($horarios->isEmpty()) {
-            return response()->json(['message' => 'No se encontraron horarios'], 404);
-        }
-
-        return response()->json($horarios);
-    }
-    public function asignarServicio(Request $request)
-    {
-        // Validar la solicitud
-        $validatedData = $request->validate([
-            'idHorario' => 'required|exists:horarios,idHorario',
-            'idServicio' => 'required|exists:servicios,idServicio',
+        $validated = $request->validate([
+            'idEntrenador' => 'required|exists:entrenadores,idEntrenador',
+            'dia' => 'required|string',
+            'horaInicio' => 'required|date_format:H:i',
+            'horaFin' => 'required|date_format:H:i|after:horaInicio',
+            'capacidad' => 'required|integer|min:1',
         ]);
 
-        // Asignar el servicio al horario
-        $servicioHorario = new ServicioHorario();
-        $servicioHorario->idHorario = $request->idHorario;
-        $servicioHorario->idServicio = $request->idServicio;
-        $servicioHorario->estado = 'Activo'; // o según la lógica de negocio
-        $servicioHorario->idAutor = auth()->user()->idUsuario;
-        $servicioHorario->save();
+        // Añadir el id del usuario logueado como autor
+        $validated['idAutor'] = Auth::id(); // id del usuario logueado
 
-        return redirect()->back()->with('success', 'Servicio asignado correctamente.');
+        Horario::create($validated);
+
+        return redirect()->route('admin.horarios.index')->with('success', 'Horario creado con éxito.');
     }
+
+    // Editar horario
+    public function update(Request $request, Horario $horario)
+    {
+        $validated = $request->validate([
+            'idEntrenador' => 'required|exists:entrenadores,idEntrenador',
+            'dia' => 'required|string',
+            'horaInicio' => 'required|date_format:H:i',
+            'horaFin' => 'required|date_format:H:i|after:horaInicio',
+            'capacidad' => 'required|integer|min:1',
+        ]);
+
+        // Actualizar el id del usuario logueado como autor de la modificación
+        $validated['idAutor'] = Auth::id();
+
+        $horario->update($validated);
+
+        return redirect()->route('admin.horarios.index')->with('success', 'Horario actualizado con éxito.');
+    }
+
+    // Eliminar horario
+    public function destroy(Horario $horario)
+    {
+        // Marcar como eliminado y añadir el id del usuario que realizó la acción
+        $horario->update([
+            'eliminado' => 0,
+            'idAutor' => Auth::id()
+        ]);
+
+        return redirect()->route('admin.horarios.index')->with('success', 'Horario eliminado con éxito.');
+    }
+
+    
+    
 }

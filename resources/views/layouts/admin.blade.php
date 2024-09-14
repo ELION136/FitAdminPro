@@ -2,9 +2,7 @@
 <html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
     data-sidebar-image="none" data-preloader="disable" data-theme="default" data-theme-colors="default">
 
-
-<>
-
+<head>
     <meta charset="utf-8" />
     <title>FitAdminPro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +10,7 @@
     <meta content="Themesbrand" name="author" />
 
 
-    <link rel="shortcut icon" href="{{ url('dist/assets/images/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url('dist/assets/images/logo1.png') }}">
 
     <!-- plugin css -->
     <link href="{{ url('dist/assets/libs/jsvectormap/css/jsvectormap.min.css') }}" rel="stylesheet" type="text/css" />
@@ -179,6 +177,16 @@
                                     <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span
                                         class="align-middle" data-key="t-logout">Cerrar Session</span>
                                 </a>
+                                <li><a class="dropdown-item d.flex border-block-end" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault();
+										document.getElementById('logout-form').submit();"
+                                    style="color: red">
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                        class="d-none">
+                                        @csrf
+                                    </form>
+                                    <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i><span class="ms-2">Cerrar sesion </span>
+                                </a></li>
 
 
                                 </a>
@@ -200,19 +208,19 @@
                 <!-- Dark Logo-->
                 <a href="index.html" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="{{ url('dist/assets/images/logo-sm.png') }}" alt="" height="22">
+                        <img src="{{ url('dist/assets/images/logo1.png') }}" alt="" height="30">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ url('dist/assets/images/logo-dark.png') }}" alt="" height="17">
+                        <img src="{{ url('dist/assets/images/logo3.png') }}" alt="" height="35">
                     </span>
                 </a>
                 <!-- Light Logo-->
                 <a href="index.html" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="{{ url('dist/assets/images/logo-sm.png') }}" alt="" height="22">
+                        <img src="{{ url('dist/assets/images/logo1.png') }}" alt="" height="30">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ url('dist/assets/images/logo-light.png') }}" alt="" height="17">
+                        <img src="{{ url('dist/assets/images/logo3.png') }}" alt="" height="35">
                     </span>
                 </a>
                 <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover"
@@ -398,28 +406,29 @@
                             </div>
                         </li>
 
+                        
                         <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarServicios" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarLayouts">
-                                <i class="ri-layout-3-line"></i> <span data-key="t-layouts">Servicios</span>
-                                
+                            <a class="nav-link menu-link" href="#sidebarServicios" data-bs-toggle="collapse"
+                                role="button" aria-expanded="false" aria-controls="sidebarMaps">
+                                <i class="ri-map-pin-line"></i> <span data-key="t-maps">Servicios</span>
                             </a>
                             <div class="collapse menu-dropdown" id="sidebarServicios">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
-                                        <a href="layouts-horizontal.html" target="_blank" class="nav-link" data-key="t-horizontal">Horizontal</a>
+                                        <a href="{{route('admin.servicios.index')}}" class="nav-link"
+                                            data-key="t-form-select">Mis servicios</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="layouts-detached.html" target="_blank" class="nav-link" data-key="t-detached">Detached</a>
+                                        <a href="{{ route('admin.horarios.index') }}" class="nav-link"
+                                            data-key="t-list-js">horarios</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="layouts-two-column.html" target="_blank" class="nav-link" data-key="t-two-column">Two Column</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="layouts-vertical-hovered.html" target="_blank" class="nav-link" data-key="t-hovered">Hovered</a>
+                                        <a href="{{ route('admin.asistencias.index') }}" class="nav-link"><span
+                                                data-key="t-boxicons">Asistencias</span> </a>
                                     </li>
                                 </ul>
                             </div>
-                        </li> <!-- end Dashboard Menu -->
+                        </li>
 
 
                         <li class="nav-item">
@@ -1624,6 +1633,8 @@
     <!-- Vector map-->
     <script src="{{ url('dist/assets/libs/jsvectormap/js/jsvectormap.min.js') }}"></script>
     <script src="{{ url('dist/assets/libs/jsvectormap/maps/world-merc.js') }}"></script>
+    <script src="{{url('dist/assets/js/pages/profile-setting.init.js')}}"></script>
+
 
     <!-- Dashboard init -->
     <script src="{{ url('dist/assets/js/pages/dashboard-analytics.init.js') }}"></script>

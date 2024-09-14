@@ -4,7 +4,7 @@
   
         <div class="card-sigin">
             <div class="main-signup-header">
-                <h2 class="text-primary mb-4">Bienvenido a <img src="{{ url('assets/images/brand-logos/2desktop-logo-white.png') }}" alt="FitAdminPro Logo"
+                <h2 class="text-orange mb-4">Bienvenido a <img src="{{ url('dist/assets/images/2desktop-logo-white.png') }}" alt="FitAdminPro Logo"
                     class="logo-luminoso mb-4"></h2>
                 
                

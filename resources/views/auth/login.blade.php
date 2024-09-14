@@ -1,31 +1,40 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr" data-nav-layout="vertical" data-vertical-style="overlay" data-theme-mode="dark"
-    data-header-styles="dark" data-menu-styles="dark" data-toggled="close">
+<!doctype html>
+<html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
+    data-sidebar-image="none" data-preloader="disable" data-theme="default" data-theme-colors="default">
+
 <head>
-    <!-- Meta Data -->
-    <meta charset="UTF-8">
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8" />
     <title>FitAdminPro</title>
-    <meta name="Description" content="Bootstrap Responsive Admin Web Dashboard HTML5 Template">
-    <meta name="Author" content="Spruko Technologies Private Limited">
-    <meta name="keywords"
-        content="admin,admin dashboard,admin panel,admin template,bootstrap,clean,dashboard,flat,jquery,modern,responsive,premium admin templates,responsive admin,ui,ui kit.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+    <meta content="Themesbrand" name="author" />
 
-    <!-- Favicon -->
-    <link rel="icon" href="{{ url('assets/images/brand-logos/toggle-logo2.png') }}" type="image/x-icon">
 
-    <!-- Main Theme Js -->
-    <script src="{{ url('assets/js/authentication-main.js') }}"></script>
+    <link rel="shortcut icon" href="{{ url('dist/assets/images/logo1.png') }}">
 
+    <!-- plugin css -->
+    <link href="{{ url('dist/assets/libs/jsvectormap/css/jsvectormap.min.css') }}" rel="stylesheet" type="text/css" />
+
+ 
+
+
+    <!-- Layout config Js -->
+    <script src="{{ url('dist/assets/js/layout.js') }}"></script>
     <!-- Bootstrap Css -->
-    <link id="style" href="{{ url('assets/libs/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-
-    <!-- Style Css -->
-    <link href="{{ url('assets/css/styles.min.css') }}" rel="stylesheet">
-
+    <link href="{{ url('dist/assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <!-- Icons Css -->
-    <link href="{{ url('assets/css/icons.min.css') }}" rel="stylesheet">
+    <link href="{{ url('dist/assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
+    <!-- App Css-->
+    <link href="{{ url('dist/assets/css/app.min.css') }}" rel="stylesheet" type="text/css" />
+    <!-- custom Css-->
+    <link href="{{ url('dist/assets/css/custom.min.css') }}" rel="stylesheet" type="text/css" />
+
+    <link href="{{ asset('package/dist/sweetalert2.min.css') }}" rel="stylesheet">
+    <script src="{{ asset('package/dist/sweetalert2.all.min.js') }}"></script>
+
+
+
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 
@@ -41,7 +50,7 @@
             min-height: 100vh;
             position: relative;
             z-index: 1;
-            background: linear-gradient(rgba(12, 54, 94, 0.5), rgba(9, 50, 73, 0.5)),
+            background: linear-gradient(rgba(26, 29, 32, 0.75), rgba(1, 1, 1, 0.413)),
                 url('{{ url('styles/img/f3.jpg') }}') no-repeat center center fixed;
             background-size: cover;
             color: #ffffff;
@@ -76,7 +85,7 @@
         }
 
         .form-control:focus {
-            border-color: #4a90e2;
+            border-color: #e2b44a;
             box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.25);
             background-color: rgba(255, 255, 255, 0.15);
         }
@@ -97,7 +106,7 @@
             top: -0.5rem;
             left: 0.75rem;
             font-size: 12px;
-            color: #4a90e2;
+            color: #e2914a;
         }
 
         .is-invalid {
@@ -114,13 +123,13 @@
         .btn-primary {
             border-radius: 8px;
             padding: 0.75rem 1.5rem;
-            background-color: #4a90e2;
-            border-color: #4a90e2;
+            background-color: #ec7d0d;
+            border-color: #f0950c;
         }
 
         .btn-primary:hover {
-            background-color: #3a7bd5;
-            border-color: #3a7bd5;
+            background-color: #f34814;
+            border-color: #f22e0c;
         }
 
         .main-signup-header {
@@ -137,7 +146,7 @@
         }
 
         .text-primary {
-            color: #7d96f1 !important;
+            color: #e6813e !important;
         }
 
         .form-check-label, .text-muted {
@@ -145,22 +154,22 @@
         }
 
         a {
-            color: #4a90e2;
+            color: #e2a04a;
         }
 
         a:hover {
-            color: #3a7bd5;
+            color: #d5873a;
         }
 
         .logo-luminoso {
         max-height: 40px; /* Ajusta la altura del logo */
         vertical-align: middle;
-        filter: drop-shadow(0 0 10px rgba(74, 144, 226, 0.7)); /* Sombra luminosa alrededor del logo */
+        filter: drop-shadow(0 0 10px rgba(226, 155, 74, 0.7)); /* Sombra luminosa alrededor del logo */
         transition: all 0.3s ease; /* Transición suave para los efectos */
         }
 
         .logo-luminoso:hover {
-        filter: drop-shadow(0 0 20px rgba(74, 144, 226, 1)) brightness(1.2); /* Aumenta el brillo al pasar el cursor */
+        filter: drop-shadow(0 0 20px rgb(226, 137, 74)) brightness(1.2); /* Aumenta el brillo al pasar el cursor */
         transform: scale(1.05); /* Pequeño efecto de zoom */
         }
     </style>
@@ -173,7 +182,7 @@
         <div class="card-sigin">
             <div class="main-signup-header">
                 <h2 class="text-primary mb-2">Bienvenido! a <br>
-                    <img src="{{ url('assets/images/brand-logos/2desktop-logo-white.png') }}" alt="FitAdminPro Logo" class="logo-luminoso">
+                    <img src="{{ url('dist/assets/images/logo3.png') }}" alt="FitAdminPro Logo" class="logo-luminoso">
                 </h2>
                 
                 
@@ -232,7 +241,12 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ url('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url('dist/assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url('dist/assets/libs/simplebar/simplebar.min.js') }}"></script>
+    <script src="{{ url('dist/assets/libs/node-waves/waves.min.js') }}"></script>
+    <script src="{{ url('dist/assets/libs/feather-icons/feather.min.js') }}"></script>
+    <script src="{{ url('dist/assets/js/pages/plugins/lord-icon-2.1.0.js') }}"></script>
+    <script src="{{ url('dist/assets/js/plugins.js') }}"></script>
     
     
 </body>

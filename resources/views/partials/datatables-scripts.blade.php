@@ -1,9 +1,14 @@
 @push('scripts')
 
 <!-- Include DataTables and Buttons JS libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 
+
 <script>
+
+
     $(document).ready(function() {
         $('.datatable').DataTable({
             dom: 'Bfrtip',
@@ -22,6 +27,17 @@
                     text: '<i class="fas fa-file-csv"></i> CSV',
                     titleAttr: 'Exportar a CSV',
                     className: 'btn btn-success' // Color de fondo verde
+                },
+
+
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="fas fa-file-pdf"></i> PDF',
+                    titleAttr: 'Exportar a PDF',
+                    className: 'btn btn-danger',
+                    customize: function(doc) {
+                        
+                }
                 },
                 {
                     extend: 'excelHtml5',

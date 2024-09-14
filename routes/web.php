@@ -41,6 +41,9 @@ Route::get('/admin/home', [App\Http\Controllers\AdminController::class, 'home'])
 // Rutas para el perfil del usuario autenticado
 Route::get('/profile/show', [App\Http\Controllers\UsuarioController::class, 'profile'])->name('profile.index')->middleware('auth');
 Route::put('/profile/update', [App\Http\Controllers\UsuarioController::class, 'updateProfile'])->name('profile.update')->middleware('auth');
+route::post('/profile/validate', [App\Http\Controllers\UsuarioController::class, 'validateProfile'])->name('profile.validate')->middleware('auth');
+
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/entrenadores', [App\Http\Controllers\EntrenadorController::class, 'index'])->name('admin.entrenadores.index');
     Route::get('/admin/entrenadores/create', [App\Http\Controllers\EntrenadorController::class, 'create'])->name('admin.entrenadores.create');
@@ -97,9 +100,19 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/admin/horarios', [App\Http\Controllers\HorarioController::class, 'index'])->name('admin.horarios.index');
-    Route::post('/admin/horarios/asignar', [App\Http\Controllers\HorarioController::class, 'asignarServicio'])->name('admin.horarios.asignarServicio');
-    Route::get('/admin/horarios/{idEntrenador}', [App\Http\Controllers\HorarioController::class, 'getHorarios'])->name('admin.horarios.getHorarios');
+
+    // Guardar un nuevo horario (POST)
+    Route::post('/admin/horarios', [App\Http\Controllers\HorarioController::class, 'store'])->name('admin.horarios.store');
+    // routes/web.php
     
+
+
+    // Editar un horario existente (PUT)
+    Route::put('/admin/horarios/{horario}', [App\Http\Controllers\HorarioController::class, 'update'])->name('admin.horarios.update');
+
+    // Eliminar (deshabilitar) un horario (DELETE)
+    Route::delete('/admin/horarios/{horario}', [App\Http\Controllers\HorarioController::class, 'destroy'])->name('admin.horarios.destroy');
+
     Route::get('/admin/horarios2', [App\Http\Controllers\Horario2Controller::class, 'index'])->name('admin.horarios2.index');
     Route::put('/admin/horarios2/{idHorario}', [App\Http\Controllers\Horario2Controller::class, 'update'])->name('admin.horarios2.update');
     Route::delete('/admin/horarios2/{idHorario}', [App\Http\Controllers\Horario2Controller::class, 'destroy'])->name('admin.horarios2.destroy');
