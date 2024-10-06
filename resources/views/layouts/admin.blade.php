@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
-    data-sidebar-image="none" data-preloader="disable" data-theme="default" data-theme-colors="default">
+    data-sidebar-image="none" data-preloader="disable" data-theme="material" data-theme-colors="default" data-bs-theme="dark">
 
 <head>
     <meta charset="utf-8" />
@@ -10,6 +10,7 @@
     <meta content="Themesbrand" name="author" />
 
 
+
     <link rel="shortcut icon" href="{{ url('dist/assets/images/logo1.png') }}">
 
     <!-- plugin css -->
@@ -17,12 +18,15 @@
 
     <!--datatable css-->
 
+    
+<!--datatable responsive css-->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" />
-    <!--datatable responsive css-->
+    
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap.min.css" />
 
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
 
+    
     <!-- Layout config Js -->
     <script src="{{ url('dist/assets/js/layout.js') }}"></script>
     <!-- Bootstrap Css -->
@@ -168,25 +172,18 @@
                                             class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i>
                                         <span class="align-middle">Perfil</span></a>
                                 @endif
-                                <a class="dropdown-item" href="{{ route('logout') }} onclick="event.preventDefault();
-                                    document.getElementById('logout-form').submit();" style="color: red">
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST"
-                                        class="d-none">
-                                        @csrf
-                                    </form>
-                                    <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span
-                                        class="align-middle" data-key="t-logout">Cerrar Session</span>
-                                </a>
+
                                 <li><a class="dropdown-item d.flex border-block-end" href="{{ route('logout') }}"
-                                    onclick="event.preventDefault();
+                                        onclick="event.preventDefault();
 										document.getElementById('logout-form').submit();"
-                                    style="color: red">
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST"
-                                        class="d-none">
-                                        @csrf
-                                    </form>
-                                    <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i><span class="ms-2">Cerrar sesion </span>
-                                </a></li>
+                                        style="color: red">
+                                        <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                            class="d-none">
+                                            @csrf
+                                        </form>
+                                        <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i><span
+                                            class="ms-2">Cerrar sesion </span>
+                                    </a></li>
 
 
                                 </a>
@@ -277,8 +274,6 @@
             </div>
             <div id="scrollbar">
                 <div class="container-fluid">
-
-
                     <div id="two-column-menu">
                     </div>
                     <ul class="navbar-nav" id="navbar-nav">
@@ -288,176 +283,231 @@
                                 role="button" aria-expanded="false" aria-controls="sidebarDashboards">
                                 <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Dashboards</span>
                             </a>
-                            <div class="collapse menu-dropdown" id="sidebarDashboards">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.home') }}" class="nav-link" data-key="t-analytics">
-                                            Inicio </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.index') }}" class="nav-link" data-key="t-crm">
-                                            Panel de control </a>
-                                    </li>
+                            @if (auth()->user() && auth()->user()->rol === 'Administrador')
+                                <div class="collapse menu-dropdown" id="sidebarDashboards">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.index') }}" class="nav-link" data-key="t-crm">
+                                                Panel de control
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            @endif
 
-                                </ul>
-                            </div>
+                            @if (auth()->user() && auth()->user()->rol === 'Cliente')
+                                <div class="collapse menu-dropdown" id="sidebarDashboards">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('cliente.dashboard') }}" class="nav-link"
+                                                data-key="t-crm">
+                                                Panel de control
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            @endif
                         </li> <!-- end Dashboard Menu -->
-
-
-
-
-
-
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Paginas</span>
                         </li>
+                        @if (auth()->user() && (auth()->user()->rol === 'Administrador' || auth()->user()->rol === 'Entrenador'))
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="#sidebarLanding" data-bs-toggle="collapse"
+                                    role="button" aria-expanded="false" aria-controls="sidebarLanding">
+                                    <i class="ri-user-line"></i><span data-key="t-landing">Usuarios</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarLanding">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.entrenadores.index') }}" class="nav-link"
+                                                data-key="t-one-page"> Entrenadores
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.clientes.index') }}" class="nav-link"
+                                                data-key="t-nft-landing">Clintes
+                                            </a>
+                                        </li>
+                                        
+                                    </ul>
+                                </div>
+                            </li>
+                        @endif
 
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarLanding" data-bs-toggle="collapse"
-                                role="button" aria-expanded="false" aria-controls="sidebarLanding">
-                                <i class="ri-rocket-line"></i> <span data-key="t-landing">Usuarios</span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarLanding">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.entrenadores.index') }}" class="nav-link"
-                                            data-key="t-one-page"> Entrenadores
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.clientes.index') }}" class="nav-link"
-                                            data-key="t-nft-landing">Clintes
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="job-landing.html" class="nav-link" data-key="t-job">Usuarios</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
+                        @if (auth()->user() && auth()->user()->rol === 'Cliente')
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="{{ route('cliente.entrenadores.index') }}">
+                                    <i class="ri-honour-line"></i> <span data-key="t-widgets">Entrenadores</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="#sidebarMember" data-bs-toggle="collapse"
+                                    role="button" aria-expanded="false" aria-controls="sidebarForms">
+                                    <i class="ri-file-list-3-line"></i> <span data-key="t-forms">membresia</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarMember">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('cliente.membresias.index') }}" class="nav-link"
+                                                data-key="t-basic-elements">Catalogo</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('cliente.membresias.info') }}" class="nav-link"
+                                                data-key="t-form-select"> Mi Membresia</a>
+                                        </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarForms" data-bs-toggle="collapse"
-                                role="button" aria-expanded="false" aria-controls="sidebarForms">
-                                <i class="ri-file-list-3-line"></i> <span data-key="t-forms">Inscripciones</span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarForms">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.inscripciones.create') }}" class="nav-link"
-                                            data-key="t-basic-elements">inscripcion a
-                                            membresias</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.membresias.historial') }}" class="nav-link"
-                                            data-key="t-form-select"> Historial de
-                                            inscripciones </a>
-                                    </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="{{ route('cliente.asistencias.view') }}">
+                                    <i class="ri-honour-line"></i> <span data-key="t-widgets">Mis Asistencias</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if (auth()->user() && (auth()->user()->rol === 'Administrador' || auth()->user()->rol === 'Entrenador'))
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="#sidebarForms" data-bs-toggle="collapse"
+                                    role="button" aria-expanded="false" aria-controls="sidebarForms">
+                                    <i class="ri-file-list-3-line"></i> <span data-key="t-forms">Inscripciones</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarForms">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.inscripciones.create') }}" class="nav-link"
+                                                data-key="t-basic-elements">inscripcion a
+                                                membresias</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.inscripciones.index') }}" class="nav-link"
+                                                data-key="t-form-select"> Historial de
+                                                inscripciones </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="#sidebarTables" data-bs-toggle="collapse"
+                                    role="button" aria-expanded="false" aria-controls="sidebarTables">
+                                    <i class="ri-vip-crown-line"></i> <span data-key="t-tables">Membresias</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarTables">
+                                    <ul class="nav nav-sm flex-column">
 
-                                </ul>
-                            </div>
-                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.planes.index') }}" class="nav-link"
+                                                data-key="t-grid-js">Planes de
+                                                Membresias</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarTables" data-bs-toggle="collapse"
-                                role="button" aria-expanded="false" aria-controls="sidebarTables">
-                                <i class="ri-layout-grid-line"></i> <span data-key="t-tables">Membresias</span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarTables">
-                                <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="#sidebarIcons" data-bs-toggle="collapse"
+                                    role="button" aria-expanded="false" aria-controls="sidebarIcons">
+                                    <i class="ri-check-double-line"></i> <span data-key="t-icons">Asistencias </span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarIcons">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.asistencias.cliente') }}" class="nav-link"><span
+                                                    data-key="t-remix">Registrar</span></a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('qr.scanner') }}" class="nav-link"><span
+                                                    data-key="t-remix">QrRegistrar</span></a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.asistencias.index') }}" class="nav-link"><span
+                                                    data-key="t-boxicons">Asistencias</span> </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('qr.generateAll') }}" class="nav-link"><span
+                                                    data-key="t-boxicons">vista</span> </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="#sidebarServicios" data-bs-toggle="collapse"
+                                    role="button" aria-expanded="false" aria-controls="sidebarMaps">
+                                    <i class="ri-service-line"></i> <span data-key="t-maps">Servicios</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarServicios">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.servicios.index') }}" class="nav-link"
+                                                data-key="t-form-select">Lista de Servicios</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.horarios.index') }}" class="nav-link"
+                                                data-key="t-list-js">Horarios de Servicios</a>
+                                        </li>
+                                        
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="#sidebarReservas" data-bs-toggle="collapse"
+                                    role="button" aria-expanded="false" aria-controls="sidebarMaps">
+                                    <i class="ri-calendar-event-line"></i> <span data-key="t-maps">Reservas</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarReservas">
+                                    <ul class="nav nav-sm flex-column">
 
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.planes.index') }}" class="nav-link"
-                                            data-key="t-grid-js">Planes de
-                                            Membresias</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.pagos.index') }}" class="nav-link"
-                                            data-key="t-list-js">Pagos</a>
-                                    </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.reservas.index') }}" class="nav-link"><span
+                                                    data-key="t-boxicons">Lista de Reservas</span> </a>
+                                        </li>
+                                    
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.reservas.create') }}" class="nav-link"
+                                                data-key="t-list-js">Realizar Reservas</a>
+                                        </li>
+                                        
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="#sidebarPagos" data-bs-toggle="collapse"
+                                    role="button" aria-expanded="false" aria-controls="sidebarMaps">
+                                    <i class="ri-money-dollar-circle-line"></i> <span data-key="t-maps">Pagos</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarPagos">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{route('admin.pagos.index')}}" class="nav-link"
+                                                data-key="t-form-select">historial de pagos</a>
+                                        </li>
+                                        
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link" href="#sidebarMaps" data-bs-toggle="collapse"
+                                    role="button" aria-expanded="false" aria-controls="sidebarMaps">
+                                    <i class="ri-bar-chart-line"></i><span data-key="t-maps">Reportes</span>
+                                </a>
+                                <div class="collapse menu-dropdown" id="sidebarMaps">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.reportes.inscripciones') }}" class="nav-link"
+                                                data-key="t-form-select">Reportes de inscripciones </a>
+                                        </li>
+                                    
+                                        
 
-                                </ul>
-                            </div>
-                        </li>
-
-
-
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarIcons" data-bs-toggle="collapse"
-                                role="button" aria-expanded="false" aria-controls="sidebarIcons">
-                                <i class="ri-compasses-2-line"></i> <span data-key="t-icons">Asistencias </span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarIcons">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.asistencias.cliente') }}" class="nav-link"><span
-                                                data-key="t-remix">Registrar</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.asistencias.index') }}" class="nav-link"><span
-                                                data-key="t-boxicons">Asistencias</span> </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.asistencias.estadisticas') }}"
-                                            class="nav-link"><span data-key="t-material-design">Estadisticas</span>
-                                        </a>
-                                    </li>
-
-                                </ul>
-                            </div>
-                        </li>
-
-                        
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarServicios" data-bs-toggle="collapse"
-                                role="button" aria-expanded="false" aria-controls="sidebarMaps">
-                                <i class="ri-map-pin-line"></i> <span data-key="t-maps">Servicios</span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarServicios">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{route('admin.servicios.index')}}" class="nav-link"
-                                            data-key="t-form-select">Mis servicios</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.horarios.index') }}" class="nav-link"
-                                            data-key="t-list-js">horarios</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.asistencias.index') }}" class="nav-link"><span
-                                                data-key="t-boxicons">Asistencias</span> </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-
-
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarMaps" data-bs-toggle="collapse"
-                                role="button" aria-expanded="false" aria-controls="sidebarMaps">
-                                <i class="ri-map-pin-line"></i> <span data-key="t-maps">Reportes</span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarMaps">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.membresias.historial') }}" class="nav-link"
-                                            data-key="t-form-select"> Historial de
-                                            inscripciones </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.pagos.index') }}" class="nav-link"
-                                            data-key="t-list-js">Pagos</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.asistencias.index') }}" class="nav-link"><span
-                                                data-key="t-boxicons">Asistencias</span> </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        
-
-
-
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.reportes.reservas') }}"
+                                                class="nav-link"><span data-key="t-material-design">Reportes
+                                                    reservas</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        @endif
                     </ul>
                 </div>
                 <!-- Sidebar -->
@@ -1612,8 +1662,10 @@
     <script src="{{ url('dist/assets/js/pages/plugins/lord-icon-2.1.0.js') }}"></script>
     <script src="{{ url('dist/assets/js/plugins.js') }}"></script>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
+    
     <!--datatable js-->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
@@ -1625,7 +1677,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
 
-    <script src="{{url('dist/assets/js/pages/datatables.init.js')}}"></script>
+    <script src="{{ url('dist/assets/js/pages/datatables.init.js') }}"></script>
 
     <!-- apexcharts -->
     <script src="{{ url('dist/assets/libs/apexcharts/apexcharts.min.js') }}"></script>
@@ -1633,12 +1685,19 @@
     <!-- Vector map-->
     <script src="{{ url('dist/assets/libs/jsvectormap/js/jsvectormap.min.js') }}"></script>
     <script src="{{ url('dist/assets/libs/jsvectormap/maps/world-merc.js') }}"></script>
-    <script src="{{url('dist/assets/js/pages/profile-setting.init.js')}}"></script>
+    <script src="{{ url('dist/assets/js/pages/profile-setting.init.js') }}"></script>
+
+    <!-- calendar min js -->
+    <script src="{{ url('dist/assets/libs/fullcalendar/index.global.min.js') }}"></script>
+
+    <!-- Calendar init -->
+    <script src="{{ url('dist/assets/js/pages/calendar.init.js') }}"></script>
 
 
     <!-- Dashboard init -->
     <script src="{{ url('dist/assets/js/pages/dashboard-analytics.init.js') }}"></script>
     <script src="{{ url('dist/assets/js/pages/dashboard-projects.init.js') }}"></script>
+
     <!-- App js -->
     @stack('scripts')
     <script>
@@ -1666,10 +1725,6 @@
                 mybutton.addEventListener("click", topFunction);
             }
         });
-        
-
-
-    
     </script>
     <script src="{{ url('dist/assets/js/app.js') }}"></script>
 </body>

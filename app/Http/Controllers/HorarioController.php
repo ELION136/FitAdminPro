@@ -13,64 +13,136 @@ use App\Models\Entrenador;
 
 class HorarioController extends Controller
 {
-    // Mostrar los horarios con entrenadores
     public function index()
     {
-        $horarios = Horario::with('entrenador')->where('eliminado', 1)->get();
+        // Obtener todos los horarios para mostrarlos en la vista
+        $horarios = Horario::with(['servicio', 'entrenador'])->where('eliminado', 1)->get();
+        $servicios = Servicio::where('eliminado', 1)->get();
         $entrenadores = Entrenador::all();
-        return view('admin.horarios.index', compact('horarios', 'entrenadores'));
+
+        return view('admin.horarios.index', compact('horarios', 'servicios', 'entrenadores'));
     }
 
-    // Crear horario
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        // Validar los campos del formulario
+        $request->validate([
+            'idServicio' => 'required|exists:servicios,idServicio',
             'idEntrenador' => 'required|exists:entrenadores,idEntrenador',
-            'dia' => 'required|string',
+            'diaSemana' => 'required|array',
             'horaInicio' => 'required|date_format:H:i',
-            'horaFin' => 'required|date_format:H:i|after:horaInicio',
             'capacidad' => 'required|integer|min:1',
         ]);
 
-        // Añadir el id del usuario logueado como autor
-        $validated['idAutor'] = Auth::id(); // id del usuario logueado
+        // Obtener la duración del servicio seleccionado
+        $servicio = Servicio::findOrFail($request->idServicio);
+        $duracion = $servicio->duracion; // La duración está en minutos
 
-        Horario::create($validated);
+        // Calcular la hora de fin sumando la duración a la hora de inicio
+        $horaInicio = Carbon::createFromFormat('H:i', $request->horaInicio);
+        $horaFin = $horaInicio->copy()->addMinutes($duracion); // Sumar duración en minutos
 
-        return redirect()->route('admin.horarios.index')->with('success', 'Horario creado con éxito.');
+        $idAutor = auth()->id();
+
+        // Verificar si ya existe un horario en el mismo día, misma hora, mismo servicio y entrenador
+        foreach ($request->diaSemana as $dia) {
+            $exists = Horario::where('idServicio', $request->idServicio)
+                ->where('idEntrenador', $request->idEntrenador)
+                ->where('diaSemana', $dia)
+                ->where('horaInicio', $request->horaInicio)
+                ->where('horaFin', $horaFin->format('H:i'))
+                ->exists();
+
+            if ($exists) {
+                return back()->withErrors([
+                    'error' => "Ya existe un horario para el servicio y entrenador en $dia a la misma hora."
+                ]);
+            }
+
+            // Si no existe, crear un nuevo registro para ese día
+            Horario::create([
+                'idServicio' => $request->idServicio,
+                'idEntrenador' => $request->idEntrenador,
+                'diaSemana' => $dia,
+                'horaInicio' => $request->horaInicio,
+                'horaFin' => $horaFin->format('H:i'), // Guardar la horaFin calculada
+                'capacidad' => $request->capacidad,
+                'idAutor' => $idAutor,
+            ]);
+        }
+
+        return redirect()->route('admin.horarios.index')->with('success', 'Horarios creados exitosamente.');
     }
 
-    // Editar horario
-    public function update(Request $request, Horario $horario)
+    public function update(Request $request, $id)
     {
-        $validated = $request->validate([
+        // Validar los datos entrantes
+        $request->validate([
+            'idServicio' => 'required|exists:servicios,idServicio',
             'idEntrenador' => 'required|exists:entrenadores,idEntrenador',
-            'dia' => 'required|string',
+            'diaSemana' => 'required|array', // Validar como array
+            'diaSemana.*' => 'in:Lunes,Martes,Miércoles,Jueves,Viernes,Sábado,Domingo', // Validar cada día
             'horaInicio' => 'required|date_format:H:i',
-            'horaFin' => 'required|date_format:H:i|after:horaInicio',
             'capacidad' => 'required|integer|min:1',
         ]);
 
-        // Actualizar el id del usuario logueado como autor de la modificación
-        $validated['idAutor'] = Auth::id();
+        // Obtener la duración del servicio seleccionado
+        $servicio = Servicio::findOrFail($request->idServicio);
+        $duracion = $servicio->duracion; // La duración está en minutos
 
-        $horario->update($validated);
+        // Calcular la hora de fin sumando la duración a la hora de inicio
+        try {
+            $horaInicio = Carbon::createFromFormat('H:i', $request->horaInicio);
+        } catch (\Exception $e) {
+            return back()->withErrors(['horaInicio' => 'El formato de la hora de inicio no es válido.']);
+        }
 
-        return redirect()->route('admin.horarios.index')->with('success', 'Horario actualizado con éxito.');
+        $horaFin = $horaInicio->copy()->addMinutes($duracion); // Sumar duración en minutos
+
+        // Buscar el horario existente que se va a actualizar
+        $horario = Horario::findOrFail($id);
+        $idAutor = auth()->id();
+
+        // Verificar conflictos de horario para cada día seleccionado
+        foreach ($request->diaSemana as $dia) {
+            $exists = Horario::where('idServicio', $request->idServicio)
+                ->where('idEntrenador', $request->idEntrenador)
+                ->where('diaSemana', $dia)
+                ->where('horaInicio', $request->horaInicio)
+                ->where('horaFin', $horaFin->format('H:i'))
+                ->where('idHorario', '!=', $horario->idHorario) // Ignorar el horario que estamos actualizando
+                ->exists();
+
+            if ($exists) {
+                return back()->withErrors([
+                    'error' => "Ya existe un horario para el servicio y entrenador en $dia a la misma hora."
+                ]);
+            }
+        }
+
+        // Actualizar el horario en la base de datos
+        $horario->idServicio = $request->idServicio;
+        $horario->idEntrenador = $request->idEntrenador;
+        $horario->horaInicio = $request->horaInicio;
+        $horario->horaFin = $horaFin->format('H:i'); // Guardar la horaFin calculada
+        $horario->capacidad = $request->capacidad;
+        $horario->idAutor = $idAutor;
+
+        // Actualizar los días de la semana, dependiendo si es relación o columna
+        $horario->diaSemana = implode(',', $request->diaSemana); // Guardar los días como un string
+        $horario->save();
+
+        return redirect()->route('admin.horarios.index')->with('success', 'Horario actualizado exitosamente.');
     }
 
-    // Eliminar horario
-    public function destroy(Horario $horario)
+
+    public function destroy($id)
     {
-        // Marcar como eliminado y añadir el id del usuario que realizó la acción
-        $horario->update([
-            'eliminado' => 0,
-            'idAutor' => Auth::id()
-        ]);
+        // Borrar de manera lógica (actualizando el campo eliminado a 0)
+        $horario = Horario::findOrFail($id);
+        $horario->update(['eliminado' => 0]);
 
-        return redirect()->route('admin.horarios.index')->with('success', 'Horario eliminado con éxito.');
+        return redirect()->route('admin.horarios.index')->with('success', 'Horario desactivado con éxito.');
     }
 
-    
-    
 }

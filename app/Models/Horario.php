@@ -13,8 +13,9 @@ class Horario extends Model
     protected $primaryKey = 'idHorario';
 
     protected $fillable = [
-        'idEntrenador',
-        'dia',
+        'idServicio',
+        'idEntrenador', 
+        'diaSemana',
         'horaInicio',
         'horaFin',
         'capacidad',
@@ -30,18 +31,20 @@ class Horario extends Model
     /*public function empleado()
     {
         return $this->belongsTo(Empleado::class, 'idEmpleado');
-    }*/
+    }*/public function servicio()
+    {
+        return $this->belongsTo(Servicio::class, 'idServicio');
+    }
+
     public function entrenador()
     {
         return $this->belongsTo(Entrenador::class, 'idEntrenador');
     }
 
-
-    public function servicios()
+    public function detalleReservas()
     {
-        return $this->belongsToMany(Servicio::class, 'servicios_horarios', 'idHorario', 'idServicio');
+        return $this->hasMany(DetalleReserva::class, 'idHorario');
     }
-
 
 
 }

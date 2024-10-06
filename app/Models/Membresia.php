@@ -14,31 +14,17 @@ class Membresia extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'idCliente',
-        'idPlan',
-        'fechaInicio',
-        'fechaFin',
-        'estado',
+        'nombre', 
+        'precio', 
+        'duracion', 
+        'descripcion',
         'idAutor',
         'eliminado',
     ];
-    protected $casts = [
-        'fechaInicio' => 'datetime',
-        'fechaFin' => 'datetime',
-    ];
+    protected $dates = ['fechaCreacion', 'fechaModificacion'];
 
-    public function cliente()
+    public function inscripciones()
     {
-        return $this->belongsTo(Cliente::class, 'idCliente');
-    }
-
-    public function planMembresia()
-    {
-        return $this->belongsTo(PlanMembresia::class, 'idPlan');
-    }
-
-    public function pagos()
-    {
-        return $this->hasMany(Pago::class, 'idMembresia');
+        return $this->hasMany(Inscripcion::class, 'idMembresia');
     }
 }

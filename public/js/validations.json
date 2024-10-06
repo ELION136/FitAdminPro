@@ -1,0 +1,42 @@
+{
+    "nombre": {
+        "required": "El nombre es obligatorio",
+        "minLength": "El nombre debe tener al menos 3 caracteres",
+        "lettersOnly": "El nombre solo debe contener letras",
+        "noSpaces": "El nombre no debe contener espacios"
+    },
+    "primerApellido": {
+        "required": "El primer apellido es obligatorio",
+        "minLength": "El apellido debe tener al menos 3 caracteres",
+        "lettersOnly": "El apellido solo debe contener letras",
+        "noSpaces": "El apellido no debe contener espacios"
+    },
+    "segundoApellido": {
+        "lettersOnly": "El segundo apellido solo debe contener letras"
+    },
+    "email": {
+        "required": "El email es obligatorio",
+        "invalid": "El formato de email es incorrecto",
+        "noSpaces": "El email no debe contener espacios"
+    },
+    "fechaNacimiento": {
+        "required": "La fecha de nacimiento es obligatoria"
+    },
+    "telefono": {
+        "numbersOnly": "El teléfono solo debe contener números",
+        "minLength": "El teléfono debe tener al menos 7 dígitos",
+        "maxLength": "El teléfono no debe exceder los 15 dígitos"
+    },
+    "nombreUsuario": {
+        "required": "El nombre de usuario es obligatorio",
+        "lettersNumbersOnly": "El nombre de usuario solo debe contener letras y números",
+        "noSpaces": "El nombre de usuario no debe contener espacios",
+        "minLength": "El nombre de usuario debe tener al menos 4 caracteres"
+    },
+    "direccion": {
+        "required": "La dirección es obligatoria"
+    },
+    "especialidad": {
+        "required": "La especialidad es obligatoria"
+    }
+}

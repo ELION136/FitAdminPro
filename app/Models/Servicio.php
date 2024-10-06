@@ -11,23 +11,34 @@ class Servicio extends Model
 
     protected $table = 'servicios';
     protected $primaryKey = 'idServicio';
+
+    
     protected $fillable = [
         'nombre',
         'descripcion',
         'duracion',
-        'tipoServicio',
-        'categoria',
+        'precio',
+        'fechaInicio',     // Añadir el campo fechaInicio
+        'fechaFin',   
         'idAutor',
         'eliminado',
     ];
 
     public $timestamps = false;
 
-    protected $dates = ['fechaCreacion', 'fechaModificacion'];
-
+    protected $dates = [
+        'fechaCreacion',
+        'fechaModificacion',
+        'fechaInicio',     // Indicar que es un campo de tipo fecha
+        'fechaFin', ];
+ 
+        protected $casts = [
+            'fechaInicio' => 'date',
+            'fechaFin' => 'date',
+        ];
     // Relaciones
     public function horarios()
     {
-        return $this->belongsToMany(Horario::class, 'servicios_horarios', 'idServicio', 'idHorario');
+        return $this->hasMany(Horario::class, 'idServicio');
     }
 }

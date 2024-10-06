@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
-    data-sidebar-image="none" data-preloader="disable" data-theme="default" data-theme-colors="default">
+    data-sidebar-image="none" data-preloader="disable" data-theme="galaxy" data-theme-colors="default" data-bs-theme="dark" >
 
 <head>
     <meta charset="utf-8" />
@@ -50,7 +50,7 @@
             min-height: 100vh;
             position: relative;
             z-index: 1;
-            background: linear-gradient(rgba(26, 29, 32, 0.75), rgba(1, 1, 1, 0.413)),
+            background: linear-gradient(rgba(27, 31, 34, 0.75), rgba(31, 37, 42, 0.413)),
                 url('{{ url('styles/img/f3.jpg') }}') no-repeat center center fixed;
             background-size: cover;
             color: #ffffff;
@@ -88,6 +88,7 @@
             border-color: #e2b44a;
             box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.25);
             background-color: rgba(255, 255, 255, 0.15);
+            color: #edf0f3;
         }
 
         .form-label {

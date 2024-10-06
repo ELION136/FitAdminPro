@@ -14,10 +14,10 @@ class Pago extends Model
     protected $primaryKey = 'idPago';
 
     protected $fillable = [
-        'idMembresia',
+        'idReserva',
         'monto',
-        'fechaPago',
-        'metodoPago',
+        
+        'estadoPago',
         'fechaCreacion', 
         'fechaModificacion', 
         'idAutor', 
@@ -28,9 +28,9 @@ class Pago extends Model
 
     protected $dates = ['fechaPago', 'fechaCreacion', 'fechaModificacion'];
 
-    public function membresia()
+    public function reserva()
     {
-        return $this->belongsTo(Membresia::class, 'idMembresia');
+        return $this->belongsTo(Reserva::class, 'idReserva');
     }
 
 }

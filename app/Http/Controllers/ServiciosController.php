@@ -9,6 +9,7 @@ class ServiciosController extends Controller
 {
     public function index()
     {
+        // Mostrar solo los servicios activos (eliminado = 1)
         $servicios = Servicio::where('eliminado', 1)->get();
         return view('admin.servicios.index', compact('servicios'));
     }
@@ -20,14 +21,16 @@ class ServiciosController extends Controller
     {
         $request->validate([
             'nombre' => 'required|max:100',
-            'descripcion' => 'required',
+            'descripcion' => 'nullable',
             'duracion' => 'required|integer|min:1',
-            'tipoServicio' => 'required|in:Individual,Grupal,Online,Presencial',
-            'categoria' => 'required|in:Entrenamiento,Nutrición,Rehabilitación,Otro',
+            'precio' => 'required|numeric|min:0', // Validación del precio
+            'fechaInicio' => 'required|date', // Validación de la fecha de inicio
+            'fechaFin' => 'required|date|after_or_equal:fechaInicio', // Validación de la fecha de fin
         ]);
 
         $servicio = new Servicio($request->all());
         $servicio->idAutor = auth()->id();
+        $servicio->eliminado = 1; // Asegura que se marque como activo
         $servicio->save();
 
         return redirect()->route('admin.servicios.index')->with('success', 'El servicio ha sido creado exitosamente');
@@ -40,10 +43,11 @@ class ServiciosController extends Controller
     {
         $request->validate([
             'nombre' => 'required|max:100',
-            'descripcion' => 'required',
+            'descripcion' => 'nullable',
             'duracion' => 'required|integer|min:1',
-            'tipoServicio' => 'required|in:Individual,Grupal,Online,Presencial',
-            'categoria' => 'required|in:Entrenamiento,Nutrición,Rehabilitación,Otro',
+            'precio' => 'required|numeric|min:0', // Validación del precio
+            'fechaInicio' => 'required|date', // Validación de la fecha de inicio
+            'fechaFin' => 'required|date|after_or_equal:fechaInicio', // Validación de la fecha de fin
         ]);
 
         $servicio = Servicio::findOrFail($idServicio);
@@ -60,7 +64,7 @@ class ServiciosController extends Controller
     public function destroy($idServicio)
     {
         $servicio = Servicio::findOrFail($idServicio);
-        $servicio->eliminado = 0;  // Eliminación lógica
+        $servicio->eliminado = 0; // Eliminación lógica
         $servicio->save();
 
         return redirect()->route('admin.servicios.index')->with('success', 'El servicio ha sido eliminado exitosamente');

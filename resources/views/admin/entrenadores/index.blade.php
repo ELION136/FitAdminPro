@@ -25,17 +25,22 @@
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Lista de Entrenadores</h5><br>
-                    <a href="{{ route('admin.entrenadores.create') }}" class="btn btn-primary rounded-pill btn-wave"
+                    <a href="{{ route('admin.entrenadores.create') }}" class="btn btn-outline-primary waves-effect waves-light material-shadow-none"
                         data-bs-original-title="Añadir">
-                        <i class="bi bi-clipboard-check"></i> Añadir un nuevo Empleado
-                    </a>
-                    <a href="{{ route('admin.entrenadores.eliminados') }}" class="btn btn-warning rounded-pill btn-wave"
+                        <i class="las la-plus"></i> Añadir un nuevo Empleado
+                    </a> 
+                
+                    <a href="{{ route('admin.entrenadores.eliminados') }}" class="btn btn-outline-warning waves-effect waves-light material-shadow-none"
                         data-bs-original-title="Añadir">
-                        <i class="bi bi-archive"></i> Habilitar
+                        <i class="las la-archive"></i> Habilitar
                     </a>
-                    <a href="{{ route('admin.entrenadores.pdf') }}" class="btn btn-danger rounded-pill btn-wave">
+                    <a href="{{ route('admin.entrenadores.pdf') }}" class="btn btn-outline-danger waves-effect waves-light material-shadow-none">
                         <i class="fas fa-file-pdf"></i> Exportar PDF
                     </a>
+                    <a href="{{ route('admin.entrenadores.export.excel') }}" class="btn btn-outline-success waves-effect waves-light material-shadow-none">
+                        <i class="fas fa-file-excel"></i> Exportar Excel
+                    </a>
+                    
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -58,7 +63,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>
-                                            
+
                                             @if ($entrenador->usuario->image)
                                                 <img src="{{ asset('storage/' . $entrenador->usuario->image) }}"
                                                     alt="Foto de perfil" width="50" height="50">
@@ -116,6 +121,111 @@
                                                     <i class=" ri-close-circle-fill"></i>
                                                 </button>
                                             </form>
+
+                                            <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal"
+                                                data-bs-target="#modalVerEntrenador{{ $entrenador->idEntrenador }}">
+                                                <i class="las la-eye"></i>
+                                            </button>
+
+
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="modalVerEntrenador{{ $entrenador->idEntrenador }}"
+                                                tabindex="-1"
+                                                aria-labelledby="modalVerEntrenadorLabel{{ $entrenador->idEntrenador }}"
+                                                aria-hidden="true">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <!-- Modal Header -->
+                                                        <div class="modal-header text-white">
+                                                            <h5 class="modal-title"
+                                                                id="modalVerEntrenadorLabel{{ $entrenador->idEntrenador }}">
+                                                                <i class="fas fa-user"></i> Detalles del Entrenador
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
+                                                        </div>
+                                                        <!-- Modal Body -->
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                                <!-- Columna 1: Imagen -->
+                                                                <div class="col-md-6 text-center">
+                                                                    <div class="card">
+                                                                        <div class="card-body">
+                                                                            <img src="{{ $entrenador->usuario->image ? asset('storage/' . $entrenador->usuario->image) : asset('images/default-profile.png') }}"
+                                                                                alt="Imagen de perfil"
+                                                                                class="img-fluid rounded-circle mb-3"
+                                                                                width="150" height="150">
+                                                                            <h5 class="card-title">
+                                                                                {{$entrenador->usuario->nombreUsuario}} </h5> 
+                                                                                <p class="text-muted">
+                                                                                {{ $entrenador->nombre }}
+                                                                                {{ $entrenador->primerApellido }}
+                                                                                {{ $entrenador->segundoApellido }}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Columna 2: Información -->
+                                                                <div class="col-md-6">
+                                                                    <div class="card">
+                                                                        <div class="card-body">
+                                                                            <!-- Correo -->
+                                                                            <div class="mb-3">
+                                                                                <i
+                                                                                    class="fas fa-envelope text-primary"></i>
+                                                                                <strong>Correo Electrónico:</strong>
+                                                                                <p class="text-muted">
+                                                                                    {{ $entrenador->usuario->email }}</p>
+                                                                            </div>
+                                                                            <!-- Género -->
+                                                                            <div class="mb-3">
+                                                                                <i
+                                                                                    class="fas fa-venus-mars text-primary"></i>
+                                                                                <strong>Género:</strong>
+                                                                                <p class="text-muted">
+                                                                                    {{ $entrenador->genero }}</p>
+                                                                            </div>
+                                                                            <!-- Edad -->
+                                                                            <div class="mb-3">
+                                                                                <i
+                                                                                    class="fas fa-birthday-cake text-primary"></i>
+                                                                                <strong>Edad:</strong>
+                                                                                <p class="text-muted">
+                                                                                    {{ \Carbon\Carbon::parse($entrenador->fechaNacimiento)->age }}
+                                                                                    años</p>
+                                                                            </div>
+                                                                            <!-- Estado -->
+                                                                            <div class="mb-3">
+                                                                                <i
+                                                                                    class="fas fa-user-check text-primary"></i>
+                                                                                <strong>Estado:</strong>
+                                                                                <p
+                                                                                    class="{{ $entrenador->eliminado ? 'text-success' : 'text-danger' }}">
+                                                                                    {{ $entrenador->eliminado ? 'Activo' : 'Inactivo' }}
+                                                                                </p>
+                                                                            </div>
+                                                                            <!-- Fecha de Registro -->
+                                                                            <div class="mb-3">
+                                                                                <i
+                                                                                    class="fas fa-calendar-alt text-primary"></i>
+                                                                                <strong>Fecha de Registro:</strong>
+                                                                                <p class="text-muted">
+                                                                                    {{ \Carbon\Carbon::parse($entrenador->created_at)->format('d/m/Y H:i') }}
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Modal Footer -->
+                                                        <div class="modal-footer bg-light">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Cerrar</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </td>
                                     </tr>
                                 @endforeach
@@ -129,7 +239,6 @@
     <!--End::row-1 -->
 
     <script>
-
         function confirmDisable(idEntrenador) {
             Swal.fire({
                 title: '¿Estás seguro?',
@@ -146,7 +255,7 @@
                 }
             });
         }
-    
+
         function confirmDeletion(idEntrenador) {
             Swal.fire({
                 title: '¿Estás seguro?',
@@ -164,11 +273,8 @@
             });
         }
     </script>
-    
 @endsection
 
 @include('partials.datatables-scripts')
 @push('scripts')
-
-
 @endpush

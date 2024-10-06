@@ -5,12 +5,12 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
-                <h4 class="mb-sm-0">Entrenadores</h4>
+                <h4 class="mb-sm-0">Clientes</h4>
 
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"><a href="javascript: void(0);">Nomina</a></li>
-                        <li class="breadcrumb-item active">Entrenadores</li>
+                        <li class="breadcrumb-item active">Clientes</li>
                     </ol>
                 </div>
 
@@ -28,16 +28,19 @@
                     <h5 class="card-title mb-0">Clientes </h5><br>
                         
                     
-                    <a href="{{ route('admin.clientes.create') }}" class="btn btn-primary rounded-pill btn-wave"
+                    <a href="{{ route('admin.clientes.create') }}" class="btn btn-outline-info waves-effect waves-light material-shadow-none"
                         data-bs-original-title="Añadir">
-                        <i class="bi bi-clipboard-check"></i> Añadir un nuevo Cliente
+                        <i class="las la-plus"></i> Añadir un nuevo Cliente
                     </a>
-                    <a href="{{ route('admin.clientes.eliminados') }}" class="btn btn-warning rounded-pill btn-wave"
+                    <a href="{{ route('admin.clientes.eliminados') }}" class="btn btn-outline-warning waves-effect waves-light material-shadow-none"
                         data-bs-original-title="Añadir">
-                        <i class="bi bi-archive"></i> Habilitar
+                        <i class="las la-archive"></i> Habilitar
                     </a>
-                    <a href="{{ route('admin.clientes.pdf') }}" class="btn btn-danger">
+                    <a href="{{ route('admin.clientes.pdf') }}" class="btn btn-outline-danger waves-effect waves-light material-shadow-none">
                         <i class="fas fa-file-pdf"></i> Exportar PDF
+                    </a>
+                    <a href="{{ route('admin.clientes.exportExcel') }}" class="btn btn-outline-success waves-effect waves-light material-shadow-none">
+                        <i class="fas fa-file-excel"></i> Exportar Excel
                     </a>
                 </div>
                 <div class="card-body">
@@ -46,7 +49,7 @@
                             <thead>
                                 <tr>
                                     <th><span>#</span></th>
-                                    <th><span>Foto de Perfil</span></th>
+                                    <th><span>Imagen</span></th>
                                     <th><span>Nombre Completo</span></th>
                                     <th><span>Correo Electronico</span></th>
                                     <th><span>Género</span></th>
@@ -119,6 +122,109 @@
                                                 </button>
                                             </form>
                                             @endif
+                                            <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal"
+                                                data-bs-target="#modalCliente{{ $cliente->idCliente }}">
+                                                <i class="las la-eye"></i>
+                                            </button>
+
+
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="modalCliente{{ $cliente->idCliente  }}"
+                                                tabindex="-1"
+                                                aria-labelledby="modalVerEntrenadorLabel{{ $cliente->idCliente }}"
+                                                aria-hidden="true">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <!-- Modal Header -->
+                                                        <div class="modal-header text-white">
+                                                            <h5 class="modal-title"
+                                                                id="modalVerEntrenadorLabel{{ $cliente->idCliente }}">
+                                                                <i class="fas fa-user"></i> Detalles del Entrenador
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
+                                                        </div>
+                                                        <!-- Modal Body -->
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                                <!-- Columna 1: Imagen -->
+                                                                <div class="col-md-6 text-center">
+                                                                    <div class="card">
+                                                                        <div class="card-body">
+                                                                            <img src="{{ $cliente->usuario->image ? asset('storage/' . $cliente->usuario->image) : asset('images/default-profile.png') }}"
+                                                                                alt="Imagen de perfil"
+                                                                                class="img-fluid rounded-circle mb-3"
+                                                                                width="150" height="150">
+                                                                            <h5 class="card-title">
+                                                                                {{$cliente->usuario->nombreUsuario}} </h5> 
+                                                                                <p class="text-muted">
+                                                                                {{ $cliente->nombre }}
+                                                                                {{ $cliente->primerApellido }}
+                                                                                {{ $cliente->segundoApellido }}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Columna 2: Información -->
+                                                                <div class="col-md-6">
+                                                                    <div class="card">
+                                                                        <div class="card-body">
+                                                                            <!-- Correo -->
+                                                                            <div class="mb-3">
+                                                                                <i
+                                                                                    class="fas fa-envelope text-primary"></i>
+                                                                                <strong>Correo Electrónico:</strong>
+                                                                                <p class="text-muted">
+                                                                                    {{ $cliente->usuario->email }}</p>
+                                                                            </div>
+                                                                            <!-- Género -->
+                                                                            <div class="mb-3">
+                                                                                <i
+                                                                                    class="fas fa-venus-mars text-primary"></i>
+                                                                                <strong>Género:</strong>
+                                                                                <p class="text-muted">
+                                                                                    {{ $cliente->genero }}</p>
+                                                                            </div>
+                                                                            <!-- Edad -->
+                                                                            <div class="mb-3">
+                                                                                <i
+                                                                                    class="fas fa-birthday-cake text-primary"></i>
+                                                                                <strong>Edad:</strong>
+                                                                                <p class="text-muted">
+                                                                                    {{ \Carbon\Carbon::parse($cliente->fechaNacimiento)->age }}
+                                                                                    años</p>
+                                                                            </div>
+                                                                            <!-- Estado -->
+                                                                            <div class="mb-3">
+                                                                                <i
+                                                                                    class="fas fa-user-check text-primary"></i>
+                                                                                <strong>Estado:</strong>
+                                                                                <p
+                                                                                    class="{{ $cliente->eliminado ? 'text-success' : 'text-danger' }}">
+                                                                                    {{ $cliente->eliminado ? 'Activo' : 'Inactivo' }}
+                                                                                </p>
+                                                                            </div>
+                                                                            <!-- Fecha de Registro -->
+                                                                            <div class="mb-3">
+                                                                                <i
+                                                                                    class="fas fa-calendar-alt text-primary"></i>
+                                                                                <strong>Fecha de Registro:</strong>
+                                                                                <p class="text-muted">
+                                                                                    {{ \Carbon\Carbon::parse($cliente->fechaCreacion)->format('d/m/Y H:i') }}
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Modal Footer -->
+                                                        <div class="modal-footer bg-light">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Cerrar</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                         </td>
                                     </tr>

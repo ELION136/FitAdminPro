@@ -2,29 +2,37 @@
 
 @section('content')
     <!-- Page Header -->
-    <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
-        <div class="my-auto">
-            <h5 class="page-title fs-21 mb-1">Servicios</h5>
-            <nav>
-                <ol class="breadcrumb mb-0">
-                   
-                    <li class="breadcrumb-item active" aria-current="page">Servicios</li>
-                </ol>
-            </nav>
-        </div>
-        <div class="d-flex my-xl-auto right-content align-items-center">
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createServicioModal">Crear nuevo servicio</button>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
+                <h4 class="mb-sm-0">Servicios</h4>
+
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">Paginas</a></li>
+                        <li class="breadcrumb-item active">Servicios</li>
+                    </ol>
+                </div>
+
+            </div>
         </div>
     </div>
     <!-- Page Header Close -->
 
     <!-- Start::row-1 -->
     <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header pb-0">
-                    <div class="d-flex justify-content-between">
-                        <h4 class="card-title mb-0">Servicios Disponibles</h4>
+        <div class="col-lg-12">
+            <div class="card" id="apiKeyList">
+
+                <div class="card-header d-flex align-items-center">
+                    <h5 class="card-title flex-grow-1 mb-0">Servicios</h5>
+                    <div class="d-flex gap-1 flex-wrap">
+                        <button class="btn btn-soft-danger" id="remove-actions" onClick="deleteMultiple()"><i
+                                class="ri-delete-bin-2-line"></i></button>
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                            data-bs-target="#createServicioModal"><i class="ri-add-line align-bottom me-1"></i> Añadir
+                            nuevo Servicio</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -36,8 +44,10 @@
                                     <th>Nombre</th>
                                     <th>Descripción</th>
                                     <th>Duración (minutos)</th>
-                                    <th>Tipo</th>
-                                    <th>Categoría</th>
+                                    <th>Precio (Bs)</th>
+                                    <th>Fecha Inicio</th>
+                                    <th>Fecha Fin</th>
+                                    <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -50,34 +60,46 @@
                                         <td>
                                             <span data-bs-toggle="tooltip" data-bs-placement="top"
                                                 title="{{ $servicio->descripcion }}">
-                                                {{ Str::limit($servicio->descripcion, 50, '...') }}
+                                                {{ Str::limit($servicio->descripcion, 25, '...') }}
                                             </span>
                                         </td>
                                         <td>{{ $servicio->duracion }}</td>
-                                        <td>{{ $servicio->tipoServicio }}</td>
-                                        <td>{{ $servicio->categoria }}</td>
+                                        <td>{{ $servicio->precio }}</td>
+                                        <td>{{ $servicio->fechaInicio->format('d/m/Y') }}</td>
+                                        <td>{{ $servicio->fechaFin->format('d/m/Y') }}</td>
+                                        <td>
+                                            @if ($servicio->eliminado == 1)
+                                                <span class="text-success">Activo</span>
+                                            @else
+                                                <span class="text-danger">Inactivo</span>
+                                            @endif
+                                        </td>
                                         <td>
                                             <!-- Botón para abrir el modal de edición -->
-                                            <button type="button" class="btn btn-warning" data-bs-toggle="modal"
-                                                data-bs-target="#editServicioModal{{ $servicio->idServicio }}">
-                                                Editar
+                                            <button type="button"
+                                                class="btn btn-outline-warning btn-icon waves-effect waves-light material-shadow-none"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editServicioModal{{ $servicio->idServicio }}"
+                                                title="Editar">
+                                                <i class="las la-pen"></i>
                                             </button>
-
                                             <!-- Botón para eliminar con confirmación SweetAlert -->
-                                            <form action="{{ route('admin.servicios.destroy', $servicio->idServicio) }}" method="POST"
-                                                style="display:inline;">
+                                            <form action="{{ route('admin.servicios.destroy', $servicio->idServicio) }}"
+                                                method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger show_confirm">
-                                                    Eliminar
+                                                <button type="submit" title="Eliminar"
+                                                    class="btn btn-outline-danger btn-icon waves-effect waves-light material-shadow-none show_confirm">
+                                                    <i class=" las la-trash-alt"></i>
                                                 </button>
                                             </form>
                                         </td>
                                     </tr>
 
                                     <!-- Modal para Editar Servicio -->
-                                    <div class="modal fade" id="editServicioModal{{ $servicio->idServicio }}" tabindex="-1"
-                                        aria-labelledby="editServicioModalLabel{{ $servicio->idServicio }}" aria-hidden="true">
+                                    <div class="modal fade" id="editServicioModal{{ $servicio->idServicio }}"
+                                        tabindex="-1" aria-labelledby="editServicioModalLabel{{ $servicio->idServicio }}"
+                                        aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <form action="{{ route('admin.servicios.update', $servicio->idServicio) }}"
@@ -85,8 +107,9 @@
                                                     @csrf
                                                     @method('PUT')
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="editServicioModalLabel{{ $servicio->idServicio }}">
-                                                            Editar Servicio</h5>
+                                                        <h5 class="modal-title"
+                                                            id="editServicioModalLabel{{ $servicio->idServicio }}">Editar
+                                                            Servicio</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
                                                     </div>
@@ -101,43 +124,59 @@
                                                             </div>
                                                         @endif
                                                         <div class="mb-3">
-                                                            <label for="nombre" class="form-label">Nombre del Servicio</label>
-                                                            <input type="text" class="form-control @error('nombre') is-invalid @enderror" id="nombre"
-                                                                name="nombre" value="{{ $servicio->nombre }}" required>
+                                                            <label for="nombre" class="form-label">Nombre del
+                                                                Servicio</label>
+                                                            <input type="text"
+                                                                class="form-control @error('nombre') is-invalid @enderror"
+                                                                id="nombre" name="nombre"
+                                                                value="{{ $servicio->nombre }}" required>
                                                         </div>
                                                         <div class="mb-3">
                                                             <label for="descripcion" class="form-label">Descripción</label>
-                                                            <textarea class="form-control @error('descripcion') is-invalid @enderror" id="descripcion"
-                                                                name="descripcion" required>{{ $servicio->descripcion }}</textarea>
+                                                            <textarea class="form-control @error('descripcion') is-invalid @enderror" id="descripcion" name="descripcion" required>{{ $servicio->descripcion }}</textarea>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="duracion" class="form-label">Duración (minutos)</label>
-                                                            <input type="number" class="form-control @error('duracion') is-invalid @enderror" id="duracion"
-                                                                name="duracion" value="{{ $servicio->duracion }}" required>
+                                                            <label for="duracion" class="form-label">Duración
+                                                                (minutos)
+                                                            </label>
+                                                            <input type="number"
+                                                                class="form-control @error('duracion') is-invalid @enderror"
+                                                                id="duracion" name="duracion"
+                                                                value="{{ $servicio->duracion }}" required>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="tipoServicio" class="form-label">Tipo de Servicio</label>
-                                                            <select class="form-select @error('tipoServicio') is-invalid @enderror" id="tipoServicio" name="tipoServicio" required>
-                                                                <option value="Individual" {{ $servicio->tipoServicio == 'Individual' ? 'selected' : '' }}>Individual</option>
-                                                                <option value="Grupal" {{ $servicio->tipoServicio == 'Grupal' ? 'selected' : '' }}>Grupal</option>
-                                                                <option value="Online" {{ $servicio->tipoServicio == 'Online' ? 'selected' : '' }}>Online</option>
-                                                                <option value="Presencial" {{ $servicio->tipoServicio == 'Presencial' ? 'selected' : '' }}>Presencial</option>
-                                                            </select>
+                                                            <label for="precio" class="form-label">Precio (Bs)</label>
+                                                            <input type="number"
+                                                                class="form-control @error('precio') is-invalid @enderror"
+                                                                id="precio" name="precio"
+                                                                value="{{ $servicio->precio }}" required>
                                                         </div>
+                                                        <!-- Añadir campos para fechaInicio y fechaFin -->
                                                         <div class="mb-3">
-                                                            <label for="categoria" class="form-label">Categoría</label>
-                                                            <select class="form-select @error('categoria') is-invalid @enderror" id="categoria" name="categoria" required>
-                                                                <option value="Entrenamiento" {{ $servicio->categoria == 'Entrenamiento' ? 'selected' : '' }}>Entrenamiento</option>
-                                                                <option value="Nutrición" {{ $servicio->categoria == 'Nutrición' ? 'selected' : '' }}>Nutrición</option>
-                                                                <option value="Rehabilitación" {{ $servicio->categoria == 'Rehabilitación' ? 'selected' : '' }}>Rehabilitación</option>
-                                                                <option value="Otro" {{ $servicio->categoria == 'Otro' ? 'selected' : '' }}>Otro</option>
-                                                            </select>
+                                                            <label for="fechaInicio" class="form-label">Fecha de
+                                                                Inicio</label>
+                                                            <input type="date"
+                                                                class="form-control @error('fechaInicio') is-invalid @enderror"
+                                                                id="fechaInicio" name="fechaInicio"
+                                                                value="{{ is_string($servicio->fechaInicio) ? $servicio->fechaInicio : $servicio->fechaInicio->format('Y-m-d') }}"
+                                                                required min="{{ date('Y-m-d') }}" required>
                                                         </div>
+
+                                                        <div class="mb-3">
+                                                            <label for="fechaFin" class="form-label">Fecha de Fin</label>
+                                                            <input type="date"
+                                                                class="form-control @error('fechaFin') is-invalid @enderror"
+                                                                id="fechaFin" name="fechaFin"
+                                                                value="{{ is_string($servicio->fechaFin) ? $servicio->fechaFin : $servicio->fechaFin->format('Y-m-d') }}"
+                                                                required min="{{ date('Y-m-d') }}" required>
+                                                        </div>
+
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">Cerrar</button>
-                                                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                                        <button type="submit" class="btn btn-primary">Guardar
+                                                            Cambios</button>
                                                     </div>
                                                 </form>
                                             </div>
@@ -175,47 +214,53 @@
                                 </ul>
                             </div>
                         @endif
+                        <!-- Campo para Nombre -->
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre del Servicio</label>
                             <input type="text" class="form-control @error('nombre') is-invalid @enderror"
-                                id="nombre" name="nombre" required>
+                                id="nombre" name="nombre"  required>
                         </div>
+                        <!-- Campo para Descripción -->
                         <div class="mb-3">
                             <label for="descripcion" class="form-label">Descripción</label>
-                            <textarea class="form-control @error('descripcion') is-invalid @enderror" id="descripcion" name="descripcion" required></textarea>
+                            <textarea class="form-control @error('descripcion') is-invalid @enderror" id="descripcion" name="descripcion"
+                                required></textarea>
                         </div>
+                        <!-- Campo para Duración -->
                         <div class="mb-3">
                             <label for="duracion" class="form-label">Duración (minutos)</label>
                             <input type="number" class="form-control @error('duracion') is-invalid @enderror"
                                 id="duracion" name="duracion" required>
                         </div>
+                        <!-- Campo para Precio -->
                         <div class="mb-3">
-                            <label for="tipoServicio" class="form-label">Tipo de Servicio</label>
-                            <select class="form-select @error('tipoServicio') is-invalid @enderror" id="tipoServicio" name="tipoServicio" required>
-                                <option value="Individual">Individual</option>
-                                <option value="Grupal">Grupal</option>
-                                <option value="Online">Online</option>
-                                <option value="Presencial">Presencial</option>
-                            </select>
+                            <label for="precio" class="form-label">Precio (Bs)</label>
+                            <input type="number" class="form-control @error('precio') is-invalid @enderror"
+                                id="precio" name="precio" required>
                         </div>
+                        <!-- Campo para Fecha Inicio -->
                         <div class="mb-3">
-                            <label for="categoria" class="form-label">Categoría</label>
-                            <select class="form-select @error('categoria') is-invalid @enderror" id="categoria" name="categoria" required>
-                                <option value="Entrenamiento">Entrenamiento</option>
-                                <option value="Nutrición">Nutrición</option>
-                                <option value="Rehabilitación">Rehabilitación</option>
-                                <option value="Otro">Otro</option>
-                            </select>
+                            <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
+                            <input type="date" class="form-control @error('fechaInicio') is-invalid @enderror"
+                                id="fechaInicio" name="fechaInicio" required min="{{ date('Y-m-d') }}" required>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="submit" class="btn btn-primary">Crear Servicio</button>
+                        <!-- Campo para Fecha Fin -->
+                        <div class="mb-3">
+                            <label for="fechaFin" class="form-label">Fecha de Fin</label>
+                            <input type="date" class="form-control @error('fechaFin') is-invalid @enderror"
+                                id="fechaFin" name="fechaFin" required min="{{ date('Y-m-d') }}" required>
+                        </div>
+                        <!-- Botones -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">Crear Servicio</button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
 @endsection
 
 @push('scripts')

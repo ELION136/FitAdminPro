@@ -34,7 +34,7 @@
                                     <p class="text-uppercase fw-medium text-muted text-truncate mb-3">Usuarios</p>
                                     <div class="d-flex align-items-center mb-3">
                                         <h4 class="fs-4 flex-grow-1 mb-0"><span class="counter-value"
-                                                data-target="{{ $total }}">0</span></h4>
+                                                data-target="{{ $totalUsuarios }}">0</span></h4>
                                         <span class="badge bg-danger-subtle text-danger fs-12"><i
                                                 class="ri-arrow-down-s-line fs-13 align-middle me-1"></i>5.02 %</span>
                                     </div>
@@ -69,6 +69,7 @@
                     </div>
                 </div><!-- end col -->
 
+
                 <div class="col-xl-4">
                     <div class="card card-animate">
                         <div class="card-body">
@@ -82,7 +83,7 @@
                                     <p class="text-uppercase fw-medium text-muted text-truncate mb-3">Miembros</p>
                                     <div class="d-flex align-items-center mb-3">
                                         <h4 class="fs-4 flex-grow-1 mb-0"><span class="counter-value"
-                                                data-target="{{ $clientesConMembresia }}">0</span></h4>
+                                                data-target="0">{{ $totalMembresiasActivas }}</span></h4>
                                         <span class="badge bg-danger-subtle text-danger fs-12"><i
                                                 class="ri-arrow-down-s-line fs-13 align-middle me-1"></i>10.35 %</span>
                                     </div>
@@ -95,152 +96,312 @@
             </div><!-- end row -->
 
             <div class="row">
-                <div class="col-xl-12">
+                <!-- Tarjeta de Entrenadores Registrados -->
+                <div class="col-xl-4">
+                    <div class="card card-animate">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm flex-shrink-0">
+                                    <span class="avatar-title bg-primary-subtle text-primary rounded-2 fs-2">
+                                        <i data-feather="user-check" class="text-primary"></i>
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <p class="text-uppercase fw-medium text-muted mb-3">Entrenadores Activos</p>
+                                    <h4 class="fs-4 mb-0"><span class="counter-value"
+                                            data-target="{{ $totalEntrenadores }}">0</span></h4>
+                                    <p class="text-muted mb-0">Entrenadores en el sistema</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Clientes Registrados -->
+                <div class="col-xl-4">
+                    <div class="card card-animate">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm flex-shrink-0">
+                                    <span class="avatar-title bg-success-subtle text-success rounded-2 fs-2">
+                                        <i data-feather="user" class="text-success"></i>
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <p class="text-uppercase fw-medium text-muted mb-3">Clientes Activos</p>
+                                    <h4 class="fs-4 mb-0"><span class="counter-value"
+                                            data-target="{{ $totalClientes }}">0</span></h4>
+                                    <p class="text-muted mb-0">Clientes en el sistema</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Ingresos del Mes -->
+                <div class="col-xl-4">
+                    <div class="card card-animate">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm flex-shrink-0">
+                                    <span class="avatar-title bg-warning-subtle text-warning rounded-2 fs-2">
+                                        <i data-feather="dollar-sign" class="text-warning"></i>
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <p class="text-uppercase fw-medium text-muted mb-3">Ingresos del Mes</p>
+                                    <h4 class="fs-4 mb-0">Bs.- <span class="counter-value"
+                                            data-target="{{ $ingresosMes }}">0</span></h4>
+                                    <p class="text-muted mb-0">Monto total recibido</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Reservas Pendientes -->
+                <div class="col-xl-4">
+                    <div class="card card-animate">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm flex-shrink-0">
+                                    <span class="avatar-title bg-danger-subtle text-danger rounded-2 fs-2">
+                                        <i data-feather="calendar" class="text-danger"></i>
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <p class="text-uppercase fw-medium text-muted mb-3">Reservas Pendientes</p>
+                                    <h4 class="fs-4 mb-0"><span class="counter-value"
+                                            data-target="{{ $reservasPendientes }}">0</span></h4>
+                                    <p class="text-muted mb-0">Reservas aún no procesadas</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Servicios Activos -->
+                <div class="col-xl-4">
+                    <div class="card card-animate">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm flex-shrink-0">
+                                    <span class="avatar-title bg-info-subtle text-info rounded-2 fs-2">
+                                        <i data-feather="briefcase" class="text-info"></i>
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <p class="text-uppercase fw-medium text-muted mb-3">Servicios Activos</p>
+                                    <h4 class="fs-4 mb-0"><span class="counter-value"
+                                            data-target="{{ $totalServicios }}">0</span></h4>
+                                    <p class="text-muted mb-0">Servicios ofrecidos actualmente</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <div class="row">
+                <!-- Gráfico de barras: Usuarios por Rol -->
+                <div class="col-xl-6">
                     <div class="card">
-                        <div class="card-header border-0 align-items-center d-flex">
-                            <h4 class="card-title mb-0 flex-grow-1">Projects Overview</h4>
-                            <div>
-                                <button type="button" class="btn btn-soft-secondary btn-sm material-shadow-none">
-                                    ALL
-                                </button>
-                                <button type="button" class="btn btn-soft-secondary btn-sm material-shadow-none">
-                                    1M
-                                </button>
-                                <button type="button" class="btn btn-soft-secondary btn-sm material-shadow-none">
-                                    6M
-                                </button>
-                                <button type="button" class="btn btn-soft-primary btn-sm material-shadow-none">
-                                    1Y
-                                </button>
-                            </div>
-                        </div><!-- end card header -->
-
-                        <div class="card-header p-0 border-0 bg-light-subtle">
-                            <div class="row g-0 text-center">
-                                <div class="col-6 col-sm-3">
-                                    <div class="p-3 border border-dashed border-start-0">
-                                        <h5 class="mb-1"><span class="counter-value" data-target="9851">0</span></h5>
-                                        <p class="text-muted mb-0">Number of Projects</p>
-                                    </div>
-                                </div>
-                                <!--end col-->
-                                <div class="col-6 col-sm-3">
-                                    <div class="p-3 border border-dashed border-start-0">
-                                        <h5 class="mb-1"><span class="counter-value" data-target="1026">0</span></h5>
-                                        <p class="text-muted mb-0">Active Projects</p>
-                                    </div>
-                                </div>
-                                <!--end col-->
-                                <div class="col-6 col-sm-3">
-                                    <div class="p-3 border border-dashed border-start-0">
-                                        <h5 class="mb-1">$<span class="counter-value" data-target="228.89">0</span>k</h5>
-                                        <p class="text-muted mb-0">Revenue</p>
-                                    </div>
-                                </div>
-                                <!--end col-->
-                                <div class="col-6 col-sm-3">
-                                    <div class="p-3 border border-dashed border-start-0 border-end-0">
-                                        <h5 class="mb-1 text-success"><span class="counter-value"
-                                                data-target="10589">0</span>h</h5>
-                                        <p class="text-muted mb-0">Working Hours</p>
-                                    </div>
-                                </div>
-                                <!--end col-->
-                            </div>
-                        </div><!-- end card header -->
-                        <div class="card-body p-0 pb-2">
-                            <div>
-                                <div id="projects-overview-chart"
-                                    data-colors='["--vz-primary", "--vz-warning", "--vz-success"]'
-                                    data-colors-minimal='["--vz-primary", "--vz-primary-rgb, 0.1", "--vz-primary-rgb, 0.50"]'
-                                    data-colors-interactive='["--vz-primary", "--vz-info", "--vz-warning"]'
-                                    data-colors-creative='["--vz-secondary", "--vz-warning", "--vz-success"]'
-                                    data-colors-corporate='["--vz-primary", "--vz-secondary", "--vz-danger"]'
-                                    data-colors-galaxy='["--vz-primary", "--vz-primary-rgb, 0.1", "--vz-primary-rgb, 0.50"]'
-                                    data-colors-classic='["--vz-primary", "--vz-secondary", "--vz-warning"]'
-                                    dir="ltr" class="apex-charts"></div>
-                            </div>
-                        </div><!-- end card body -->
-                    </div><!-- end card -->
-                </div><!-- end col -->
-            </div><!-- end row -->
-        </div><!-- end col -->
-
-        <div class="col-xxl-4">
-            <div class="card">
-                <div class="card-header border-0">
-                    <h4 class="card-title mb-0">Upcoming Schedules</h4>
-                </div><!-- end cardheader -->
-                <div class="card-body pt-0">
-                    <div class="upcoming-scheduled">
-                        <input type="text" class="form-control" data-provider="flatpickr" data-date-format="d M, Y"
-                            data-deafult-date="today" data-inline-date="true">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">Usuarios por Rol</h4>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="usuariosPorRol"></canvas>
+                        </div>
                     </div>
-
-                    <h6 class="text-uppercase fw-semibold mt-4 mb-3 text-muted">Events:</h6>
-                    <div class="mini-stats-wid d-flex align-items-center mt-3">
-                        <div class="flex-shrink-0 avatar-sm">
-                            <span class="mini-stat-icon avatar-title rounded-circle text-success bg-success-subtle fs-4">
-                                09
-                            </span>
+                </div>
+            
+                <!-- Gráfico de líneas: Asistencias por Mes -->
+                <div class="col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">Asistencias por Mes</h4>
                         </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-1">Development planning</h6>
-                            <p class="text-muted mb-0">iTest Factory </p>
+                        <div class="card-body">
+                            <canvas id="asistenciasPorMes"></canvas>
                         </div>
-                        <div class="flex-shrink-0">
-                            <p class="text-muted mb-0">9:20 <span class="text-uppercase">am</span></p>
-                        </div>
-                    </div><!-- end -->
-                    <div class="mini-stats-wid d-flex align-items-center mt-3">
-                        <div class="flex-shrink-0 avatar-sm">
-                            <span class="mini-stat-icon avatar-title rounded-circle text-success bg-success-subtle fs-4">
-                                12
-                            </span>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-1">Design new UI and check sales</h6>
-                            <p class="text-muted mb-0">Meta4Systems</p>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <p class="text-muted mb-0">11:30 <span class="text-uppercase">am</span></p>
-                        </div>
-                    </div><!-- end -->
-                    <div class="mini-stats-wid d-flex align-items-center mt-3">
-                        <div class="flex-shrink-0 avatar-sm">
-                            <span class="mini-stat-icon avatar-title rounded-circle text-success bg-success-subtle fs-4">
-                                25
-                            </span>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-1">Weekly catch-up </h6>
-                            <p class="text-muted mb-0">Nesta Technologies</p>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <p class="text-muted mb-0">02:00 <span class="text-uppercase">pm</span></p>
-                        </div>
-                    </div><!-- end -->
-                    <div class="mini-stats-wid d-flex align-items-center mt-3">
-                        <div class="flex-shrink-0 avatar-sm">
-                            <span class="mini-stat-icon avatar-title rounded-circle text-success bg-success-subtle fs-4">
-                                27
-                            </span>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-1">James Bangs (Client) Meeting</h6>
-                            <p class="text-muted mb-0">Nesta Technologies</p>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <p class="text-muted mb-0">03:45 <span class="text-uppercase">pm</span></p>
-                        </div>
-                    </div><!-- end -->
-
-                    <div class="mt-3 text-center">
-                        <a href="javascript:void(0);" class="text-muted text-decoration-underline">View all Events</a>
                     </div>
+                </div>
+            
+                <!-- Gráfico de pasteles: Estado de las Membresías Activas -->
+                <div class="col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">Estado de las Membresías</h4>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="estadoMembresias"></canvas>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Gráficos con ApexCharts -->
+                <div class="col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">Asistencias por Semana (ApexCharts)</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="line_chart_basic" class="apex-charts"></div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">Membresías Activas por Mes (ApexCharts)</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="line_chart_zoomable" class="apex-charts"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                </div><!-- end cardbody -->
-            </div><!-- end card -->
-        </div><!-- end col -->
-    </div><!-- end row -->
+
+
+        </div><!-- end row -->
+    </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script type="text/javascript">
+    // Gráfico de barras: Usuarios por Rol
+    var ctx = document.getElementById('usuariosPorRol').getContext('2d');
+    var usuariosPorRolChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Entrenadores', 'Clientes'],
+            datasets: [{
+                label: 'Total',
+                data: [{{ $totalEntrenadores }}, {{ $totalClientes }}],
+                backgroundColor: ['#36A2EB', '#4BC0C0'],
+                borderColor: ['#36A2EB', '#4BC0C0'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Gráfico de líneas: Asistencias por Mes
+    var ctx2 = document.getElementById('asistenciasPorMes').getContext('2d');
+    var asistenciasPorMesChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
+            datasets: [{
+                label: 'Asistencias',
+                data: [{{ $totalAsistencias }}],
+                fill: false,
+                borderColor: '#FF6384',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Gráfico de pasteles: Estado de las Membresías Activas
+    var ctx3 = document.getElementById('estadoMembresias').getContext('2d');
+    var estadoMembresiasChart = new Chart(ctx3, {
+        type: 'pie',
+        data: {
+            labels: ['Activas', 'Otras'],
+            datasets: [{
+                label: 'Membresías',
+                data: [{{ $totalMembresiasActivas }}, 100 - {{ $totalMembresiasActivas }}],
+                backgroundColor: ['#FFCE56', '#E7E9ED']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // ApexCharts: Asistencias por Semana
+    var asistenciasPorSemana = @json(array_values($asistenciasPorSemana));
+    var semanas = @json(array_keys($asistenciasPorSemana));
+
+    var membresiasActivas = @json(array_values($membresiasActivas));
+    var meses = @json(array_keys($membresiasActivas));
+
+    var options1 = {
+        chart: {
+            height: 350,
+            type: 'line',
+            zoom: {
+                enabled: false
+            }
+        },
+        series: [{
+            name: "Asistencias",
+            data: asistenciasPorSemana
+        }],
+        stroke: {
+            curve: 'smooth'
+        },
+        xaxis: {
+            categories: semanas
+        },
+        colors: ['#556ee6'],
+        title: {
+            text: 'Asistencias por Semana',
+            align: 'left'
+        }
+    };
+    var chart1 = new ApexCharts(document.querySelector("#line_chart_basic"), options1);
+    chart1.render();
+
+    // ApexCharts: Membresías Activas por Mes
+    var options2 = {
+        chart: {
+            height: 350,
+            type: 'area',
+            zoom: {
+                enabled: true
+            }
+        },
+        series: [{
+            name: "Membresías Activas",
+            data: membresiasActivas
+        }],
+        xaxis: {
+            type: 'datetime',
+            categories: meses
+        },
+        colors: ['#34c38f'],
+        title: {
+            text: 'Membresías Activas por Mes',
+            align: 'left'
+        }
+    };
+    var chart2 = new ApexCharts(document.querySelector("#line_chart_zoomable"), options2);
+    chart2.render();
+</script>
+@endpush

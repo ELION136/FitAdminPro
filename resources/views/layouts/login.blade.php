@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
-    data-sidebar-image="none" data-preloader="disable" data-theme="default" data-theme-colors="default">
+    data-sidebar-image="none" data-preloader="disable" data-theme="galaxy" data-theme-colors="default" data-bs-theme="dark">
 
 <head>
     <meta charset="utf-8" />
@@ -15,7 +15,7 @@
     <!-- plugin css -->
     <link href="{{ url('dist/assets/libs/jsvectormap/css/jsvectormap.min.css') }}" rel="stylesheet" type="text/css" />
 
- 
+
 
 
     <!-- Layout config Js -->
@@ -33,8 +33,6 @@
     <script src="{{ asset('package/dist/sweetalert2.all.min.js') }}"></script>
 
     <style>
-        
-        
         .custom-page {
             display: flex;
             justify-content: center;
@@ -42,12 +40,12 @@
             min-height: 100vh;
             position: relative;
             z-index: 1;
-            background: linear-gradient(rgba(26, 29, 32, 0.75), rgba(1, 1, 1, 0.413)),
+            background: linear-gradient(rgba(2, 39, 75, 0.75), rgba(48, 63, 78, 0.413)),
                 url('{{ url('styles/img/f3.jpg') }}') no-repeat center center fixed;
             background-size: cover;
             color: #ffffff;
-            
-            
+
+
         }
 
         .card-sigin {
@@ -93,8 +91,8 @@
             color: #f4f5f7;
         }
 
-        .form-control:focus + .form-label,
-        .form-control:not(:placeholder-shown) + .form-label {
+        .form-control:focus+.form-label,
+        .form-control:not(:placeholder-shown)+.form-label {
             top: -0.5rem;
             left: 0.75rem;
             font-size: 12px;
@@ -141,7 +139,8 @@
             color: #83b4eb !important;
         }
 
-        .form-check-label, .text-muted {
+        .form-check-label,
+        .text-muted {
             color: #d9e7f8 !important;
         }
 
@@ -154,40 +153,46 @@
         }
 
         .logo-luminoso {
-        max-height: 40px; /* Ajusta la altura del logo */
-        vertical-align: middle;
-        filter: drop-shadow(0 0 10px rgba(226, 158, 74, 0.7)); /* Sombra luminosa alrededor del logo */
-        transition: all 0.3s ease; /* Transición suave para los efectos */
+            max-height: 40px;
+            /* Ajusta la altura del logo */
+            vertical-align: middle;
+            filter: drop-shadow(0 0 10px rgba(226, 158, 74, 0.7));
+            /* Sombra luminosa alrededor del logo */
+            transition: all 0.3s ease;
+            /* Transición suave para los efectos */
         }
 
         .logo-luminoso:hover {
-        filter: drop-shadow(0 0 20px rgb(226, 158, 74)) brightness(1.2); /* Aumenta el brillo al pasar el cursor */
-        transform: scale(1.05); /* Pequeño efecto de zoom */
+            filter: drop-shadow(0 0 20px rgb(226, 158, 74)) brightness(1.2);
+            /* Aumenta el brillo al pasar el cursor */
+            transform: scale(1.05);
+            /* Pequeño efecto de zoom */
         }
     </style>
 </head>
 
 <body>
-    
-    
+
+
     <div class="container-fluid custom-page">
-        
-           
-    
-    @yield('content')
-    
-    <!-- Scripts -->
-            
-      
+
+
+
+        @yield('content')
+
+        <!-- Scripts -->
+
+
     </div>
-    
+
     <script src="{{ url('dist/assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url('dist/assets/libs/simplebar/simplebar.min.js') }}"></script>
     <script src="{{ url('dist/assets/libs/node-waves/waves.min.js') }}"></script>
     <script src="{{ url('dist/assets/libs/feather-icons/feather.min.js') }}"></script>
     <script src="{{ url('dist/assets/js/pages/plugins/lord-icon-2.1.0.js') }}"></script>
     <script src="{{ url('dist/assets/js/plugins.js') }}"></script>
-    
-    
+
+
 </body>
+
 </html>

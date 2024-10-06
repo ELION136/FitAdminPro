@@ -13,6 +13,9 @@ use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\EntrenadoresExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Validator;
 
 class EntrenadorController extends Controller
 {
@@ -54,7 +57,7 @@ class EntrenadorController extends Controller
             'nombreUsuario' => 'required|unique:usuarios,nombreUsuario|max:50|regex:/^\S*$/u',
             'email' => 'required|email|unique:usuarios,email',
             'telefono' => 'nullable|digits_between:7,15',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            //'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'nombre' => 'required|string|max:50|regex:/^[^\s].*[^\s]$/',
             'primerApellido' => 'required|string|max:50|regex:/^[^\s].*[^\s]$/',
             'segundoApellido' => 'nullable|string|max:50|regex:/^[^\s].*[^\s]$/',
@@ -92,13 +95,13 @@ class EntrenadorController extends Controller
         }
 
         // Subir y guardar la imagen si existe
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            Storage::disk('public')->put($imageName, file_get_contents($image));
-            $usuario->image = $imageName;
-            $usuario->save();
-        }
+        //if ($request->hasFile('image')) {
+        // $image = $request->file('image');
+        // $imageName = time() . '.' . $image->getClientOriginalExtension();
+        // Storage::disk('public')->put($imageName, file_get_contents($image));
+        // $usuario->image = $imageName;
+        //$usuario->save();
+        //  }
 
         // Crear el empleado asociado
         $entrenador = Entrenador::create([
@@ -349,15 +352,45 @@ class EntrenadorController extends Controller
 
     public function exportPDF()
     {
+        $entrenadores = Entrenador::paginate(50);
         $entrenadores = Entrenador::with('usuario')->where('eliminado', 1)->get();
         $pdf = Pdf::loadView('admin.entrenadores.pdf', compact('entrenadores'));
-        
+
         // Personaliza el PDF
         $pdf->setPaper('a4', 'landscape');
         $pdf->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
-    
+
         //return $pdf->download('entrenadores.pdf');
-        return $pdf->stream('entrenadores.pdf');
+        return $pdf->download('entrenadores.pdf');
     }
+    public function exportExcel()
+    {
+        return Excel::download(new EntrenadoresExport, 'entrenadores.xlsx');
+    }
+
+    // UserController.php
+
+    // EntrenadorController.php
+    public function indexCliente(Request $request)
+    {
+        $nombre = $request->get('nombre');
+        $especialidad = $request->get('especialidad');
+
+        $entrenadores = Entrenador::when($nombre, function ($query, $nombre) {
+            return $query->where(function ($query) use ($nombre) {
+                $query->where('nombre', 'like', "%$nombre%")
+                    ->orWhere('primerApellido', 'like', "%$nombre%")
+                    ->orWhere('segundoApellido', 'like', "%$nombre%");
+            });
+        })
+            ->when($especialidad, function ($query, $especialidad) {
+                return $query->where('especialidad', $especialidad);
+            })
+            ->get();
+
+        return view('cliente.entrenadores.index', compact('entrenadores'));
+    }
+
+
 
 }

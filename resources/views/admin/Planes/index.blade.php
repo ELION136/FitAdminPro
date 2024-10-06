@@ -2,31 +2,19 @@
 
 @section('content')
     <!-- Page Header -->
-    <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
-        <div class="my-auto">
-            <h5 class="page-title fs-21 mb-1">Membresias</h5>
-            <nav>
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a>Pagina</a></li><i class="bi bi-three-dots-vertical"></i>
-                    <li aria-current="page">Planes</li>
-                </ol>
-            </nav>
-        </div>
-        <div class="d-flex my-xl-auto right-content align-items-center">
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
+                <h4 class="mb-sm-0">Membresias</h4>
 
-            <div class="mb-xl-0">
-                <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuDate"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        14 Aug 2019
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuDate">
-                        <li><a class="dropdown-item" href="javascript:void(0);">2015</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0);">2016</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0);">2017</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0);">2018</a></li>
-                    </ul>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">Paginas</a></li>
+                        <li class="breadcrumb-item active">Planes</li>
+                    </ol>
                 </div>
+
             </div>
         </div>
     </div>
@@ -34,24 +22,19 @@
 
     <!-- Start::row-1 -->
     <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 grid-margin">
-            <div class="card">
-                <div class="card-header pb-0">
-                    <div class="d-flex justify-content-between">
-                        <h4 class="card-title mb-0">Planes de Membresias </h4> <br>
-                        <a href="javascript:void(0);" class="tx-inverse" data-bs-toggle="dropdown"><i
-                                class="mdi mdi-dots-horizontal text-gray"></i></a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item" href="javascript:void(0);">Action</a>
-                            <a class="dropdown-item" href="javascript:void(0);">Another Action</a>
-                            <a class="dropdown-item" href="javascript:void(0);">Something Else Here</a>
-                        </div>
-                    </div>
-                    @if (auth()->user()->rol === 'Administrador')
-                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createPlanModal">Crear nuevo
+        <div class="col-lg-12">
+            <div class="card" id="planes">
+
+
+                <div class="card-header d-flex align-items-center">
+                    <h5 class="card-title flex-grow-1 mb-0">Planes de Membresia</h5>
+                    <div class="d-flex gap-1 flex-wrap">
+                        <button class="btn btn-soft-danger" id="remove-actions" onClick="deleteMultiple()"><i class="ri-delete-bin-2-line"></i></button>
+                        @if (auth()->user()->rol === 'Administrador')
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createPlanModal"><i class="ri-add-line align-bottom me-1"></i>Crear nuevo
                         plan</button>
                         @endif
-
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -63,6 +46,7 @@
                                     <th>Descripción</th>
                                     <th>Duración(dias)</th>
                                     <th>Precio(Bs)</th>
+                                    <th>Estado</th>
                                     @if (auth()->user()->rol === 'Administrador')
                                     <th>Acciones</th>
                                     @endif
@@ -73,7 +57,7 @@
                                 @foreach ($planes as $plan)
                                     <tr>
                                         <td>{{ $numero++ }}</td>
-                                        <td>{{ $plan->nombrePlan }}</td>
+                                        <td>{{ $plan->nombre }}</td>
                                         <td>
                                             <span data-bs-toggle="tooltip" data-bs-placement="top"
                                                 title="{{ $plan->descripcion }}">
@@ -82,22 +66,30 @@
                                         </td>
                                         <td>{{ $plan->duracion }}</td>
                                         <td>{{ $plan->precio }}</td>
+                                        <td>
+                                            @if ($plan->eliminado== 1)
+                                                <span class="text-success">Activo</span>
+                                            @else
+                                                <span class="text-danger">Inactivo</span>
+                                            @endif
+                                        </td>
+
                                         @if (auth()->user()->rol === 'Administrador')
                                         <td>
                                             
                                             <!-- Botón para abrir el modal de edición -->
                                             <button type="button" class="btn btn-warning" data-bs-toggle="modal"
-                                                data-bs-target="#editPlanModal{{ $plan->idPlan }}">
-                                                Editar
+                                                data-bs-target="#editPlanModal{{ $plan->idMembresia }}">
+                                                <i class="ri-edit-2-line"></i>
                                             </button>
 
                                             <!-- Botón para eliminar con confirmación SweetAlert -->
-                                            <form action="{{ route('admin.planes.destroy', $plan->idPlan) }}" method="POST"
+                                            <form action="{{ route('admin.planes.destroy', $plan->idMembresia) }}" method="POST"
                                                 style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger show_confirm">
-                                                    Eliminar
+                                                    <i class="ri-delete-bin-line"></i>
                                                 </button>
                                             </form>
 
@@ -108,16 +100,16 @@
                                     <!--End::row-1 -->
 
                                     <!-- Modal para Editar Plan -->
-                                    <div class="modal fade" id="editPlanModal{{ $plan->idPlan }}" tabindex="-1"
-                                        aria-labelledby="editPlanModalLabel{{ $plan->idPlan }}" aria-hidden="true">
+                                    <div class="modal fade" id="editPlanModal{{ $plan->idMembresia }}" tabindex="-1"
+                                        aria-labelledby="editPlanModalLabel{{ $plan->idMembresia}}" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
-                                                <form action="{{ route('admin.planes.update', $plan->idPlan) }}"
+                                                <form action="{{ route('admin.planes.update', $plan->idMembresia) }}"
                                                     method="POST">
                                                     @csrf
                                                     @method('PUT')
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="editPlanModalLabel{{ $plan->idPlan }}">
+                                                        <h5 class="modal-title" id="editPlanModalLabel{{ $plan->idMembresia }}">
                                                             Editar Plan</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -133,10 +125,10 @@
                                                             </div>
                                                         @endif
                                                         <div class="mb-3">
-                                                            <label for="nombrePlan" class="form-label">Nombre del
+                                                            <label for="nombre" class="form-label">Nombre del
                                                                 Plan</label>
-                                                            <input type="text" class="form-control @error('nombrePlan') is-invalid @enderror" id="nombrePlan"
-                                                                name="nombrePlan" value="{{ $plan->nombrePlan }}" required>
+                                                            <input type="text" class="form-control @error('nombre') is-invalid @enderror" id="nombre"
+                                                                name="nombre" value="{{ $plan->nombre }}" required>
                                                         </div>
                                                         <div class="mb-3">
                                                             <label for="descripcion" class="form-label">Descripción</label>
@@ -196,9 +188,9 @@
                             </div>
                         @endif
                         <div class="mb-3">
-                            <label for="nombrePlan" class="form-label">Nombre del Plan</label>
+                            <label for="nombre" class="form-label">Nombre del Plan</label>
                             <input type="text" class="form-control @error('nombrePlan') is-invalid @enderror"
-                                id="nombrePlan" name="nombrePlan" required>
+                                id="nombre" name="nombre" required>
                         </div>
                         <div class="mb-3">
                             <label for="descripcion" class="form-label">Descripción</label>

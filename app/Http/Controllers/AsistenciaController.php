@@ -145,34 +145,67 @@ class AsistenciaController extends Controller
 
     public function index(Request $request)
     {
-        // Obtener las fechas de los filtros (o establecer valores por defecto)
-        // Obtener las fechas de los filtros (o establecer valores por defecto)
-        $fechaInicio = $request->input('fechaInicio', Carbon::now()->subDays(30)->format('Y-m-d'));
-        $fechaFin = $request->input('fechaFin', Carbon::now()->format('Y-m-d'));
-
         // Obtener los clientes para el filtro
         $clientes = Cliente::all();
 
-        // Filtrar asistencias según cliente y fechas
-        $asistencias = Asistencia::when($request->cliente_id, function ($query) use ($request) {
-            return $query->where('idCliente', $request->cliente_id);
-        })
-            ->whereBetween('fecha', [$fechaInicio, $fechaFin])
-            ->orderBy('fecha', 'asc')
-            ->get();
+        // Filtros de cliente y fechas
+        $query = Asistencia::query();
 
-        // Obtener las fechas únicas de asistencias
-        $fechas = $asistencias->pluck('fecha')->unique();
+        // Filtrar por cliente si se selecciona
+        if ($request->filled('idCliente')) {
+            $query->where('idCliente
+            ', $request->cliente_id);
+        }
 
-        // Calcular la frecuencia de asistencias por fecha
-        $frecuenciaAsistencias = $fechas->map(function ($fecha) use ($asistencias) {
-            return $asistencias->where('fecha', $fecha)->count();
-        });
+        // Filtrar por fechas si se seleccionan
+        if ($request->filled('fechaInicio')) {
+            $query->whereDate('fecha', '>=', $request->fechaInicio);
+        }
 
-        // Retornar la vista con los datos
-        return view('admin.asistencias.index', compact('clientes', 'asistencias', 'fechaInicio', 'fechaFin', 'fechas', 'frecuenciaAsistencias'));
+        if ($request->filled('fechaFin')) {
+            $query->whereDate('fecha', '<=', $request->fechaFin);
+        }
 
+        // Obtener las asistencias
+        $asistencias = $query->with('cliente')->orderBy('fecha', 'desc')->get();
+
+        // Estadísticas para las tarjetas
+        $totalAsistencias = $asistencias->count();
+        $asistenciasHoy = $asistencias->where('fecha', Carbon::now()->format('Y-m-d'))->count();
+        $asistenciasSinHoraSalida = $asistencias->whereNull('horaSalida')->count();
+
+        return view('admin.asistencias.index', [
+            'asistencias' => $asistencias,
+            'clientes' => $clientes,
+            'totalAsistencias' => $totalAsistencias,
+            'asistenciasHoy' => $asistenciasHoy,
+            'asistenciasSinHoraSalida' => $asistenciasSinHoraSalida,
+            'fechaInicio' => $request->fechaInicio,
+            'fechaFin' => $request->fechaFin,
+        ]);
     }
+
+    public function update(Request $request, $id)
+    {
+        // Validar los datos enviados en el modal
+        $validated = $request->validate([
+            'horaEntrada' => 'required|date_format:H:i',
+            'horaSalida' => 'nullable|date_format:H:i|after_or_equal:horaEntrada', // La hora de salida debe ser posterior a la hora de entrada
+        ]);
+
+        // Encontrar la asistencia
+        $asistencia = Asistencia::findOrFail($id);
+
+        // Actualizar los datos de la asistencia
+        $asistencia->horaEntrada = $request->horaEntrada;
+        $asistencia->horaSalida = $request->horaSalida;
+        $asistencia->save();
+
+        // Redireccionar con un mensaje de éxito
+        return redirect()->route('admin.asistencias.index')
+            ->with('success', 'Asistencia actualizada correctamente.');
+    }
+
 
     public function exportarPDF(Request $request)
     {
@@ -248,13 +281,13 @@ class AsistenciaController extends Controller
         $usuario = User::where('nombreUsuario', $request->nombreUsuario)->first();
 
         if (!$usuario) {
-            return redirect()->back()->with('error', 'El usuario ingresado no existe.');
+            return redirect()->back()->with('error', 'El usuario ingresado no existe.')->withInput();
         }
 
         // Verificar si el usuario es un cliente
         $cliente = Cliente::where('idUsuario', $usuario->idUsuario)->first();
         if (!$cliente) {
-            return redirect()->back()->with('error', 'El usuario ingresado no es un cliente.');
+            return redirect()->back()->with('error', 'El usuario ingresado no es un cliente.')->withInput();
         }
 
         $hoy = Carbon::now('America/La_Paz')->format('Y-m-d');
@@ -312,19 +345,16 @@ class AsistenciaController extends Controller
 
     public function autocompleteClientes(Request $request)
     {
-        $term = $request->get('term');
-
-        $clientes = Cliente::whereHas('usuario', function ($query) use ($term) {
-            $query->where('nombreUsuario', 'LIKE', '%' . $term . '%')
-                ->where('eliminado', 1);
-        })->with('usuario')
-            ->get()
-            ->map(function ($cliente) {
-                return [
-                    'value' => $cliente->usuario->nombreUsuario,
-                    'label' => $cliente->usuario->nombreUsuario . ' - ' . $cliente->nombre
-                ];
-            });
+        $term = $request->input('term');
+        $clientes = Cliente::join('usuarios', 'clientes.idUsuario', '=', 'usuarios.idUsuario')
+            ->where(function ($query) use ($term) {
+                $query->where('usuarios.nombreUsuario', 'LIKE', "%$term%")
+                    ->orWhere('usuarios.nombre', 'LIKE', "%$term%")
+                    ->orWhere('usuarios.primerApellido', 'LIKE', "%$term%");
+            })
+            ->select('usuarios.idUsuario', 'usuarios.nombreUsuario', 'usuarios.nombre', 'usuarios.primerApellido')
+            ->limit(10)
+            ->get();
 
         return response()->json($clientes);
     }
@@ -382,34 +412,25 @@ class AsistenciaController extends Controller
         return view('admin.asistencias.edit', compact('asistencia'));
     }
 
-    public function update(Request $request, $id)
-    {
-        $asistencia = Asistencia::findOrFail($id);
-
-        // Validación de los datos ingresados
-        $request->validate([
-            'fecha' => 'required|date',
-            'hora_entrada' => 'required|date_format:H:i',
-            'hora_salida' => 'nullable|date_format:H:i',
-            // Agregar aquí más reglas de validación según los campos de la tabla Asistencia
-        ]);
-
-        // Actualización de los datos de la asistencia
-        $asistencia->fecha = $request->input('fecha');
-        $asistencia->hora_entrada = $request->input('hora_entrada');
-        $asistencia->hora_salida = $request->input('hora_salida');
-        // Guardar otros campos si es necesario
-
-        $asistencia->save();
-
-        // Redireccionar con un mensaje de éxito
-        return redirect()->route('admin.asistencias.index')->with('success', 'Asistencia actualizada correctamente.');
-    }
     public function destroy($id)
     {
         $asistencia = Asistencia::findOrFail($id);
         $asistencia->update(['eliminado' => 0]); // Marcando como eliminado, según tu lógica
         return back()->with('success', 'Asistencia eliminada correctamente.');
+    }
+
+
+    public function mostrarAsistencias()
+    {
+        // Obtener asistencias del cliente autenticado en formato Y-m-d
+        $asistencias = Asistencia::where('idCliente', auth()->user()->id)
+            ->pluck('fecha') // Asegúrate de que la columna se llame 'fecha'
+            ->map(function ($fecha) {
+                return \Carbon\Carbon::parse($fecha)->format('Y-m-d');
+            })
+            ->toArray();
+
+        return view('cliente.asistencias.view', compact('asistencias'));
     }
 
 

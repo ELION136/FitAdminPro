@@ -32,7 +32,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-//primero creamos un controlador php artisa make:controller AdminController
+//primero creamos un controlador php artisa make:controller AdminController modificar esta ruta para ruta
 //rutas para el administrador
 //http://localhost/GYMU/siswebgym/public/admin
 Route::get('/admin', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.index')->middleware('auth');
@@ -58,6 +58,9 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/admin/entrenadores/{id}/restore', [App\Http\Controllers\EntrenadorController::class, 'restore'])->name('admin.entrenadores.restore');
     Route::get('/admin/entrenadores/eliminados', [App\Http\Controllers\EntrenadorController::class, 'eliminados'])->name('admin.entrenadores.eliminados');
     Route::get('admin/entrenadores/pdf', [App\Http\Controllers\EntrenadorController::class, 'exportPDF'])->name('admin.entrenadores.pdf');
+    Route::get('admin/entrenadores/export/excel', [App\Http\Controllers\EntrenadorController::class, 'exportExcel'])->name('admin.entrenadores.export.excel');
+
+
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -73,50 +76,62 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/admin/clientes/{id}/restore', [App\Http\Controllers\ClienteController::class, 'restore'])->name('admin.clientes.restore');
     Route::get('/admin/clientes/eliminados', [App\Http\Controllers\ClienteController::class, 'eliminados'])->name('admin.clientes.eliminados');
     Route::get('admin/clientes/pdf', [App\Http\Controllers\ClienteController::class, 'exportPDF'])->name('admin.clientes.pdf');
+    Route::get('admin/clientes/export-excel', [App\Http\Controllers\ClienteController::class, 'exportExcel'])->name('admin.clientes.exportExcel');
 
+    //ruata ala que solo solo el cliente podra accedes
+    Route::get('/cliente/dashboard', [App\Http\Controllers\ClienteController::class, 'dashboard'])->name('cliente.dashboard');
+    Route::get('/cliente/asistencias', [App\Http\Controllers\ClienteController::class, 'asistencias'])->name('cliente.asistencias');
+    ;
+    Route::get('/clientes/entrenadores', [App\Http\Controllers\EntrenadorController::class, 'indexCliente'])->name('cliente.entrenadores.index');
+    Route::get('/clientes/membresias', [App\Http\Controllers\MembresiaController::class, 'indexClinteM'])->name('cliente.membresias.index');
+    Route::post('/clientes/membresias/solicitar', [App\Http\Controllers\MembresiaController::class, 'solicitar'])->name('cliente.membresias.solicitar');
 
+    Route::get('/cliente/membresias/info', [App\Http\Controllers\MembresiaController::class, 'indexCredencial'])->name('cliente.membresias.info');
+    Route::get('/cliente/membresias/imprimir', [App\Http\Controllers\MembresiaController::class, 'imprimirCredencial'])->name('cliente.membresias.credencial');
+    Route::get('/clientes/asistencias', [App\Http\Controllers\AsistenciaController::class, 'mostrarAsistencias'])->name('cliente.asistencias.view');
 
 });
 
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/admin/planes', [App\Http\Controllers\PlanMembresiaController::class, 'index'])->name('admin.planes.index');
-    Route::post('/admin/planes', [App\Http\Controllers\PlanMembresiaController::class, 'store'])->name('admin.planes.store');
-    Route::get('/admin/planes/{id}', [App\Http\Controllers\PlanMembresiaController::class, 'show'])->name('admin.planes.show');
-    Route::put('/admin/planes/{id}', [App\Http\Controllers\PlanMembresiaController::class, 'update'])->name('admin.planes.update');
-    Route::delete('/admin/planes/{id}', [App\Http\Controllers\PlanMembresiaController::class, 'destroy'])->name('admin.planes.destroy');
+    Route::get('/admin/planes', [App\Http\Controllers\MembresiaController::class, 'index'])->name('admin.planes.index');
+    Route::post('/admin/planes', [App\Http\Controllers\MembresiaController::class, 'store'])->name('admin.planes.store');
+    Route::get('/admin/planes/{id}', [App\Http\Controllers\MembresiaController::class, 'show'])->name('admin.planes.show');
+    Route::put('/admin/planes/{id}', [App\Http\Controllers\MembresiaController::class, 'update'])->name('admin.planes.update');
+    Route::delete('/admin/planes/{id}', [App\Http\Controllers\MembresiaController::class, 'destroy'])->name('admin.planes.destroy');
     //modulo de inscripciones 
+
+});
+
+Route::middleware(['auth'])->group(function () {
     Route::get('/admin/inscripciones/crear', [App\Http\Controllers\InscripcionController::class, 'create'])->name('admin.inscripciones.create');
     Route::post('/admin/inscripciones', [App\Http\Controllers\InscripcionController::class, 'store'])->name('admin.inscripciones.store');
+    Route::get('/admin/inscripciones/resgistro', [App\Http\Controllers\InscripcionController::class, 'index'])->name('admin.inscripciones.index');
     Route::get('/membresias/historial', [App\Http\Controllers\MembresiaController::class, 'historial'])->name('admin.membresias.historial');
     Route::get('/admin/membresias/reporte', [App\Http\Controllers\MembresiaController::class, 'generarPDF'])->name('admin.membresias.generarPDF');
+
     Route::get('/admin/membresias/credencial/{id}', [App\Http\Controllers\MembresiaController::class, 'generarCredencial'])->name('admin.membresias.generarCredencial');
 
-    Route::get('/admin/pagos', [App\Http\Controllers\PagoController::class, 'index'])->name('admin.pagos.index');
-    Route::get('/admin/pagos/reporte', [App\Http\Controllers\PagoController::class, 'generarReporte'])->name('admin.pagos.reporte');
+    route::get('/admin/inscripciones/cliente/{id}', [App\Http\Controllers\InscripcionController::class, 'obtenerCliente']);
+    Route::resource('inscripciones', App\Http\Controllers\InscripcionController::class)->except(['show']);
+
+    // Rutas para actualizar el estado y el estado de pago
+    Route::post('inscripciones/{id}/estado', [App\Http\Controllers\InscripcionController::class, 'updateEstado'])->name('admin.inscripciones.updateEstado');
+    Route::post('inscripciones/{id}/estadoPago', [App\Http\Controllers\InscripcionController::class, 'updateEstadoPago'])->name('admin.inscripciones.updateEstadoPago');
+    //Route::get('/admin/pagos', [App\Http\Controllers\PagoController::class, 'index'])->name('admin.pagos.index');
+    // Route::get('/admin/pagos/reporte', [App\Http\Controllers\PagoController::class, 'generarReporte'])->name('admin.pagos.reporte');
+
 });
 
 
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/admin/horarios', [App\Http\Controllers\HorarioController::class, 'index'])->name('admin.horarios.index');
-
-    // Guardar un nuevo horario (POST)
+    Route::get('/admin/horarios/create', [App\Http\Controllers\HorarioController::class, 'create'])->name('admin.horarios.create');
     Route::post('/admin/horarios', [App\Http\Controllers\HorarioController::class, 'store'])->name('admin.horarios.store');
-    // routes/web.php
-    
-
-
-    // Editar un horario existente (PUT)
-    Route::put('/admin/horarios/{horario}', [App\Http\Controllers\HorarioController::class, 'update'])->name('admin.horarios.update');
-
-    // Eliminar (deshabilitar) un horario (DELETE)
-    Route::delete('/admin/horarios/{horario}', [App\Http\Controllers\HorarioController::class, 'destroy'])->name('admin.horarios.destroy');
-
-    Route::get('/admin/horarios2', [App\Http\Controllers\Horario2Controller::class, 'index'])->name('admin.horarios2.index');
-    Route::put('/admin/horarios2/{idHorario}', [App\Http\Controllers\Horario2Controller::class, 'update'])->name('admin.horarios2.update');
-    Route::delete('/admin/horarios2/{idHorario}', [App\Http\Controllers\Horario2Controller::class, 'destroy'])->name('admin.horarios2.destroy');
-
+    Route::get('/admin/horarios/{id}/edit', [App\Http\Controllers\HorarioController::class, 'edit'])->name('admin.horarios.edit');
+    Route::put('/admin/horarios/{id}', [App\Http\Controllers\HorarioController::class, 'update'])->name('admin.horarios.update');
+    Route::delete('/admin/horarios/{id}', [App\Http\Controllers\HorarioController::class, 'destroy'])->name('admin.horarios.destroy');
 
 
 
@@ -129,8 +144,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/asistencias/registrar', [App\Http\Controllers\AsistenciaController::class, 'registrar'])->name('admin.asistencias.registrar');
     //Route::post('/admin/asistencias/registrar-salida', [App\Http\Controllers\AsistenciaController::class, 'registrarSalida'])->name('admin.asistencias.registrar-salida');
     Route::get('/admin/asistencias/estadisticas', [App\Http\Controllers\AsistenciaController::class, 'estadisticas'])->name('admin.asistencias.estadisticas');
+
     route::get('/admin/asistencias/{id}/edit', [App\Http\Controllers\AsistenciaController::class, 'edit'])->name('admin.asistencias.edit');
+
+
+
     Route::put('/admin/asistencias/{id}', [App\Http\Controllers\AsistenciaController::class, 'update'])->name('admin.asistencias.update');
+
+
+
+
     Route::delete('/admin/asistencias/{id}', [App\Http\Controllers\AsistenciaController::class, 'destroy'])->name('admin.asistencias.destroy');
     Route::get('/admin/autocomplete-clientes', [App\Http\Controllers\AsistenciaController::class, 'autocompleteClientes'])->name('admin.autocomplete.clientes');
 });
@@ -150,9 +173,77 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/servicios/{servicio}/edit', [App\Http\Controllers\ServiciosController::class, 'edit'])->name('admin.servicios.edit');
     Route::put('/admin/servicios/{servicio}', [App\Http\Controllers\ServiciosController::class, 'update'])->name('admin.servicios.update');
     Route::delete('/admin/servicios/{servicio}', [App\Http\Controllers\ServiciosController::class, 'destroy'])->name('admin.servicios.destroy');
+
+    Route::put('admin/pagos/{idPago}/updateEstado', [App\Http\Controllers\PagoController::class, 'updateEstado'])->name('admin.pagos.updateEstado');
+    Route::put('admin/pagos/{idPago}/cancelar', [App\Http\Controllers\PagoController::class, 'cancelar'])->name('admin.pagos.cancelar');
+
+
+    // Route::get('/admin/reportes/inscripciones', [App\Http\Controllers\ReporteInscripcionController::class, 'index'])->name('admin.reportes.inscripciones');
+    // Route::get('/admin/reportes/exportPDF', [App\Http\Controllers\ReporteInscripcionController::class, 'exportPDF'])->name('admin.reportes.exportPDF');
+
+    Route::get('/admin/reportes/inscripciones', [App\Http\Controllers\ReporteInscripcionController::class, 'index'])->name('admin.reportes.inscripciones');
+
+    // Ruta para Exportar en PDF
+    Route::get('/admin/reportes/inscripciones/exportar/pdf', [App\Http\Controllers\ReporteInscripcionController::class, 'exportPDF'])->name('admin.reportes.inscripciones.exportar.pdf');
+
+    // Ruta para Exportar en Excel
+    Route::get('/admin/reportes/inscripciones/exportar/excel', [App\Http\Controllers\ReporteInscripcionController::class, 'exportExcel'])->name('admin.reportes.inscripciones.exportar.excel');
+
+
+
+    Route::get('/admin/reportes/reservas', [App\Http\Controllers\ReporteReservasController::class, 'index'])->name('admin.reportes.reservas');
+
+    Route::get('admin/reportes/reservas/exportar-pdf', [App\Http\Controllers\ReporteReservasController::class, 'exportarPDF'])->name('admin.reportes.reservas.exportarPDF');
+    Route::get('admin/reportes/reservas/exportar-excel', [App\Http\Controllers\ReporteReservasController::class, 'exportarExcel'])->name('admin.reportes.reservas.exportarExcel');
+
+
+    //reportes de pagos
+
+    Route::get('/reporte-pagos', [App\Http\Controllers\ReportePagosController::class, 'index'])->name('admin.reportes.pagos');
+    Route::get('/reporte-pagos/data', [App\Http\Controllers\ReportePagosController::class, 'getPagos'])->name('pagos.get');
+    Route::get('/reporte-pagos/export-pdf', [App\Http\Controllers\ReportePagosController::class, 'exportPDF'])->name('pagos.exportPDF');
+    Route::get('/reporte-pagos/export-excel', [App\Http\Controllers\ReportePagosController::class, 'exportExcel'])->name('pagos.exportExcel');
+
+
+
+    Route::get('admin/reportes/asistencias', [App\Http\Controllers\ReporteAsistenciasController::class, 'index'])->name('admin.reportes.asistencias');
+    Route::get('admin/reportes/asistencias/export/excel', [App\Http\Controllers\ReporteAsistenciasController::class, 'exportExcel'])->name('admin.asistencias.reporte_excel');
+    Route::get('admin/reportes/asistencias/export/pdf', [App\Http\Controllers\ReporteAsistenciasController::class, 'exportPDF'])->name('admin.asistencias.reporte_pdf');
+    Route::get('clientes/search', [App\Http\Controllers\ReporteAsistenciasController::class, 'searchClientes'])->name('clientes.search');
+
+
+    Route::get('reservas/{id}/comprobante', [App\Http\Controllers\ReservaController::class, 'generarComprobante'])->name('admin.reservas.comprobante');
+
+
 });
 
+Route::middleware(['auth'])->group(function () {
 
+    // Rutas para el módulo de reservas
+    Route::get('/admin/reservas/create', [App\Http\Controllers\ReservaController::class, 'create'])->name('admin.reservas.create');
+    Route::post('/admin/reservas', [App\Http\Controllers\ReservaController::class, 'store'])->name('admin.reservas.store');
+    Route::get('/admin/reservas', [App\Http\Controllers\ReservaController::class, 'index'])->name('admin.reservas.index');
+
+    // Ruta para actualizar el estado de una reserva
+    Route::post('/reservas/{id}/actualizar-estado', [App\Http\Controllers\ReservaController::class, 'actualizarEstado'])->name('admin.reservas.actualizarEstado');
+
+    // Ruta para cancelar una reserva
+    Route::post('/reservas/{id}/cancelar', [App\Http\Controllers\ReservaController::class, 'cancelar'])->name('admin.reservas.cancelar');
+
+    // Ruta para registrar el pago de una reserva
+    Route::post('/reservas/{id}/registrar-pago', [App\Http\Controllers\ReservaController::class, 'registrarPago'])->name('reservas.registrarPago');
+
+    // Ruta para generar un ticket de la reserva
+    Route::get('/reservas/{id}/generar-ticket', [App\Http\Controllers\ReservaController::class, 'generarTicket'])->name('reservas.generarTicket');
+
+    // Rutas para el módulo de pagos
+    Route::get('/admin/pagos', [App\Http\Controllers\PagoController::class, 'index'])->name('admin.pagos.index');
+    Route::post('/pagos/reporte', [App\Http\Controllers\PagoController::class, 'generarReporte'])->name('pagos.reporte');
+
+    // Ruta para la búsqueda de clientes (Ajax o buscador)
+    Route::get('/clientes/buscar', [App\Http\Controllers\ReservaController::class, 'buscarClientes'])->name('clientes.buscar');
+    
+});
 
 //configuracion del envio de email
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
@@ -163,3 +254,15 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
 
 Route::get('/password/change', [App\Http\Controllers\PasswordChangeController::class, 'showChangeForm'])->name('password.change');
 Route::post('/password/change', [App\Http\Controllers\PasswordChangeController::class, 'changePassword'])->name('password.change.submit');
+
+
+use App\Http\Controllers\QRCheckController;
+
+Route::get('/qr/all', [QRCheckController::class, 'generateAllQR'])->name('qr.generateAll');
+
+Route::get('/qr', [QRCheckController::class, 'index'])->name('qr.index');
+
+Route::get('/qr/{cliente}', [QRCheckController::class, 'generateQR'])->name('qr.generate');
+Route::post('/check', [QRCheckController::class, 'processCheck'])->name('qr.check');
+Route::get('/scanner', [QRCheckController::class, 'show'])->name('qr.scanner');
+Route::post('/scanner/process', [QRCheckController::class, 'process'])->name('qr.process');
