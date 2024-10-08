@@ -5,6 +5,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,14 +16,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/send-test-email', function () {
-    Mail::raw('This is a test email.', function ($message) {
-        $message->to('adonay202024@gmail.com')
-            ->subject('Test Email');
-    });
 
-    return 'Test email sent successfully!';
-});
 
 
 Route::get('/', function () {
@@ -44,6 +38,11 @@ Route::put('/profile/update', [App\Http\Controllers\UsuarioController::class, 'u
 route::post('/profile/validate', [App\Http\Controllers\UsuarioController::class, 'validateProfile'])->name('profile.validate')->middleware('auth');
 
 
+
+
+
+
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/entrenadores', [App\Http\Controllers\EntrenadorController::class, 'index'])->name('admin.entrenadores.index');
     Route::get('/admin/entrenadores/create', [App\Http\Controllers\EntrenadorController::class, 'create'])->name('admin.entrenadores.create');
@@ -51,14 +50,21 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/entrenadores/{id}/edit', [App\Http\Controllers\EntrenadorController::class, 'edit'])->name('admin.entrenadores.edit');
     Route::put('/admin/entrenadores/{id}', [App\Http\Controllers\EntrenadorController::class, 'update'])->name('admin.entrenadores.update');
     Route::delete('/admin/entrenadores/{id}', [App\Http\Controllers\EntrenadorController::class, 'destroy'])->name('admin.entrenadores.destroy');
-    Route::get('/admin/entrenadores/profile', [App\Http\Controllers\EntrenadorController::class, 'profile'])->name('admin.entrenadores.profile');
-    Route::put('/admin/entrenadores/profile/update', [App\Http\Controllers\EntrenadorController::class, 'updateProfile'])->name('admin.entrenadores.updateProfile');
+    //Route::get('/admin/entrenadores/profile', [App\Http\Controllers\EntrenadorController::class, 'profile'])->name('admin.entrenadores.profile');
+    //Route::put('/admin/entrenadores/profile/update', [App\Http\Controllers\EntrenadorController::class, 'updateProfile'])->name('admin.entrenadores.updateProfile');
     // Route::get('/admin/entrenadores/{id}/show', [App\Http\Controllers\EntrenadorController::class, 'show'])->name('admin.entrenadores.show');
-    Route::delete('/admin/entrenadores/{id}/force', [App\Http\Controllers\EntrenadorController::class, 'forceDestroy'])->name('admin.entrenadores.forceDestroy');
-    Route::patch('/admin/entrenadores/{id}/restore', [App\Http\Controllers\EntrenadorController::class, 'restore'])->name('admin.entrenadores.restore');
-    Route::get('/admin/entrenadores/eliminados', [App\Http\Controllers\EntrenadorController::class, 'eliminados'])->name('admin.entrenadores.eliminados');
-    Route::get('admin/entrenadores/pdf', [App\Http\Controllers\EntrenadorController::class, 'exportPDF'])->name('admin.entrenadores.pdf');
-    Route::get('admin/entrenadores/export/excel', [App\Http\Controllers\EntrenadorController::class, 'exportExcel'])->name('admin.entrenadores.export.excel');
+    //Route::delete('/admin/entrenadores/{id}/force', [App\Http\Controllers\EntrenadorController::class, 'forceDestroy'])->name('admin.entrenadores.forceDestroy');
+    //Route::patch('/admin/entrenadores/{id}/restore', [App\Http\Controllers\EntrenadorController::class, 'restore'])->name('admin.entrenadores.restore');
+    //Route::get('/admin/entrenadores/eliminados', [App\Http\Controllers\EntrenadorController::class, 'eliminados'])->name('admin.entrenadores.eliminados');
+    //Route::get('admin/entrenadores/pdf', [App\Http\Controllers\EntrenadorController::class, 'exportPDF'])->name('admin.entrenadores.pdf');
+    //Route::get('admin/entrenadores/export/excel', [App\Http\Controllers\EntrenadorController::class, 'exportExcel'])->name('admin.entrenadores.export.excel');
+
+
+    Route::get('/admin/usuarios', [App\Http\Controllers\UsuarioController::class, 'index'])->name('admin.usuarios.index');
+    Route::post('/admin/usuarios/store', [App\Http\Controllers\UsuarioController::class, 'store'])->name('admin.usuarios.store');
+    Route::put('/admin/usuarios/update/{idUsuario}', [App\Http\Controllers\UsuarioController::class, 'update'])->name('admin.usuarios.update');
+    Route::delete('/admin/usuarios/destroy/{idUsuario}', [App\Http\Controllers\UsuarioController::class, 'destroy'])->name('admin.usuarios.destroy');
+    Route::put('/admin/usuarios/toggleStatus/{idUsuario}', [App\Http\Controllers\UsuarioController::class, 'toggleStatus'])->name('admin.usuarios.toggleStatus');
 
 
 });
@@ -70,13 +76,20 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/clientes/{id}/edit', [App\Http\Controllers\ClienteController::class, 'edit'])->name('admin.clientes.edit');
     Route::put('/admin/clientes/{id}', [App\Http\Controllers\ClienteController::class, 'update'])->name('admin.clientes.update');
     Route::delete('/admin/clientes/{id}', [App\Http\Controllers\ClienteController::class, 'destroy'])->name('admin.clientes.destroy');
-    Route::get('/admin/clientes/profile', [App\Http\Controllers\ClienteController::class, 'profile'])->name('admin.clientes.profile');
-    Route::put('/admin/clientes/profile/update', [App\Http\Controllers\ClienteController::class, 'updateProfile'])->name('admin.clientes.updateProfile');
-    Route::delete('/admin/clientes/{id}/force', [App\Http\Controllers\ClienteController::class, 'forceDestroy'])->name('admin.clientes.forceDestroy');
-    Route::patch('/admin/clientes/{id}/restore', [App\Http\Controllers\ClienteController::class, 'restore'])->name('admin.clientes.restore');
-    Route::get('/admin/clientes/eliminados', [App\Http\Controllers\ClienteController::class, 'eliminados'])->name('admin.clientes.eliminados');
-    Route::get('admin/clientes/pdf', [App\Http\Controllers\ClienteController::class, 'exportPDF'])->name('admin.clientes.pdf');
-    Route::get('admin/clientes/export-excel', [App\Http\Controllers\ClienteController::class, 'exportExcel'])->name('admin.clientes.exportExcel');
+    //Route::get('/admin/clientes/profile', [App\Http\Controllers\ClienteController::class, 'profile'])->name('admin.clientes.profile');
+   //Route::put('/admin/clientes/profile/update', [App\Http\Controllers\ClienteController::class, 'updateProfile'])->name('admin.clientes.updateProfile');
+    //Route::delete('/admin/clientes/{id}/force', [App\Http\Controllers\ClienteController::class, 'forceDestroy'])->name('admin.clientes.forceDestroy');
+    //Route::patch('/admin/clientes/{id}/restore', [App\Http\Controllers\ClienteController::class, 'restore'])->name('admin.clientes.restore');
+    //Route::get('/admin/clientes/eliminados', [App\Http\Controllers\ClienteController::class, 'eliminados'])->name('admin.clientes.eliminados');
+    //Route::get('admin/clientes/pdf', [App\Http\Controllers\ClienteController::class, 'exportPDF'])->name('admin.clientes.pdf');
+    //Route::get('admin/clientes/export-excel', [App\Http\Controllers\ClienteController::class, 'exportExcel'])->name('admin.clientes.exportExcel');
+
+
+
+
+
+
+
 
     //ruata ala que solo solo el cliente podra accedes
     Route::get('/cliente/dashboard', [App\Http\Controllers\ClienteController::class, 'dashboard'])->name('cliente.dashboard');

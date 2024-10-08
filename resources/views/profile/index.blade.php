@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 @section('content')
     
     <!-- Page Header Close -->
@@ -65,14 +65,7 @@
                                         </div>
                                     </div>
                                     <!--end col-->
-                                    <div class="col-lg-6">
-                                        <div class="mb-3">
-                                            <label for="phonenumberInput" class="form-label">Teléfono</label>
-                                            <input type="text" class="form-control" id="phonenumberInput" name="telefono"
-                                                value="{{ $user->telefono }}" maxlength="10">
-                                                <div class="invalid-feedback" id="telefonoError">El teléfono debe contener solo números.</div>
-                                        </div>
-                                    </div>
+                            
 
                                     <!--end col-->
                                     <div class="col-lg-6">

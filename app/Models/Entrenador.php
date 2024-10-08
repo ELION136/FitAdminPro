@@ -15,17 +15,18 @@ class Entrenador extends Model
     protected $primaryKey = 'idEntrenador';  //idEntrenador
 
     protected $fillable = [
-        'idUsuario',
         'nombre',
         'primerApellido',
         'segundoApellido',
-        'fechaNacimiento',
-        'genero',
-        'fechaContratacion',
-        'direccion',
-        'especialidad',
+        'telefono',
         'descripcion',
-        'idAutor',
+        'especialidad',
+        'genero',
+        'image',
+        'fechaNacimiento',
+        'fechaContratacion',
+        'fechaCreacion',
+        'fechaModificacion',
         'eliminado',
     ];
     protected $casts = [
@@ -34,16 +35,12 @@ class Entrenador extends Model
         'fechaCreacion' => 'datetime',
         'fechaModificacion' => 'datetime',
     ];
+    
+    protected $dates = ['fechaContratacion','fechaNacimiento' , 'fechaCreacion', 'fechaModificacion'];
 
-
-    public function usuario()
-    {
-        return $this->belongsTo(User::class, 'idUsuario');
-    }
-
-    public function horarios()
-    {
-        return $this->hasMany(Horario::class, 'idEntrenador');
-    }
+    //public function secciones()
+   // {
+    //    return $this->hasMany(Seccion::class, 'idEntrenador');
+    //}
 
 }

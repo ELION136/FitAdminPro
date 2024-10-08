@@ -142,12 +142,12 @@
                                             class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{ $userName ?? 'Usuario' }}</span>
                                         <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">
                                             Miembro:
+                                            
                                             @if (auth()->user()->rol === 'Administrador')
                                                 Administrador
-                                            @elseif (auth()->user()->rol === 'Entrenador')
-                                                Entrenador
-                                            @elseif (auth()->user()->rol === 'Cliente')
-                                                Cliente
+                                            @elseif (auth()->user()->rol === 'Vendedor')
+                                                Vendedor
+                                            
                                             @else
                                                 Rol desconocido
                                             @endif
@@ -163,14 +163,7 @@
                                     <a class="dropdown-item" href="{{ route('profile.index') }}"><i
                                             class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i>
                                         <span class="align-middle">Perfil</span></a>
-                                @elseif (auth()->user()->rol === 'Entrenador')
-                                    <a class="dropdown-item" href="{{ route('admin.entrenadores.profile') }}"><i
-                                            class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i>
-                                        <span class="align-middle">Perfil</span></a>
-                                @elseif (auth()->user()->rol === 'Cliente')
-                                    <a class="dropdown-item" href="{{ route('admin.clientes.profile') }}"><i
-                                            class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i>
-                                        <span class="align-middle">Perfil</span></a>
+                                
                                 @endif
 
                                 <li><a class="dropdown-item d.flex border-block-end" href="{{ route('logout') }}"
@@ -283,7 +276,7 @@
                                 role="button" aria-expanded="false" aria-controls="sidebarDashboards">
                                 <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Dashboards</span>
                             </a>
-                            @if (auth()->user() && auth()->user()->rol === 'Administrador')
+                           
                                 <div class="collapse menu-dropdown" id="sidebarDashboards">
                                     <ul class="nav nav-sm flex-column">
                                         <li class="nav-item">
@@ -293,79 +286,26 @@
                                         </li>
                                     </ul>
                                 </div>
-                            @endif
+                      
 
-                            @if (auth()->user() && auth()->user()->rol === 'Cliente')
-                                <div class="collapse menu-dropdown" id="sidebarDashboards">
-                                    <ul class="nav nav-sm flex-column">
-                                        <li class="nav-item">
-                                            <a href="{{ route('cliente.dashboard') }}" class="nav-link"
-                                                data-key="t-crm">
-                                                Panel de control
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            @endif
+                           
                         </li> <!-- end Dashboard Menu -->
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Paginas</span>
                         </li>
-                        @if (auth()->user() && (auth()->user()->rol === 'Administrador' || auth()->user()->rol === 'Entrenador'))
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="#sidebarLanding" data-bs-toggle="collapse"
-                                    role="button" aria-expanded="false" aria-controls="sidebarLanding">
-                                    <i class="ri-user-line"></i><span data-key="t-landing">Usuarios</span>
-                                </a>
-                                <div class="collapse menu-dropdown" id="sidebarLanding">
-                                    <ul class="nav nav-sm flex-column">
-                                        <li class="nav-item">
-                                            <a href="{{ route('admin.entrenadores.index') }}" class="nav-link"
-                                                data-key="t-one-page"> Entrenadores
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="{{ route('admin.clientes.index') }}" class="nav-link"
-                                                data-key="t-nft-landing">Clintes
-                                            </a>
-                                        </li>
-                                        
-                                    </ul>
-                                </div>
-                            </li>
-                        @endif
-
-                        @if (auth()->user() && auth()->user()->rol === 'Cliente')
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="{{ route('cliente.entrenadores.index') }}">
-                                    <i class="ri-honour-line"></i> <span data-key="t-widgets">Entrenadores</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="#sidebarMember" data-bs-toggle="collapse"
-                                    role="button" aria-expanded="false" aria-controls="sidebarForms">
-                                    <i class="ri-file-list-3-line"></i> <span data-key="t-forms">membresia</span>
-                                </a>
-                                <div class="collapse menu-dropdown" id="sidebarMember">
-                                    <ul class="nav nav-sm flex-column">
-                                        <li class="nav-item">
-                                            <a href="{{ route('cliente.membresias.index') }}" class="nav-link"
-                                                data-key="t-basic-elements">Catalogo</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="{{ route('cliente.membresias.info') }}" class="nav-link"
-                                                data-key="t-form-select"> Mi Membresia</a>
-                                        </li>
-
-                                    </ul>
-                                </div>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link menu-link" href="{{ route('cliente.asistencias.view') }}">
-                                    <i class="ri-honour-line"></i> <span data-key="t-widgets">Mis Asistencias</span>
-                                </a>
-                            </li>
-                        @endif
-                        @if (auth()->user() && (auth()->user()->rol === 'Administrador' || auth()->user()->rol === 'Entrenador'))
+                        public function destroy($idUsuario)
+                        {
+                            Log::info('Iniciando el proceso de eliminación para el usuario:', ['idUsuario' => $idUsuario]);
+                            try {
+                                $usuario = User::findOrFail($idUsuario);
+                                $usuario->update(['eliminado' => 0]);
+                                Log::info('Usuario eliminado correctamente.');
+                                return response()->json(['success' => 'Usuario eliminado correctamente']);
+                            } catch (Exception $e) {
+                                Log::error('Error al eliminar el usuario:', ['message' => $e->getMessage()]);
+                                return response()->json(['error' => 'Hubo un problema al eliminar el usuario. Por favor, intente de nuevo.'], 500);
+                            }
+                        }
+                        @if (auth()->user() && (auth()->user()->rol === 'Administrador' || auth()->user()->rol === 'Vendedor'))
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="#sidebarForms" data-bs-toggle="collapse"
                                     role="button" aria-expanded="false" aria-controls="sidebarForms">
@@ -553,9 +493,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-sm-6">
-                            <script>
-                                document.write(new Date().getFullYear())
-                            </script> © Velzon.
+                            <span id="currentYear"></span> © Velzon.
                         </div>
                         <div class="col-sm-6">
                             <div class="text-sm-end d-none d-sm-block">
@@ -565,6 +503,13 @@
                     </div>
                 </div>
             </footer>
+            
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.getElementById('currentYear').textContent = new Date().getFullYear();
+                });
+            </script>
+            
             <!-- Footer End -->
         </div>
         <!-- end main content-->

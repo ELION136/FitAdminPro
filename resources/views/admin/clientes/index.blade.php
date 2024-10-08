@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('content')
     <!-- Page Header -->
@@ -24,34 +24,25 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
-                    
+
                     <h5 class="card-title mb-0">Clientes </h5><br>
-                        
-                    
-                    <a href="{{ route('admin.clientes.create') }}" class="btn btn-outline-info waves-effect waves-light material-shadow-none"
+
+
+                    <a href="{{ route('admin.clientes.create') }}"
+                        class="btn btn-outline-info waves-effect waves-light material-shadow-none"
                         data-bs-original-title="Añadir">
                         <i class="las la-plus"></i> Añadir un nuevo Cliente
-                    </a>
-                    <a href="{{ route('admin.clientes.eliminados') }}" class="btn btn-outline-warning waves-effect waves-light material-shadow-none"
-                        data-bs-original-title="Añadir">
-                        <i class="las la-archive"></i> Habilitar
-                    </a>
-                    <a href="{{ route('admin.clientes.pdf') }}" class="btn btn-outline-danger waves-effect waves-light material-shadow-none">
-                        <i class="fas fa-file-pdf"></i> Exportar PDF
-                    </a>
-                    <a href="{{ route('admin.clientes.exportExcel') }}" class="btn btn-outline-success waves-effect waves-light material-shadow-none">
-                        <i class="fas fa-file-excel"></i> Exportar Excel
                     </a>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered text-nowrap w-100 datatable" id="miTabla">
+                        <table class="table table-bordered dt-responsive nowrap table-striped align-middle datatable" id="miTabla">
                             <thead>
                                 <tr>
                                     <th><span>#</span></th>
                                     <th><span>Imagen</span></th>
                                     <th><span>Nombre Completo</span></th>
-                                    <th><span>Correo Electronico</span></th>
+                                    <th><span>Telefono de emergencia</span></th>
                                     <th><span>Género</span></th>
                                     <th><span>Edad</span></th>
                                     <th><span>Estado</span></th>
@@ -63,9 +54,9 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>
-                                            @if ($cliente->usuario->image)
-                                                <img src="{{ asset('storage/' . $cliente->usuario->image) }}"
-                                                    alt="Foto de perfil" width="50" height="50">
+                                            @if ($cliente->image)
+                                                <img src="{{ asset('storage/' . $cliente->image) }}" alt="Foto de perfil"
+                                                    width="50" height="50">
                                             @else
                                                 <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
                                                     width="50" height="50">
@@ -73,8 +64,8 @@
                                         </td>
                                         <td>{{ $cliente->nombre }} {{ $cliente->primerApellido }}
                                             {{ $cliente->segundoApellido }}</td>
+                                            <td>{{ $cliente->telefonoEmergencia}}</td>
 
-                                        <td>{{ $cliente->usuario->email }}</td>
                                         <td>{{ $cliente->genero }}</td> <!-- Mostrar el género -->
                                         <td>{{ \Carbon\Carbon::parse($cliente->fechaNacimiento)->age }} años</td>
                                         <!-- Mostrar la edad -->
@@ -88,40 +79,23 @@
                                         <td>
 
                                             <a href="{{ route('admin.clientes.edit', $cliente->idCliente) }}"
-                                                class="btn btn-sm btn-info btn-b" data-bs-toggle="tooltip" title=""
+                                                class="btn btn-sm btn-warning btn-b" data-bs-toggle="tooltip" title=""
                                                 data-bs-original-title="Editar">
                                                 <i class="ri-sip-fill"></i>
                                             </a>
-                                               
-                                            @if (auth()->user()->rol === 'Administrador')
 
-                                            <!--boton de habilitado y deshabilitado-->
-                                            <!-- Botón para deshabilitar (Eliminación lógica) -->
                                             <form id="disable-form-{{ $cliente->idCliente }}"
                                                 action="{{ route('admin.clientes.destroy', $cliente->idCliente) }}"
                                                 method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" class="btn btn-sm btn-warning"
+                                                <button type="button" class="btn btn-sm btn-danger"
                                                     data-bs-toggle="tooltip" title="Deshabilitar"
                                                     onclick="confirmDisable({{ $cliente->idCliente }})">
                                                     <i class="ri-delete-bin-6-line"></i>
                                                 </button>
                                             </form>
 
-                                            <!-- Botón para eliminar permanentemente -->
-                                            <form id="force-delete-form-{{ $cliente->idCliente }}"
-                                                action="{{ route('admin.clientes.forceDestroy', $cliente->idCliente) }}"
-                                                method="POST" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="btn btn-sm btn-danger"
-                                                    data-bs-toggle="tooltip" title="Eliminar"
-                                                    onclick="confirmForceDelete({{ $cliente->idCliente }})">
-                                                    <i class="ri-close-circle-fill"></i>
-                                                </button>
-                                            </form>
-                                            @endif
                                             <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal"
                                                 data-bs-target="#modalCliente{{ $cliente->idCliente }}">
                                                 <i class="las la-eye"></i>
@@ -129,7 +103,7 @@
 
 
                                             <!-- Modal -->
-                                            <div class="modal fade" id="modalCliente{{ $cliente->idCliente  }}"
+                                            <div class="modal fade" id="modalCliente{{ $cliente->idCliente }}"
                                                 tabindex="-1"
                                                 aria-labelledby="modalVerEntrenadorLabel{{ $cliente->idCliente }}"
                                                 aria-hidden="true">
@@ -151,13 +125,13 @@
                                                                 <div class="col-md-6 text-center">
                                                                     <div class="card">
                                                                         <div class="card-body">
-                                                                            <img src="{{ $cliente->usuario->image ? asset('storage/' . $cliente->usuario->image) : asset('images/default-profile.png') }}"
+                                                                            <img src="{{ $cliente->image ? asset('storage/' . $cliente->image) : asset('images/default-profile.png') }}"
                                                                                 alt="Imagen de perfil"
                                                                                 class="img-fluid rounded-circle mb-3"
                                                                                 width="150" height="150">
                                                                             <h5 class="card-title">
-                                                                                {{$cliente->usuario->nombreUsuario}} </h5> 
-                                                                                <p class="text-muted">
+                                                                                {{ $cliente->nombre }} </h5>
+                                                                            <p class="text-muted">
                                                                                 {{ $cliente->nombre }}
                                                                                 {{ $cliente->primerApellido }}
                                                                                 {{ $cliente->segundoApellido }}</p>
@@ -169,13 +143,7 @@
                                                                     <div class="card">
                                                                         <div class="card-body">
                                                                             <!-- Correo -->
-                                                                            <div class="mb-3">
-                                                                                <i
-                                                                                    class="fas fa-envelope text-primary"></i>
-                                                                                <strong>Correo Electrónico:</strong>
-                                                                                <p class="text-muted">
-                                                                                    {{ $cliente->usuario->email }}</p>
-                                                                            </div>
+
                                                                             <!-- Género -->
                                                                             <div class="mb-3">
                                                                                 <i
@@ -255,26 +223,6 @@
                 }
             });
         }
-    
-        function confirmForceDelete(idCliente) {
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: "¡El cliente será eliminado permanentemente y no podrás restaurarlo!",
-                icon: 'error',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, eliminarlo!',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('force-delete-form-' + idCliente).submit();
-                }
-            });
-        }
     </script>
-    
-@endsection
-@include('partials.datatables-scripts')
-
-
+    @endsection
+    @include('partials.datatables-scripts')

@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 @section('content')
 
 <div class="pt-4 mb-4 mb-lg-3 pb-lg-4 profile-wrapper">

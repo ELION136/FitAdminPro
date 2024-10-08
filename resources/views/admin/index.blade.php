@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 @section('content')
     <!-- start page title -->
     <div class="row">
@@ -58,7 +58,7 @@
                                     <p class="text-uppercase fw-medium text-muted mb-3">Asistencias</p>
                                     <div class="d-flex align-items-center mb-3">
                                         <h4 class="fs-4 flex-grow-1 mb-0"><span class="counter-value"
-                                                data-target="{{ $totalAsistencias }}">0</span></h4>
+                                                data-target="">0</span></h4>
                                         <span class="badge bg-success-subtle text-success fs-12"><i
                                                 class="ri-arrow-up-s-line fs-13 align-middle me-1"></i>3.58 %</span>
                                     </div>
@@ -151,7 +151,7 @@
                                 <div class="flex-grow-1 ms-3">
                                     <p class="text-uppercase fw-medium text-muted mb-3">Ingresos del Mes</p>
                                     <h4 class="fs-4 mb-0">Bs.- <span class="counter-value"
-                                            data-target="{{ $ingresosMes }}">0</span></h4>
+                                            data-target="">0</span></h4>
                                     <p class="text-muted mb-0">Monto total recibido</p>
                                 </div>
                             </div>
@@ -172,7 +172,7 @@
                                 <div class="flex-grow-1 ms-3">
                                     <p class="text-uppercase fw-medium text-muted mb-3">Reservas Pendientes</p>
                                     <h4 class="fs-4 mb-0"><span class="counter-value"
-                                            data-target="{{ $reservasPendientes }}">0</span></h4>
+                                            data-target="">0</span></h4>
                                     <p class="text-muted mb-0">Reservas aún no procesadas</p>
                                 </div>
                             </div>
@@ -193,7 +193,7 @@
                                 <div class="flex-grow-1 ms-3">
                                     <p class="text-uppercase fw-medium text-muted mb-3">Servicios Activos</p>
                                     <h4 class="fs-4 mb-0"><span class="counter-value"
-                                            data-target="{{ $totalServicios }}">0</span></h4>
+                                            data-target="">0</span></h4>
                                     <p class="text-muted mb-0">Servicios ofrecidos actualmente</p>
                                 </div>
                             </div>
@@ -271,137 +271,4 @@
         </div><!-- end row -->
     </div>
 @endsection
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script type="text/javascript">
-    // Gráfico de barras: Usuarios por Rol
-    var ctx = document.getElementById('usuariosPorRol').getContext('2d');
-    var usuariosPorRolChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Entrenadores', 'Clientes'],
-            datasets: [{
-                label: 'Total',
-                data: [{{ $totalEntrenadores }}, {{ $totalClientes }}],
-                backgroundColor: ['#36A2EB', '#4BC0C0'],
-                borderColor: ['#36A2EB', '#4BC0C0'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    // Gráfico de líneas: Asistencias por Mes
-    var ctx2 = document.getElementById('asistenciasPorMes').getContext('2d');
-    var asistenciasPorMesChart = new Chart(ctx2, {
-        type: 'line',
-        data: {
-            labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
-            datasets: [{
-                label: 'Asistencias',
-                data: [{{ $totalAsistencias }}],
-                fill: false,
-                borderColor: '#FF6384',
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    // Gráfico de pasteles: Estado de las Membresías Activas
-    var ctx3 = document.getElementById('estadoMembresias').getContext('2d');
-    var estadoMembresiasChart = new Chart(ctx3, {
-        type: 'pie',
-        data: {
-            labels: ['Activas', 'Otras'],
-            datasets: [{
-                label: 'Membresías',
-                data: [{{ $totalMembresiasActivas }}, 100 - {{ $totalMembresiasActivas }}],
-                backgroundColor: ['#FFCE56', '#E7E9ED']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-
-    // ApexCharts: Asistencias por Semana
-    var asistenciasPorSemana = @json(array_values($asistenciasPorSemana));
-    var semanas = @json(array_keys($asistenciasPorSemana));
-
-    var membresiasActivas = @json(array_values($membresiasActivas));
-    var meses = @json(array_keys($membresiasActivas));
-
-    var options1 = {
-        chart: {
-            height: 350,
-            type: 'line',
-            zoom: {
-                enabled: false
-            }
-        },
-        series: [{
-            name: "Asistencias",
-            data: asistenciasPorSemana
-        }],
-        stroke: {
-            curve: 'smooth'
-        },
-        xaxis: {
-            categories: semanas
-        },
-        colors: ['#556ee6'],
-        title: {
-            text: 'Asistencias por Semana',
-            align: 'left'
-        }
-    };
-    var chart1 = new ApexCharts(document.querySelector("#line_chart_basic"), options1);
-    chart1.render();
-
-    // ApexCharts: Membresías Activas por Mes
-    var options2 = {
-        chart: {
-            height: 350,
-            type: 'area',
-            zoom: {
-                enabled: true
-            }
-        },
-        series: [{
-            name: "Membresías Activas",
-            data: membresiasActivas
-        }],
-        xaxis: {
-            type: 'datetime',
-            categories: meses
-        },
-        colors: ['#34c38f'],
-        title: {
-            text: 'Membresías Activas por Mes',
-            align: 'left'
-        }
-    };
-    var chart2 = new ApexCharts(document.querySelector("#line_chart_zoomable"), options2);
-    chart2.render();
-</script>
-@endpush
+<!-- end row -->

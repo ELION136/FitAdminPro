@@ -38,8 +38,6 @@ class User extends Authenticatable
         'password',
         'telefono',
         'image',
-        'email_verified_at',
-        'remember_token',
         'rol',
         'estado',
         'idAutor',
@@ -51,7 +49,7 @@ class User extends Authenticatable
      *
      * @var bool
      */
-    public $timestamps =false;
+    public $timestamps = false;
 
     /**
      * The attributes that should be hidden for serialization.
@@ -69,43 +67,19 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+
         'password' => 'hashed',
         'fechaCreacion' => 'datetime',
         'fechaModificacion' => 'datetime',
     ];
-
-    /**
-     * Get the employee associated with the user.
-     */
-    /*public function empleado()
-    {
-        return $this->hasOne(Empleado::class, 'idUsuario', 'idUsuario');
-    }*/
-    public function entrenador()
-    {
-        return $this->hasOne(Entrenador::class, 'idUsuario', 'idUsuario');
-    }
-
-    /**
-     * Get the client associated with the user.
-     */
-    public function cliente()
-    {
-        return $this->hasOne(Cliente::class, 'idUsuario', 'idUsuario');
-    }
-
-    /**
-     * Get the URL of the user's profile image.
-     */
     public function getProfileImageUrlAttribute()
     {
         return $this->image ? asset('storage/' . $this->image) : asset('images/default-profile.png');
     }
     public function getRoleAttribute()
-{
-    return $this->attributes['rol'];
-}
+    {
+        return $this->attributes['rol'];
+    }
 
 
 }

@@ -15,7 +15,6 @@ class Cliente extends Model
     protected $primaryKey = 'idCliente';
 
     protected $fillable = [
-        'idUsuario',
         'nombre',
         'primerApellido',
         'segundoApellido',
@@ -23,8 +22,10 @@ class Cliente extends Model
         'genero',
         'direccion',
         'telefonoEmergencia',
+        'qrCode',
+        'image',
         'idAutor',
-        'eliminado',
+        'eliminado'
     ];
     protected $casts = [
         'fechaNacimiento' => 'date',
@@ -32,37 +33,15 @@ class Cliente extends Model
         'fechaModificacion' => 'datetime',
     ];
 
-    public function usuario()
-    {
-        return $this->belongsTo(User::class, 'idUsuario');
-    }
-
-    public function membresias()
-    {
-        return $this->hasMany(Membresia::class, 'idCliente');
-    }
-
-    public function asistencia()
-    {
-        return $this->hasMany(Asistencia::class, 'idCliente', 'idCliente');
-    }
-
-    public function asistenciasMes()
-    {
-        $inicioMes = Carbon::now()->startOfMonth();
-        return $this->asistencia()->where('fecha', '>=', $inicioMes)->count();
-    }
-
-    // Método para obtener asistencias del año
-    public function asistenciasAnio()
-    {
-        $inicioAnio = Carbon::now()->startOfYear();
-        return $this->asistencia()->where('fecha', '>=', $inicioAnio)->count();
-    }
-    
     public function inscripciones()
     {
-        return $this->hasMany(Inscripcion::class, 'idCliente');
+        return $this->hasMany(Inscripcion::class, 'idCliente', 'idCliente');
+    }
+
+    // Relación con las asistencias
+    public function asistencias()
+    {
+        return $this->hasMany(Asistencia::class, 'idCliente', 'idCliente');
     }
     /*
     public function inscripciones()
