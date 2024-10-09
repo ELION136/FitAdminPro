@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
 
 
@@ -19,7 +20,7 @@
 
     <!--datatable css-->
 
-
+     
     <!--datatable responsive css-->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" />
 
@@ -427,7 +428,7 @@
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="#sidebarServicios" data-bs-toggle="collapse"
                                 role="button" aria-expanded="false" aria-controls="sidebarMaps">
-                                <i class="ri-service-line"></i> <span data-key="t-maps">Servicios</span>
+                                <i class="ri-service-line"></i> <span data-key="t-maps">Actividades</span>
                             </a>
                             <div class="collapse menu-dropdown" id="sidebarServicios">
                                 <ul class="nav nav-sm flex-column">
@@ -436,34 +437,14 @@
                                             data-key="t-form-select">Lista de Servicios</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.horarios.index') }}" class="nav-link"
-                                            data-key="t-list-js">Horarios de Servicios</a>
+                                        <a href="{{ route('admin.secciones.index') }}" class="nav-link"
+                                            data-key="t-list-js">Secciones</a>
                                     </li>
 
                                 </ul>
                             </div>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarReservas" data-bs-toggle="collapse"
-                                role="button" aria-expanded="false" aria-controls="sidebarMaps">
-                                <i class="ri-calendar-event-line"></i> <span data-key="t-maps">Reservas</span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarReservas">
-                                <ul class="nav nav-sm flex-column">
-
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.reservas.index') }}" class="nav-link"><span
-                                                data-key="t-boxicons">Lista de Reservas</span> </a>
-                                    </li>
-
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.reservas.create') }}" class="nav-link"
-                                            data-key="t-list-js">Realizar Reservas</a>
-                                    </li>
-
-                                </ul>
-                            </div>
-                        </li>
+                        
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="#sidebarPagos" data-bs-toggle="collapse"
                                 role="button" aria-expanded="false" aria-controls="sidebarMaps">

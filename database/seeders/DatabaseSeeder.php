@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
          // Tabla Usuarios
          // 1. Crear el Administrador
          // Crear Usuario Admin
-        DB::table('usuarios')->insert([
+      /*  DB::table('usuarios')->insert([
             'nombreUsuario' => 'admin',
             'password' => Hash::make('adminpassword'),
             'email' => 'admin@gmail.com',
@@ -65,6 +65,37 @@ class DatabaseSeeder extends Seeder
             'fechaCreacion' => now(),
             'eliminado' => 1,
             'idAutor'=>1,
+        ]);*/
+        DB::table('entrenadores')->insert([
+            [
+                'nombre' => 'Carlos',
+                'primerApellido' => 'López',
+                'segundoApellido' => 'Martínez',
+                'telefono' => '5551234567',
+                'descripcion' => 'Especialista en entrenamiento cardiovascular.',
+                'especialidad' => 'Entrenamiento Cardiovascular',
+                'genero' => 'Masculino',
+                'image' => 'carlos_lopez.jpg',
+                'fechaNacimiento' => '1990-04-15',
+                'fechaContratacion' => '2023-01-10',
+                'idAutor' => 1,
+                'eliminado' => 1,
+            ],
+            [
+                'nombre' => 'María',
+                'primerApellido' => 'González',
+                'segundoApellido' => 'Hernández',
+                'telefono' => '5559876543',
+                'descripcion' => 'Experta en nutrición y bienestar.',
+                'especialidad' => 'Nutrición y Bienestar',
+                'genero' => 'Femenino',
+                'image' => 'maria_gonzalez.jpg',
+                'fechaNacimiento' => '1985-08-22',
+                'fechaContratacion' => '2023-02-05',
+                'idAutor' => 1,
+                'eliminado' => 1,
+            ],
+            // Agrega más registros según sea necesario
         ]);
 
 

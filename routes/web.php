@@ -73,6 +73,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/membresias', [App\Http\Controllers\MembresiaController::class, 'store'])->name('admin.membresias.store');
     Route::put('/admin/membresias/{id}', [App\Http\Controllers\MembresiaController::class, 'update'])->name('admin.membresias.update');
     Route::delete('/admin/membresias/{id}', [App\Http\Controllers\MembresiaController::class, 'destroy'])->name('admin.membresias.destroy');
+
+    Route::get('/admin/servicios', [App\Http\Controllers\ServiciosController::class, 'index'])->name('admin.servicios.index');
+    Route::post('/admin/servicios', [App\Http\Controllers\ServiciosController::class, 'store'])->name('admin.servicios.store');
+    Route::put('/admin/servicios/{id}', [App\Http\Controllers\ServiciosController::class, 'update'])->name('admin.servicios.update');
+    Route::delete('/admin/servicios/{id}', [App\Http\Controllers\ServiciosController::class, 'destroy'])->name('admin.servicios.destroy');
+
+
+    Route::get('/admin/secciones', [App\Http\Controllers\SeccionController::class, 'index'])->name('admin.secciones.index');
+    Route::post('/admin/secciones', [App\Http\Controllers\SeccionController::class, 'store'])->name('admin.secciones.store');
+    Route::put('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'update'])->name('admin.secciones.update');
+    Route::delete('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'destroy'])->name('admin.secciones.destroy');
+
+
 });
 
 Route::middleware(['auth'])->group(function () {

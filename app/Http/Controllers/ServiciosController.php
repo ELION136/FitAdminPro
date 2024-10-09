@@ -4,69 +4,74 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Servicio;
-
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 class ServiciosController extends Controller
 {
     public function index()
     {
-        // Mostrar solo los servicios activos (eliminado = 1)
         $servicios = Servicio::where('eliminado', 1)->get();
         return view('admin.servicios.index', compact('servicios'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required|max:100',
-            'descripcion' => 'nullable',
-            'duracion' => 'required|integer|min:1',
-            'precio' => 'required|numeric|min:0', // Validación del precio
-            'fechaInicio' => 'required|date', // Validación de la fecha de inicio
-            'fechaFin' => 'required|date|after_or_equal:fechaInicio', // Validación de la fecha de fin
+        $validator = Validator::make($request->all(), [
+            'nombre' => 'required|string|max:50',
+            'descripcion' => 'nullable|string',
+            'capacidadMaxima' => 'required|integer|min:1',
+            'precioPorSeccion' => 'required|numeric|min:0|max:10000',
+            'incluyeCostoEntrada' => 'boolean',
         ]);
 
-        $servicio = new Servicio($request->all());
-        $servicio->idAutor = auth()->id();
-        $servicio->eliminado = 1; // Asegura que se marque como activo
-        $servicio->save();
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
-        return redirect()->route('admin.servicios.index')->with('success', 'El servicio ha sido creado exitosamente');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $idServicio)
-    {
-        $request->validate([
-            'nombre' => 'required|max:100',
-            'descripcion' => 'nullable',
-            'duracion' => 'required|integer|min:1',
-            'precio' => 'required|numeric|min:0', // Validación del precio
-            'fechaInicio' => 'required|date', // Validación de la fecha de inicio
-            'fechaFin' => 'required|date|after_or_equal:fechaInicio', // Validación de la fecha de fin
+        Servicio::create([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+            'capacidadMaxima' => $request->capacidadMaxima,
+            'precioPorSeccion' => $request->precioPorSeccion,
+            'incluyeCostoEntrada' => $request->incluyeCostoEntrada ? 1 : 0,
+            'idAutor' => Auth::id(),
         ]);
 
-        $servicio = Servicio::findOrFail($idServicio);
-        $servicio->update($request->all());
-        $servicio->idAutor = auth()->id();
-        $servicio->save();
-
-        return redirect()->route('admin.servicios.index')->with('success', 'El servicio ha sido actualizado exitosamente');
+        return response()->json(['success' => 'Servicio creado exitosamente.']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($idServicio)
+    public function update(Request $request, $id)
     {
-        $servicio = Servicio::findOrFail($idServicio);
-        $servicio->eliminado = 0; // Eliminación lógica
-        $servicio->save();
+        $validator = Validator::make($request->all(), [
+            'nombre' => 'required|string|max:50',
+            'descripcion' => 'nullable|string',
+            'capacidadMaxima' => 'required|integer|min:1',
+            'precioPorSeccion' => 'required|numeric|min:0|max:10000',
+            'incluyeCostoEntrada' => 'boolean',
+        ]);
 
-        return redirect()->route('admin.servicios.index')->with('success', 'El servicio ha sido eliminado exitosamente');
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $servicio = Servicio::findOrFail($id);
+        $servicio->update([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+            'capacidadMaxima' => $request->capacidadMaxima,
+            'precioPorSeccion' => $request->precioPorSeccion,
+            'incluyeCostoEntrada' => $request->incluyeCostoEntrada ? 1 : 0,
+            'idAutor' => Auth::id(),
+        ]);
+
+        return response()->json(['success' => 'Servicio actualizado exitosamente.']);
+    }
+
+    public function destroy($id)
+    {
+        $servicio = Servicio::findOrFail($id);
+        $servicio->update(['eliminado' => 0]);
+
+        return response()->json(['success' => 'Servicio eliminado exitosamente.']);
     }
 }

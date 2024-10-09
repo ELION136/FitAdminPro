@@ -11,6 +11,7 @@ class Membresia extends Model
 
     protected $table = 'membresias';
     protected $primaryKey = 'idMembresia';
+    public $timestamps = false;
 
     protected $fillable = [
         'nombre',

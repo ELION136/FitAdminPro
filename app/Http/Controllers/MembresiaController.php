@@ -22,8 +22,8 @@ class MembresiaController extends Controller
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:50',
             'descripcion' => 'nullable|string',
-            'duracionDias' => 'required|integer',
-            'precio' => 'required|numeric|min:0',
+            'duracionDias' => 'required|integer|min:1|max:365', // Duración mínima de 1 día y máxima de 1 año
+            'precio' => 'required|numeric|min:0|max:10000', // Precio mínimo de 0 y máximo de 10,000 BOB
         ]);
 
         if ($validator->fails()) {
@@ -46,8 +46,8 @@ class MembresiaController extends Controller
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:50',
             'descripcion' => 'nullable|string',
-            'duracionDias' => 'required|integer',
-            'precio' => 'required|numeric|min:0',
+            'duracionDias' => 'required|integer|min:1|max:365', // Duración mínima de 1 día y máxima de 1 año
+            'precio' => 'required|numeric|min:0|max:10000', // Precio mínimo de 0 y máximo de 10,000 BOB
         ]);
 
         if ($validator->fails()) {

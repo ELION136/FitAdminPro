@@ -198,8 +198,8 @@ class InscripcionController extends Controller
         }
 
         // Obtener inscripciones paginadas
-        $inscripciones = $query->with('cliente', 'membresia')
-                               ->paginate(10);
+        $inscripciones = $query->with('cliente', 'membresia');
+                               //->paginate(10);
 
         // Contadores de tarjetas
         $membresiasActivas = Inscripcion::where('estado', 'activa')->count();

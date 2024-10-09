@@ -6,7 +6,7 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0">Gestión de Membresías</h4>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalMembresia">Añadir Membresía</button>
+                <button class="btn btn-primary" onclick="createMembresia()">Añadir Membresía</button>
             </div>
         </div>
     </div>
@@ -21,7 +21,7 @@
                                 <th>Nombre</th>
                                 <th>Descripción</th>
                                 <th>Duración (días)</th>
-                                <th>Precio</th>
+                                <th>Precio (BOB)</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -31,7 +31,7 @@
                                     <td>{{ $membresia->nombre }}</td>
                                     <td>{{ $membresia->descripcion }}</td>
                                     <td>{{ $membresia->duracionDias }}</td>
-                                    <td>{{ $membresia->precio }}</td>
+                                    <td>{{ number_format($membresia->precio, 2, '.', ',') }} BOB</td>
                                     <td>
                                         <button class="btn btn-success btn-sm" onclick="editMembresia({{ $membresia }})">Editar</button>
                                         <button class="btn btn-danger btn-sm" onclick="deleteMembresia({{ $membresia->idMembresia }})">Eliminar</button>
@@ -72,7 +72,7 @@
                     </div>
                     <div class="form-group">
                         <label for="precio">Precio</label>
-                        <input type="number" class="form-control" id="precio" name="precio" required>
+                        <input type="number" step="0.01" class="form-control" id="precio" name="precio" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -87,23 +87,43 @@
 @endsection
 
 @push('scripts')
-    <script>
+
+<script>
     let form = document.getElementById('formMembresia');
+
+    // Función para abrir el modal de creación de una nueva membresía
+    function createMembresia() {
+        form.reset(); // Restablecer los campos del formulario
+        form.membresiaId.value = ''; // Limpiar el campo de ID
+        document.getElementById('modalMembresiaLabel').textContent = 'Añadir Membresía'; // Cambiar el título del modal
+        new bootstrap.Modal(document.getElementById('modalMembresia')).show(); // Mostrar el modal
+    }
+
+    // Función para abrir el modal de edición de una membresía existente
+    function editMembresia(membresia) {
+        form.reset(); // Restablecer los campos del formulario
+        form.membresiaId.value = membresia.idMembresia; // Asignar el ID de la membresía
+        form.nombre.value = membresia.nombre;
+        form.descripcion.value = membresia.descripcion;
+        form.duracionDias.value = membresia.duracionDias;
+        form.precio.value = membresia.precio;
+        document.getElementById('modalMembresiaLabel').textContent = 'Editar Membresía'; // Cambiar el título del modal
+        new bootstrap.Modal(document.getElementById('modalMembresia')).show(); // Mostrar el modal
+    }
 
     // Crear o Editar Membresía
     form.addEventListener('submit', function (e) {
         e.preventDefault();
         let membresiaId = form.membresiaId.value;
         let url = membresiaId ? `{{ route('admin.membresias.update', '') }}/${membresiaId}` : `{{ route('admin.membresias.store') }}`;
-        let method = membresiaId ? 'POST' : 'POST';
         let formData = new FormData(form);
-        
-        if(membresiaId) {
+
+        if (membresiaId) {
             formData.append('_method', 'PUT');
         }
 
         fetch(url, {
-            method: method,
+            method: 'POST', // Usamos POST para enviar, aunque sea un PUT o DELETE con _method
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             },
@@ -112,40 +132,80 @@
         .then(response => response.json())
         .then(data => {
             if (data.errors) {
-                alert(JSON.stringify(data.errors));
+                let errors = Object.values(data.errors).map(err => err.join('<br>')).join('<br>');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    html: errors,
+                    confirmButtonText: 'Aceptar'
+                });
             } else {
-                location.reload();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: 'Membresía guardada correctamente',
+                    confirmButtonText: 'Aceptar'
+                }).then(() => {
+                    location.reload();
+                });
             }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Ha ocurrido un error en el servidor',
+                confirmButtonText: 'Aceptar'
+            });
+            console.error('Error:', error);
         });
     });
 
-    function editMembresia(membresia) {
-        form.reset();
-        form.membresiaId.value = membresia.idMembresia;
-        form.nombre.value = membresia.nombre;
-        form.descripcion.value = membresia.descripcion;
-        form.duracionDias.value = membresia.duracionDias;
-        form.precio.value = membresia.precio;
-        document.getElementById('modalMembresiaLabel').textContent = 'Editar Membresía';
-        new bootstrap.Modal(document.getElementById('modalMembresia')).show();
-    }
-
+    // Función para eliminar una membresía
     function deleteMembresia(id) {
-        if (confirm('¿Estás seguro de que quieres eliminar esta membresía?')) {
-            fetch(`{{ route('admin.membresias.destroy', '') }}/${id}`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ _method: 'DELETE' })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                }
-            });
-        }
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "No podrás revertir esto",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`{{ route('admin.membresias.destroy', '') }}/${id}`, {
+                    method: 'POST', // Usamos POST para enviar el _method: DELETE
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ _method: 'DELETE' })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Eliminado',
+                            text: 'La membresía ha sido eliminada correctamente',
+                            confirmButtonText: 'Aceptar'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ha ocurrido un error en el servidor',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    console.error('Error:', error);
+                });
+            }
+        });
     }
-    </script>
+</script>
 @endpush

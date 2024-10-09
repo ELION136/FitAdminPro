@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Seccion extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $table = 'secciones';
     protected $primaryKey = 'idSeccion';
+    public $timestamps = false;
 
     protected $fillable = [
         'idServicio',
