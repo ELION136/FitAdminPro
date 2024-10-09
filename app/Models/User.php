@@ -80,6 +80,10 @@ class User extends Authenticatable
     {
         return $this->attributes['rol'];
     }
+    public function inscripciones()
+    {
+        return $this->hasMany(Inscripcion::class, 'idUsuario', 'idUsuario');
+    }
 
 
 }

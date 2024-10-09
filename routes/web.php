@@ -67,6 +67,12 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/admin/usuarios/toggleStatus/{idUsuario}', [App\Http\Controllers\UsuarioController::class, 'toggleStatus'])->name('admin.usuarios.toggleStatus');
 
 
+
+
+    Route::get('/admin/membresias', [App\Http\Controllers\MembresiaController::class, 'index'])->name('admin.membresias.index');
+    Route::post('/admin/membresias', [App\Http\Controllers\MembresiaController::class, 'store'])->name('admin.membresias.store');
+    Route::put('/admin/membresias/{id}', [App\Http\Controllers\MembresiaController::class, 'update'])->name('admin.membresias.update');
+    Route::delete('/admin/membresias/{id}', [App\Http\Controllers\MembresiaController::class, 'destroy'])->name('admin.membresias.destroy');
 });
 
 Route::middleware(['auth'])->group(function () {

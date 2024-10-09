@@ -11,20 +11,23 @@ class Membresia extends Model
 
     protected $table = 'membresias';
     protected $primaryKey = 'idMembresia';
-    public $timestamps = false;
 
     protected $fillable = [
-        'nombre', 
-        'precio', 
-        'duracion', 
+        'nombre',
         'descripcion',
+        'duracionDias',
+        'precio',
         'idAutor',
-        'eliminado',
+        'eliminado'
     ];
-    protected $dates = ['fechaCreacion', 'fechaModificacion'];
+
+    protected $casts = [
+        'fechaCreacion' => 'datetime',
+        'fechaModificacion' => 'datetime',
+    ];
 
     public function inscripciones()
     {
-        return $this->hasMany(Inscripcion::class, 'idMembresia');
+        return $this->hasMany(DetalleInscripcion::class, 'idMembresia', 'idMembresia');
     }
 }

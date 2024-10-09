@@ -4,29 +4,35 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Asistencia extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
-    protected $table = 'asistencia';
+    protected $table = 'asistencias';
     protected $primaryKey = 'idAsistencia';
 
     protected $fillable = [
         'idCliente',
-        'fecha',
-        'horaEntrada',
-        'horaSalida',
+        'idInscripcion',
+        'metodoRegistro',
         'idAutor',
-        'eliminado',
+        'eliminado'
     ];
 
-    public $timestamps = false;
-
-    protected $dates = ['fecha'];
+    protected $casts = [
+        'fechaCreacion' => 'datetime',
+        'fechaModificacion' => 'datetime',
+    ];
 
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class, 'idCliente');
+        return $this->belongsTo(Cliente::class, 'idCliente', 'idCliente');
+    }
+
+    public function inscripcion()
+    {
+        return $this->belongsTo(Inscripcion::class, 'idInscripcion', 'idInscripcion');
     }
 }

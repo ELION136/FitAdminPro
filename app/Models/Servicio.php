@@ -4,41 +4,32 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Servicio extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'servicios';
     protected $primaryKey = 'idServicio';
 
-    
     protected $fillable = [
         'nombre',
         'descripcion',
-        'duracion',
-        'precio',
-        'fechaInicio',     // Añadir el campo fechaInicio
-        'fechaFin',   
+        'capacidadMaxima',
+        'precioPorSeccion',
+        'incluyeCostoEntrada',
         'idAutor',
-        'eliminado',
+        'eliminado'
     ];
 
-    public $timestamps = false;
+    protected $casts = [
+        'fechaCreacion' => 'datetime',
+        'fechaModificacion' => 'datetime',
+    ];
 
-    protected $dates = [
-        'fechaCreacion',
-        'fechaModificacion',
-        'fechaInicio',     // Indicar que es un campo de tipo fecha
-        'fechaFin', ];
- 
-        protected $casts = [
-            'fechaInicio' => 'date',
-            'fechaFin' => 'date',
-        ];
-    // Relaciones
-    public function horarios()
+    public function secciones()
     {
-        return $this->hasMany(Horario::class, 'idServicio');
+        return $this->hasMany(Seccion::class, 'idServicio', 'idServicio');
     }
 }

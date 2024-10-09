@@ -5,44 +5,47 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 class Inscripcion extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'inscripciones';
     protected $primaryKey = 'idInscripcion';
-    public $timestamps = false;
 
     protected $fillable = [
-        'idCliente', 
-        'idMembresia', 
-        'fechaInicio', 
-        'fechaFin', 
+        'idCliente',
+        'idUsuario',
         'estado',
-        'montoPago', 
-        'fechaPago', 
-        'estadoPago',
+        'totalPago',
+        'diasRestantes',
         'idAutor',
-        'eliminado',
+        'eliminado'
     ];
 
-    protected $dates = ['fechaInicio',
-    'fechaFin', 'fechaPago', 
-    'fechaCreacion', 'fechaModificacion'];
     protected $casts = [
-        'fechaInicio' => 'date',
-        'fechaFin' => 'date',
+        'fechaCreacion' => 'datetime',
+        'fechaModificacion' => 'datetime',
     ];
 
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class, 'idCliente');
+        return $this->belongsTo(Cliente::class, 'idCliente', 'idCliente');
     }
 
-    public function membresia()
+    public function usuario()
     {
-        return $this->belongsTo(Membresia::class, 'idMembresia');
+        return $this->belongsTo(User::class, 'idUsuario', 'idUsuario');
+    }
+
+    public function detalleInscripciones()
+    {
+        return $this->hasMany(DetalleInscripcion::class, 'idInscripcion', 'idInscripcion');
+    }
+
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class, 'idInscripcion', 'idInscripcion');
     }
 
     public function isActiva()

@@ -292,19 +292,7 @@
                         </li> <!-- end Dashboard Menu -->
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Paginas</span>
                         </li>
-                        public function destroy($idUsuario)
-                        {
-                            Log::info('Iniciando el proceso de eliminación para el usuario:', ['idUsuario' => $idUsuario]);
-                            try {
-                                $usuario = User::findOrFail($idUsuario);
-                                $usuario->update(['eliminado' => 0]);
-                                Log::info('Usuario eliminado correctamente.');
-                                return response()->json(['success' => 'Usuario eliminado correctamente']);
-                            } catch (Exception $e) {
-                                Log::error('Error al eliminar el usuario:', ['message' => $e->getMessage()]);
-                                return response()->json(['error' => 'Hubo un problema al eliminar el usuario. Por favor, intente de nuevo.'], 500);
-                            }
-                        }
+                       
                         @if (auth()->user() && (auth()->user()->rol === 'Administrador' || auth()->user()->rol === 'Vendedor'))
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="#sidebarForms" data-bs-toggle="collapse"

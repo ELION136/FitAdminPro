@@ -4,33 +4,32 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 class Pago extends Model
-{use HasFactory;
-
-    use HasFactory;
+{
+    use HasFactory, SoftDeletes;
 
     protected $table = 'pagos';
     protected $primaryKey = 'idPago';
 
     protected $fillable = [
-        'idReserva',
+        'idInscripcion',
+        'tipoProducto',
+        'idMembresia',
+        'idSeccion',
         'monto',
-        
-        'estadoPago',
-        'fechaCreacion', 
-        'fechaModificacion', 
-        'idAutor', 
+        'idAutor',
         'eliminado'
     ];
 
-    public $timestamps = false;
+    protected $casts = [
+        'fechaCreacion' => 'datetime',
+        'fechaModificacion' => 'datetime',
+    ];
 
-    protected $dates = ['fechaPago', 'fechaCreacion', 'fechaModificacion'];
-
-    public function reserva()
+    public function inscripcion()
     {
-        return $this->belongsTo(Reserva::class, 'idReserva');
+        return $this->belongsTo(Inscripcion::class, 'idInscripcion', 'idInscripcion');
     }
 
 }

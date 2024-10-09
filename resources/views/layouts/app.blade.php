@@ -1,7 +1,7 @@
 <!doctype html>
-<html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
-    data-sidebar-image="none" data-preloader="disable" data-theme="material" data-theme-colors="default"
-    data-bs-theme="dark">
+<html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image=img-4
+    data-sidebar-image="none" data-preloader="disable" data-theme="saas" data-theme-colors="default"
+    data-bs-theme="ligth">
 
 <head>
     <meta charset="utf-8" />
@@ -390,7 +390,7 @@
                                 <ul class="nav nav-sm flex-column">
 
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.planes.index') }}" class="nav-link"
+                                        <a href="{{ route('admin.membresias.index') }}" class="nav-link"
                                             data-key="t-grid-js">Planes de
                                             Membresias</a>
                                     </li>

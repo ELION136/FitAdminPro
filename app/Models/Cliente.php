@@ -38,7 +38,6 @@ class Cliente extends Model
         return $this->hasMany(Inscripcion::class, 'idCliente', 'idCliente');
     }
 
-    // Relación con las asistencias
     public function asistencias()
     {
         return $this->hasMany(Asistencia::class, 'idCliente', 'idCliente');
