@@ -65,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/admin/usuarios/update/{idUsuario}', [App\Http\Controllers\UsuarioController::class, 'update'])->name('admin.usuarios.update');
     Route::delete('/admin/usuarios/destroy/{idUsuario}', [App\Http\Controllers\UsuarioController::class, 'destroy'])->name('admin.usuarios.destroy');
     Route::put('/admin/usuarios/toggleStatus/{idUsuario}', [App\Http\Controllers\UsuarioController::class, 'toggleStatus'])->name('admin.usuarios.toggleStatus');
-
+    Route::post('/admin/usuarios/validate', [App\Http\Controllers\UsuarioController::class, 'validateField'])->name('admin.usuarios.validate');
 
 
 

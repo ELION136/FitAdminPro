@@ -1,7 +1,7 @@
 <!doctype html>
-<html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image=img-4
-    data-sidebar-image="none" data-preloader="disable" data-theme="saas" data-theme-colors="default"
-    data-bs-theme="ligth">
+<html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
+    data-sidebar-image=img-4 data-sidebar-image="none" data-preloader="disable" data-theme="saas"
+    data-theme-colors="default" data-bs-theme="ligth">
 
 <head>
     <meta charset="utf-8" />
@@ -20,7 +20,7 @@
 
     <!--datatable css-->
 
-     
+
     <!--datatable responsive css-->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" />
 
@@ -287,7 +287,32 @@
                                 </ul>
                             </div>
 
-
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="#sidebarIcons" data-bs-toggle="collapse"
+                                role="button" aria-expanded="false" aria-controls="sidebarIcons">
+                                <i class="ri-check-double-line"></i> <span data-key="t-icons">Asistencias </span>
+                            </a>
+                            <div class="collapse menu-dropdown" id="sidebarIcons">
+                                <ul class="nav nav-sm flex-column">
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.asistencias.cliente') }}" class="nav-link"><span
+                                                data-key="t-remix">Registrar</span></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('qr.scanner') }}" class="nav-link"><span
+                                                data-key="t-remix">QrRegistrar</span></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.asistencias.index') }}" class="nav-link"><span
+                                                data-key="t-boxicons">Asistencias</span> </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('qr.generateAll') }}" class="nav-link"><span
+                                                data-key="t-boxicons">vista</span> </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
 
                         </li> <!-- end Dashboard Menu -->
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Paginas</span>
@@ -399,32 +424,7 @@
                             </div>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarIcons" data-bs-toggle="collapse"
-                                role="button" aria-expanded="false" aria-controls="sidebarIcons">
-                                <i class="ri-check-double-line"></i> <span data-key="t-icons">Asistencias </span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarIcons">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.asistencias.cliente') }}" class="nav-link"><span
-                                                data-key="t-remix">Registrar</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('qr.scanner') }}" class="nav-link"><span
-                                                data-key="t-remix">QrRegistrar</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.asistencias.index') }}" class="nav-link"><span
-                                                data-key="t-boxicons">Asistencias</span> </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('qr.generateAll') }}" class="nav-link"><span
-                                                data-key="t-boxicons">vista</span> </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="#sidebarServicios" data-bs-toggle="collapse"
                                 role="button" aria-expanded="false" aria-controls="sidebarMaps">
@@ -444,7 +444,7 @@
                                 </ul>
                             </div>
                         </li>
-                        
+
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="#sidebarPagos" data-bs-toggle="collapse"
                                 role="button" aria-expanded="false" aria-controls="sidebarMaps">

@@ -21,6 +21,7 @@ class ServiciosController extends Controller
             'descripcion' => 'nullable|string',
             'capacidadMaxima' => 'required|integer|min:1',
             'precioPorSeccion' => 'required|numeric|min:0|max:10000',
+            'duracion' => 'required|integer|min:60|max:1440',
             'incluyeCostoEntrada' => 'boolean',
         ]);
 
@@ -31,6 +32,7 @@ class ServiciosController extends Controller
         Servicio::create([
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,
+            'duracion' => $request->duracion, // Guardar la duracion
             'capacidadMaxima' => $request->capacidadMaxima,
             'precioPorSeccion' => $request->precioPorSeccion,
             'incluyeCostoEntrada' => $request->incluyeCostoEntrada ? 1 : 0,
@@ -47,6 +49,7 @@ class ServiciosController extends Controller
             'descripcion' => 'nullable|string',
             'capacidadMaxima' => 'required|integer|min:1',
             'precioPorSeccion' => 'required|numeric|min:0|max:10000',
+            'duracion' => 'required|integer|min:60|max:1440',
             'incluyeCostoEntrada' => 'boolean',
         ]);
 
@@ -58,6 +61,7 @@ class ServiciosController extends Controller
         $servicio->update([
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,
+            'duracion' => $request->duracion, // Guardar la duracion
             'capacidadMaxima' => $request->capacidadMaxima,
             'precioPorSeccion' => $request->precioPorSeccion,
             'incluyeCostoEntrada' => $request->incluyeCostoEntrada ? 1 : 0,

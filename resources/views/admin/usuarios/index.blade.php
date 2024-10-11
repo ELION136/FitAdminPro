@@ -47,9 +47,12 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>
-                                            <img src="{{ asset('storage/' . $usuario->image) }}" alt="Foto de perfil"
-                                                width="50" height="50">
-                                        </td>
+                                            @if ($usuario->image)
+                                                <img src="{{ asset('storage/' . $usuario->image) }}" alt="Foto de perfil" width="50" height="50">
+                                            @else
+                                                <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil" width="50" height="50">
+                                            @endif
+                                        </td>                                        
                                         <td>{{ $usuario->nombreUsuario }}</td>
                                         <td>{{ $usuario->email }}</td>
                                         <td>{{ $usuario->rol }}</td>
@@ -90,112 +93,136 @@
         </div>
     </div>
 
-    <!-- Modal para editar usuario (reutilizable) -->
-    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Editar Usuario</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="edit-user-form" enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" id="editUserId" name="idUsuario">
-                        <div class="mb-3">
-                            <label for="editNombreUsuario" class="form-label">Nombre de Usuario <span
-                                    style="color: red">*</span></label>
-                            <input type="text" class="form-control" id="editNombreUsuario" name="nombreUsuario" required>
-                            <div class="invalid-feedback" id="editNombreUsuarioError"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editEmail" class="form-label">Correo Electrónico <span
-                                    style="color: red">*</span></label>
-                            <input type="email" class="form-control" id="editEmail" name="email" required>
-                            <div class="invalid-feedback" id="editEmailError"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editRol" class="form-label">Rol <span style="color: red">*</span></label>
-                            <select class="form-control" id="editRol" name="rol" required>
-                                <option value="" disabled>Seleccione un rol</option>
-                                <option value="Administrador">Administrador</option>
-                                <option value="Vendedor">Vendedor</option>
-                            </select>
-                            <div class="invalid-feedback" id="editRolError"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editImage" class="form-label">Foto (Opcional)</label>
-                            <input type="file" class="form-control" id="editImage" name="image" accept="image/*">
-                            <div class="invalid-feedback" id="editImageError"></div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Actualizar</button>
-                    </form>
-                </div>
+   <!-- Modal para editar usuario (reutilizable) -->
+   <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-user-form" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" id="editUserId" name="idUsuario">
+                    <div class="mb-3">
+                        <label for="editNombreUsuario" class="form-label">Nombre de Usuario <span
+                                style="color: red">*</span></label>
+                        <input type="text" class="form-control" id="editNombreUsuario" name="nombreUsuario" required>
+                        <div class="invalid-feedback" id="editNombreUsuarioError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Correo Electrónico <span
+                                style="color: red">*</span></label>
+                        <input type="email" class="form-control" id="editEmail" name="email" required>
+                        <div class="invalid-feedback" id="editEmailError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRol" class="form-label">Rol <span style="color: red">*</span></label>
+                        <select class="form-control" id="editRol" name="rol" required>
+                            <option value="" disabled>Seleccione un rol</option>
+                            <option value="Administrador">Administrador</option>
+                            <option value="Vendedor">Vendedor</option>
+                        </select>
+                        <div class="invalid-feedback" id="editRolError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editImage" class="form-label">Foto (Opcional)</label>
+                        <input type="file" class="form-control" id="editImage" name="image" accept="image/*">
+                        <img id="previewEditImage" src="#" alt="Previsualización" style="display: none; width: 100px; height: 100px;">
+                        <div class="invalid-feedback" id="editImageError"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Actualizar</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal para crear usuario -->
-    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Añadir Usuario</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="create-user-form" enctype="multipart/form-data">
-                        @csrf
-                        <!-- Campos del formulario para crear usuario -->
-                        <div class="mb-3">
-                            <label for="nombreUsuario" class="form-label">Nombre de Usuario <span
-                                    style="color: red">*</span></label>
-                            <input type="text" class="form-control" id="nombreUsuario" name="nombreUsuario" required>
-                            <div class="invalid-feedback" id="nombreUsuarioError"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Correo Electrónico <span
-                                    style="color: red">*</span></label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                            <div class="invalid-feedback" id="emailError"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Contraseña <span style="color: red">*</span></label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                            <div class="invalid-feedback" id="passwordError"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="rol" class="form-label">Rol <span style="color: red">*</span></label>
-                            <select class="form-control" id="rol" name="rol" required>
-                                <option value="" disabled selected>Seleccione un rol</option>
-                                <option value="Administrador">Administrador</option>
-                                <option value="Vendedor">Vendedor</option>
-                            </select>
-                            <div class="invalid-feedback" id="rolError"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="image" class="form-label">Foto (Opcional)</label>
-                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
-                            <div class="invalid-feedback" id="imageError"></div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Crear</button>
-                    </form>
-                </div>
+<!-- Modal para crear usuario -->
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Añadir Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="create-user-form" enctype="multipart/form-data">
+                    @csrf
+                    <!-- Campos del formulario para crear usuario -->
+                    <div class="mb-3">
+                        <label for="nombreUsuario" class="form-label">Nombre de Usuario <span
+                                style="color: red">*</span></label>
+                        <input type="text" class="form-control" id="nombreUsuario" name="nombreUsuario" required>
+                        <div class="invalid-feedback" id="nombreUsuarioError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo Electrónico <span
+                                style="color: red">*</span></label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                        <div class="invalid-feedback" id="emailError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rol" class="form-label">Rol <span style="color: red">*</span></label>
+                        <select class="form-control" id="rol" name="rol" required>
+                            <option value="" disabled selected>Seleccione un rol</option>
+                            <option value="Administrador">Administrador</option>
+                            <option value="Vendedor">Vendedor</option>
+                        </select>
+                        <div class="invalid-feedback" id="rolError"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Foto (Opcional)</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <img id="previewImage" src="#" alt="Previsualización" style="display: none; width: 100px; height: 100px;">
+                        <div class="invalid-feedback" id="imageError"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Crear</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
 @endsection
-
 @push('scripts')
     <script>
+        // Previsualización de la imagen seleccionada
+        function previewImage(input, previewElementId) {
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#' + previewElementId).attr('src', e.target.result).show();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Mostrar la previsualización en el formulario de creación
+        $('#image').on('change', function() {
+            previewImage(this, 'previewImage');
+        });
+
+        // Mostrar la previsualización en el formulario de edición
+        $('#editImage').on('change', function() {
+            previewImage(this, 'previewEditImage');
+        });
+
         // Función para abrir el modal de edición y llenar los campos
         function openEditModal(usuario) {
             $('#editUserId').val(usuario.idUsuario);
             $('#editNombreUsuario').val(usuario.nombreUsuario);
             $('#editEmail').val(usuario.email);
             $('#editRol').val(usuario.rol);
+            
+            // Mostrar la imagen si existe, o ocultar la previsualización
+            if (usuario.image) {
+                $('#previewEditImage').attr('src', '{{ asset("storage/") }}/' + usuario.image).show();
+            } else {
+                $('#previewEditImage').hide();
+            }
 
             // Limpiar errores previos
             $('.invalid-feedback').text('');
@@ -206,7 +233,7 @@
         }
 
         // Evento para abrir el modal de edición
-        $('.edit-button').on('click', function() {
+        $(document).on('click', '.edit-button', function() {
             let usuario = $(this).data('usuario');
             openEditModal(usuario);
         });
@@ -222,7 +249,7 @@
             });
         }
 
-        // Función común para solicitudes AJAX
+        // Función común para enviar solicitudes AJAX
         function sendAjaxRequest(url, method, formData, successMessage) {
             $.ajax({
                 url: url,
@@ -249,8 +276,7 @@
         $('#create-user-form').on('submit', function(event) {
             event.preventDefault();
             let formData = new FormData(this);
-            sendAjaxRequest("{{ route('admin.usuarios.store') }}", 'POST', formData,
-                'Usuario creado exitosamente!');
+            sendAjaxRequest("{{ route('admin.usuarios.store') }}", 'POST', formData, 'Usuario creado exitosamente!');
         });
 
         // Enviar formulario de edición
@@ -258,12 +284,10 @@
             event.preventDefault();
             let formData = new FormData(this);
             let userId = $('#editUserId').val();
-            sendAjaxRequest("{{ route('admin.usuarios.update', '') }}/" + userId, 'POST', formData,
-                'Usuario actualizado exitosamente!');
+            sendAjaxRequest("{{ route('admin.usuarios.update', '') }}/" + userId, 'POST', formData, 'Usuario actualizado exitosamente!');
         });
 
         // Función para cambiar el estado del usuario
-        // Función para mostrar confirmación antes de cambiar el estado del usuario
         function toggleUserStatus(idUsuario) {
             Swal.fire({
                 title: '¿Estás seguro?',
@@ -276,7 +300,17 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Realizar la solicitud AJAX para cambiar el estado del usuario
+                    // Mostrar la alerta de "procesando"
+                    Swal.fire({
+                        title: 'Procesando...',
+                        text: 'Por favor, espera.',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
                     $.ajax({
                         url: "{{ route('admin.usuarios.toggleStatus', '') }}/" + idUsuario,
                         method: 'POST',
@@ -285,11 +319,14 @@
                             _method: 'PUT'
                         },
                         success: function(response) {
-                            location.reload();
+                            Swal.close();
+                            Swal.fire('Éxito!', 'El estado del usuario ha sido cambiado.', 'success').then(() => {
+                                location.reload();
+                            });
                         },
                         error: function(response) {
-                            Swal.fire('Error!', 'Hubo un problema al cambiar el estado del usuario.',
-                                'error');
+                            Swal.close();
+                            Swal.fire('Error!', 'Hubo un problema al cambiar el estado del usuario.', 'error');
                         }
                     });
                 }

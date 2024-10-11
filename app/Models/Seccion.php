@@ -22,6 +22,7 @@ class Seccion extends Model
         'horaFin',
         'capacidad',
         'idEntrenador',
+        'estado',
         'idAutor',
         'eliminado'
     ];
@@ -31,18 +32,35 @@ class Seccion extends Model
         'fechaModificacion' => 'datetime',
     ];
 
+    /**
+     * Relación con el modelo Servicio.
+     */
     public function servicio()
     {
         return $this->belongsTo(Servicio::class, 'idServicio', 'idServicio');
     }
 
+    /**
+     * Relación con el modelo Entrenador.
+     */
     public function entrenador()
     {
         return $this->belongsTo(Entrenador::class, 'idEntrenador', 'idEntrenador');
     }
 
-    public function inscripciones()
+    /**
+     * Relación muchos a muchos con el modelo DiaSemana.
+     */
+    public function dias()
     {
-        return $this->hasMany(DetalleInscripcion::class, 'idSeccion', 'idSeccion');
+        return $this->belongsToMany(DiaSemana::class, 'seccion_dias', 'idSeccion', 'idDia');
+    }
+
+    /**
+     * Verificar si la sección está activa.
+     */
+    public function isActive()
+    {
+        return $this->estado === 'activa';
     }
 }

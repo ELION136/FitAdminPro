@@ -19,6 +19,7 @@ class Servicio extends Model
         'descripcion',
         'capacidadMaxima',
         'precioPorSeccion',
+        'duracion', // Agregar el nuevo campo duracion aquí
         'incluyeCostoEntrada',
         'idAutor',
         'eliminado'

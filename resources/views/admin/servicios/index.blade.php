@@ -20,6 +20,7 @@
                             <tr>
                                 <th>Nombre</th>
                                 <th>Descripción</th>
+                                <th>Duración</th>
                                 <th>Capacidad Máxima</th>
                                 <th>Precio por Sección (BOB)</th>
                                 <th>Incluye Costo Entrada</th>
@@ -31,6 +32,14 @@
                                 <tr>
                                     <td>{{ $servicio->nombre }}</td>
                                     <td>{{ $servicio->descripcion }}</td>
+                                    <td>
+                                        @php
+                                            $horas = floor($servicio->duracion / 60);
+                                            $minutos = $servicio->duracion % 60;
+                                        @endphp
+                                        {{ $horas > 0 ? $horas . ' hora' . ($horas > 1 ? 's' : '') : '' }}
+                                        {{ $minutos > 0 ? $minutos . ' minuto' . ($minutos > 1 ? 's' : '') : '' }}
+                                    </td>
                                     <td>{{ $servicio->capacidadMaxima }}</td>
                                     <td>{{ number_format($servicio->precioPorSeccion, 2, '.', ',') }} BOB</td>
                                     <td>{{ $servicio->incluyeCostoEntrada ? 'Sí' : 'No' }}</td>
@@ -69,6 +78,10 @@
                         <textarea class="form-control" id="descripcion" name="descripcion"></textarea>
                     </div>
                     <div class="form-group">
+                        <label for="duracion">Duración (minutos)</label>
+                        <input type="number" class="form-control" id="duracion" name="duracion" required min="60" max="1440">
+                    </div>                    
+                    <div class="form-group">
                         <label for="capacidadMaxima">Capacidad Máxima</label>
                         <input type="number" class="form-control" id="capacidadMaxima" name="capacidadMaxima" required>
                     </div>
@@ -93,126 +106,143 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    let form = document.getElementById('formServicio');
-
-    // Función para abrir el modal de creación de un nuevo servicio
-    function createServicio() {
-        form.reset();
-        form.servicioId.value = '';
-        document.getElementById('modalServicioLabel').textContent = 'Añadir Servicio';
-        new bootstrap.Modal(document.getElementById('modalServicio')).show();
-    }
-
-    // Función para abrir el modal de edición de un servicio existente
-    function editServicio(servicio) {
-        form.reset();
-        form.servicioId.value = servicio.idServicio;
-        form.nombre.value = servicio.nombre;
-        form.descripcion.value = servicio.descripcion;
-        form.capacidadMaxima.value = servicio.capacidadMaxima;
-        form.precioPorSeccion.value = servicio.precioPorSeccion;
-        form.incluyeCostoEntrada.checked = servicio.incluyeCostoEntrada;
-        document.getElementById('modalServicioLabel').textContent = 'Editar Servicio';
-        new bootstrap.Modal(document.getElementById('modalServicio')).show();
-    }
-
-    // Crear o Editar Servicio
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        let servicioId = form.servicioId.value;
-        let url = servicioId ? `{{ route('admin.servicios.update', '') }}/${servicioId}` : `{{ route('admin.servicios.store') }}`;
-        let formData = new FormData(form);
-
-        if (servicioId) {
-            formData.append('_method', 'PUT');
+    // Script para manejar la creación, edición y eliminación de servicios
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('formServicio');
+        
+        // Función para abrir el modal de creación de un nuevo servicio
+        function createServicio() {
+            form.reset();
+            document.getElementById('servicioId').value = '';
+            document.getElementById('modalServicioLabel').textContent = 'Añadir Servicio';
+            new bootstrap.Modal(document.getElementById('modalServicio')).show();
         }
 
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.errors) {
-                let errors = Object.values(data.errors).map(err => err.join('<br>')).join('<br>');
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    html: errors,
-                    confirmButtonText: 'Aceptar'
-                });
-            } else {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Éxito',
-                    text: 'Servicio guardado correctamente',
-                    confirmButtonText: 'Aceptar'
-                }).then(() => {
-                    location.reload();
-                });
-            }
-        })
-        .catch(error => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Ha ocurrido un error en el servidor',
-                confirmButtonText: 'Aceptar'
-            });
-            console.error('Error:', error);
-        });
-    });
+        // Función para abrir el modal de edición de un servicio existente
+        function editServicio(servicio) {
+            form.reset();
+            document.getElementById('servicioId').value = servicio.idServicio;
+            document.getElementById('nombre').value = servicio.nombre;
+            document.getElementById('descripcion').value = servicio.descripcion;
+            document.getElementById('duracion').value = servicio.duracion;
+            document.getElementById('capacidadMaxima').value = servicio.capacidadMaxima;
+            document.getElementById('precioPorSeccion').value = servicio.precioPorSeccion;
+            document.getElementById('incluyeCostoEntrada').checked = servicio.incluyeCostoEntrada;
+            document.getElementById('modalServicioLabel').textContent = 'Editar Servicio';
+            new bootstrap.Modal(document.getElementById('modalServicio')).show();
+        }
 
-    // Función para eliminar un servicio
-    function deleteServicio(id) {
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: "No podrás revertir esto",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`{{ route('admin.servicios.destroy', '') }}/${id}`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ _method: 'DELETE' })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
+        // Función para eliminar un servicio
+        function deleteServicio(id) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "No podrás revertir esto",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`{{ route('admin.servicios.destroy', '') }}/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            _method: 'DELETE'
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Eliminado',
+                                text: 'El servicio ha sido eliminado correctamente',
+                                confirmButtonText: 'Aceptar'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'No se pudo eliminar el servicio.',
+                                confirmButtonText: 'Aceptar'
+                            });
+                        }
+                    })
+                    .catch(error => {
                         Swal.fire({
-                            icon: 'success',
-                            title: 'Eliminado',
-                            text: 'El servicio ha sido eliminado correctamente',
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Ha ocurrido un error en el servidor',
                             confirmButtonText: 'Aceptar'
-                        }).then(() => {
-                            location.reload();
                         });
-                    }
-                })
-                .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+            });
+        }
+
+        // Manejar la respuesta del servidor para guardar el servicio
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let servicioId = document.getElementById('servicioId').value;
+            let url = servicioId ? `{{ route('admin.servicios.update', '') }}/${servicioId}` : `{{ route('admin.servicios.store') }}`;
+            let formData = new FormData(form);
+
+            if (servicioId) {
+                formData.append('_method', 'PUT');
+            }
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.errors) {
+                    let errors = Object.values(data.errors).map(err => err.join('<br>')).join('<br>');
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Ha ocurrido un error en el servidor',
+                        html: errors,
                         confirmButtonText: 'Aceptar'
                     });
-                    console.error('Error:', error);
+                } else {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: data.success,
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => {
+                        location.reload();
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ha ocurrido un error en el servidor',
+                    confirmButtonText: 'Aceptar'
                 });
-            }
+                console.error('Error:', error);
+            });
         });
-    }
+
+        window.createServicio = createServicio;
+        window.editServicio = editServicio;
+        window.deleteServicio = deleteServicio;
+    });
 </script>
 @endpush

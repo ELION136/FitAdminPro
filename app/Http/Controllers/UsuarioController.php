@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Exception;
@@ -22,14 +22,19 @@ class UsuarioController extends Controller
         return view('admin.usuarios.index', compact('usuarios'));
     }
 
+    private function generatePassword()
+    {
+        $prefix = 'fitadminpro';
+        $randomNumbers = rand(1000, 9999);
+        return $prefix . $randomNumbers;
+    }
+
     public function store(Request $request)
     {
-        // Validación
         Log::info('Iniciando el proceso de validación para crear un usuario.');
         $validator = Validator::make($request->all(), [
             'nombreUsuario' => 'required|unique:usuarios,nombreUsuario|max:50|regex:/^\S*$/u',
             'email' => 'required|email|unique:usuarios,email',
-            'password' => 'required|min:6',
             'rol' => 'required|in:Administrador,Vendedor',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
@@ -39,8 +44,10 @@ class UsuarioController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Subir y guardar la imagen si existe
+        // Generar una contraseña temporal
+        $temporaryPassword = $this->generatePassword();
         $imageName = null;
+
         try {
             Log::info('Procesando la subida de imagen.');
             if ($request->hasFile('image')) {
@@ -55,12 +62,12 @@ class UsuarioController extends Controller
                 Log::info('Imagen subida correctamente:', ['imageName' => $imageName]);
             }
 
-            // Crear el usuario
+            // Crear el usuario con la contraseña temporal
             Log::info('Creando el usuario en la base de datos.');
-            User::create([
+            $usuario = User::create([
                 'nombreUsuario' => $request->nombreUsuario,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => Hash::make($temporaryPassword),
                 'image' => $imageName,
                 'rol' => $request->rol,
                 'idAutor' => Auth::user()->idUsuario,
@@ -68,12 +75,42 @@ class UsuarioController extends Controller
             ]);
 
             Log::info('Usuario creado correctamente.');
-            return response()->json(['success' => 'Usuario creado correctamente']);
+
+            // Enviar el correo electrónico con la contraseña temporal
+            Mail::to($usuario->email)->send(new \App\Mail\TemporaryPasswordMail($usuario, $temporaryPassword));
+            Log::info('Correo electrónico enviado con la contraseña temporal.');
+
+            return response()->json(['success' => 'Usuario creado correctamente. Se ha enviado un correo electrónico con la contraseña temporal.']);
         } catch (Exception $e) {
             Log::error('Error al guardar el usuario:', ['message' => $e->getMessage()]);
             return response()->json(['error' => 'Hubo un problema al crear el usuario. Por favor, intente de nuevo.'], 500);
         }
     }
+    public function validateField(Request $request)
+    {
+        $fieldName = $request->input('field');
+        $fieldValue = $request->input($fieldName);
+
+        $rules = [];
+
+        // Definir las reglas de validación para los campos
+        if ($fieldName === 'nombreUsuario') {
+            $rules['nombreUsuario'] = 'required|unique:usuarios,nombreUsuario|max:50|regex:/^\S*$/u';
+        } elseif ($fieldName === 'email') {
+            $rules['email'] = 'required|email|unique:usuarios,email';
+        }
+
+        // Realizar la validación
+        $validator = Validator::make([$fieldName => $fieldValue], $rules);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        return response()->json(['success' => 'Validación exitosa']);
+    }
+
+
 
     public function update(Request $request, $idUsuario)
     {

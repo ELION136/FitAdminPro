@@ -1,31 +1,15 @@
 @extends('layouts.app')
 @section('content')
-
-<div class="pt-4 mb-4 mb-lg-3 pb-lg-4 profile-wrapper">
-    <div class="row g-4">
-        <div class="col-auto">
-            <div class="avatar-lg">
-                <img src="{{ auth()->user()->profile_image_url }}" alt="user-img" class="img-thumbnail rounded-circle" />
-            </div>
-        </div>
-        <!--end col-->
-        <div class="col">
-            <div class="p-2">
-                <h3 class="text-white mb-1">{{ Auth::user()->nombreUsuario }}</h3>
-                <p class="text-white text-opacity-75">{{ Auth::user()->rol }}</p>
-                <div class="hstack text-white-50 gap-1">
-                    <div class="me-2"><i class="ri-map-pin-user-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>Ubicación desconocida</div>
-                </div>
-            </div>
-        </div>
-
-      
-        <!--end col-->
-        
-        <!--end col-->
+<div class="profile-wrapper text-center" style="padding: 30px 20px; background: rgba(255, 255, 255, 0.05); border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);">
+    <div class="avatar position-relative mb-3">
+        <img src="{{ auth()->user()->profile_image_url }}" alt="user-img" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;" />
     </div>
-    <!--end row-->
+    <div class="user-info">
+        <h4 class="mb-1" style="font-size: 1.5rem; font-weight: bold;  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);">{{ Auth::user()->nombreUsuario }}</h4>
+        <p class="mb-2" style="font-size: 1rem;  letter-spacing: 0.5px;">{{ Auth::user()->rol }}</p>
+    </div>
 </div>
+
 
 <div class="row">
     <div class="col-lg-12">
