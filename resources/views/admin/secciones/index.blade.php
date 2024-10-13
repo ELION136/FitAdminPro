@@ -1,28 +1,47 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h4 class="mb-sm-0">Gestión de Secciones</h4>
-                    <button class="btn btn-primary" onclick="createSeccion()">Añadir Sección</button>
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
+                <h4 class="mb-sm-0">Gestión de Secciones</h4>
+
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">Paginas</a></li>
+                        <li class="breadcrumb-item active">Secciones</li>
+                    </ol>
                 </div>
+
             </div>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <table class="table table-bordered table-striped">
-                            <thead>
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="card" id="customerList">
+                <div class="card-header border-bottom-dashed">
+                    <div class="row">
+                        <div class="col-sm">
+                            <h5 class="card-title mb-0">Lista de Secciones</h5>
+                        </div>
+                        <div class="col-sm-auto">
+                            <button class="btn btn-success" onclick="createSeccion()">
+                                <i class="ri-add-line align-bottom me-1"></i> Añadir Sección
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="reservaTable" class="table table-bordered text-nowrap w-100">
+                            <thead class="table-light">
                                 <tr>
+                                    <th>#</th>
                                     <th>Servicio</th>
                                     <th>Fecha Inicio</th>
                                     <th>Fecha Fin</th>
-                                    <th>Hora Inicio</th>
-                                    <th>Hora Fin</th>
+
                                     <th>Capacidad</th>
                                     <th>Entrenador</th>
                                     <th>Días</th>
@@ -30,13 +49,14 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php $contador = 1; @endphp <!-- Inicializamos el contador -->
                                 @foreach ($secciones as $seccion)
                                     <tr>
+                                        <td>{{ $contador++ }}</td>
                                         <td>{{ $seccion->servicio->nombre }}</td>
                                         <td>{{ $seccion->fechaInicio }}</td>
                                         <td>{{ $seccion->fechaFin }}</td>
-                                        <td>{{ $seccion->horaInicio }}</td>
-                                        <td>{{ $seccion->horaFin }}</td>
+
                                         <td>{{ $seccion->capacidad }}</td>
                                         <td>{{ $seccion->entrenador->nombre ?? 'N/A' }}</td>
                                         <td>
@@ -47,10 +67,20 @@
                                             @endforeach
                                         </td>
                                         <td>
-                                            <button class="btn btn-success btn-sm"
-                                                onclick="editSeccion({{ $seccion }})">Editar</button>
-                                            <button class="btn btn-danger btn-sm"
-                                                onclick="deleteSeccion({{ $seccion->idSeccion }})">Eliminar</button>
+                                            <ul class="list-inline hstack gap-2 mb-0">
+                                                <li class="list-inline-item">
+                                                    <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                                                        onclick="editSeccion({{ $seccion }})">
+                                                        <i class="ri-pencil-fill fs-16"></i>
+                                                    </button>
+                                                </li>
+                                                <li class="list-inline-item">
+                                                    <button class="btn btn-danger btn-sm"
+                                                        onclick="deleteSeccion({{ $seccion->idSeccion }})">
+                                                        <i class="ri-delete-bin-5-fill fs-16"></i>
+                                                    </button>
+                                                </li>
+                                            </ul>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -62,60 +92,61 @@
         </div>
     </div>
 
-    <!-- Modal Crear/Editar Sección -->
+
     <!-- Modal Crear/Editar Sección -->
     <div class="modal fade" id="modalSeccion" tabindex="-1" aria-labelledby="modalSeccionLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <form id="formSeccion" method="POST">
                     @csrf
                     <input type="hidden" id="seccionId" name="seccionId">
-                    <div class="modal-header">
+                    <div class="modal-header bg-light p-3">
                         <h5 class="modal-title" id="modalSeccionLabel">Añadir/Editar Sección</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="idServicio">Servicio</label>
-                                    <select class="form-control" id="idServicio" name="idServicio" required>
+                                <div class="mb-3">
+                                    <label for="idServicio" class="form-label">Servicio</label>
+                                    <select class="form-select" id="idServicio" name="idServicio" required>
                                         <option value="" selected disabled>Seleccione un servicio</option>
                                         @foreach ($servicios as $servicio)
                                             <option value="{{ $servicio->idServicio }}"
                                                 data-capacidad="{{ $servicio->capacidadMaxima }}"
-                                                data-duracion="{{ $servicio->duracion }}">{{ $servicio->nombre }}
+                                                data-duracion="{{ $servicio->duracion }}">
+                                                {{ $servicio->nombre }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="form-group mb-3">
-                                    <label for="fechaInicio">Fecha Inicio</label>
+                                <div class="mb-3">
+                                    <label for="fechaInicio" class="form-label">Fecha Inicio</label>
                                     <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
                                 </div>
-                                <div class="form-group mb-3">
-                                    <label for="fechaFin">Fecha Fin</label>
-                                    <input type="date" class="form-control" id="fechaFin" name="fechaFin" readonly
-                                        required>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="horaInicio">Hora Inicio</label>
+                                <div class="mb-3">
+                                    <label for="horaInicio" class="form-label">Hora Inicio</label>
                                     <input type="time" class="form-control" id="horaInicio" name="horaInicio" required>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="horaFin">Hora Fin</label>
-                                    <input type="time" class="form-control" id="horaFin" name="horaFin" readonly
-                                        required>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="capacidad">Capacidad</label>
+                                <div class="mb-3">
+                                    <label for="fechaFin" class="form-label">Fecha Fin</label>
+                                    <input type="date" class="form-control" id="fechaFin" name="fechaFin" readonly
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="horaFin" class="form-label">Hora Fin</label>
+                                    <input type="time" class="form-control" id="horaFin" name="horaFin" readonly
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="capacidad" class="form-label">Capacidad</label>
                                     <input type="number" class="form-control" id="capacidad" name="capacidad" readonly>
                                 </div>
-                                <div class="form-group mb-3">
-                                    <label for="idEntrenador">Entrenador</label>
-                                    <select class="form-control" id="idEntrenador" name="idEntrenador">
+                                <div class="mb-3">
+                                    <label for="idEntrenador" class="form-label">Entrenador</label>
+                                    <select class="form-select" id="idEntrenador" name="idEntrenador">
                                         <option value="" selected>Ninguno</option>
                                         @foreach ($entrenadores as $entrenador)
                                             <option value="{{ $entrenador->idEntrenador }}">{{ $entrenador->nombre }}
@@ -123,19 +154,19 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="form-group mb-3">
-                                    <label for="dias">Días de la semana</label>
-                                    <div id="dias">
-                                        @foreach ($dias as $dia)
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="dias[]"
-                                                    value="{{ $dia->idDia }}" id="dia-{{ $dia->idDia }}">
-                                                <label class="form-check-label"
-                                                    for="dia-{{ $dia->idDia }}">{{ ucfirst($dia->nombreDia) }}</label>
-                                            </div>
-                                        @endforeach
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dias" class="form-label">Días de la semana</label>
+                            <div id="dias" class="d-flex flex-wrap gap-3">
+                                @foreach ($dias as $dia)
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias[]"
+                                            value="{{ $dia->idDia }}" id="dia-{{ $dia->idDia }}">
+                                        <label class="form-check-label"
+                                            for="dia-{{ $dia->idDia }}">{{ ucfirst($dia->nombreDia) }}</label>
                                     </div>
-                                </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -151,6 +182,34 @@
 
 @push('scripts')
     <script>
+        $(document).ready(function() {
+            $('#reservaTable').DataTable({
+                lengthMenu: [5, 10, 25, 50, 100],
+                pageLength: 5,
+                language: {
+                    lengthMenu: "Mostrar _MENU_ registros por página",
+                    decimal: "",
+                    emptyTable: "No hay datos disponibles en la tabla",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                    infoEmpty: "Mostrando 0 a 0 de 0 entradas",
+                    infoFiltered: "(filtrado de _MAX_ entradas totales)",
+                    loadingRecords: "Cargando...",
+                    processing: "Procesando...",
+                    search: "Buscar:",
+                    zeroRecords: "No se encontraron registros coincidentes",
+                    paginate: {
+                        first: "Primero",
+                        last: "Último",
+                        next: "Siguiente",
+                        previous: "Anterior"
+                    },
+                    aria: {
+                        sortAscending: ": activar para ordenar la columna de manera ascendente",
+                        sortDescending: ": activar para ordenar la columna de manera descendente"
+                    }
+                },
+            });
+        });
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('formSeccion');
             const capacidadInput = document.getElementById('capacidad');
@@ -196,7 +255,7 @@
                 if (duracion && horaInicioInput.value) {
                     let horaInicio = new Date(`1970-01-01T${horaInicioInput.value}`);
                     let horaFin = new Date(horaInicio.getTime() + duracion * 60 *
-                    1000); // Convertir minutos a milisegundos
+                        1000); // Convertir minutos a milisegundos
 
                     // Establecer la hora de cierre a las 22:00 en el mismo día
                     let horaCierre = new Date(horaInicio);

@@ -43,7 +43,8 @@
     <link href="{{ asset('package/dist/sweetalert2.min.css') }}" rel="stylesheet">
     <script src="{{ asset('package/dist/sweetalert2.all.min.js') }}"></script>
 
-
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
 </head>
 
 <body>
@@ -382,15 +383,15 @@
                             <div class="collapse menu-dropdown" id="sidebarIcons">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.asistencias.cliente') }}" class="nav-link"><span
+                                        <a href="{{ route('admin.asistencias.index') }}" class="nav-link"><span
                                                 data-key="t-remix"><i class="ri-edit-line"></i>Registrar</span></a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('qr.scanner') }}" class="nav-link"><span
+                                        <a href="" class="nav-link"><span
                                                 data-key="t-remix"><i class="ri-qr-code-line"></i>QrRegistrar</span></a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.asistencias.index') }}" class="nav-link"><span
+                                        <a href="{{ route('admin.asistencias.ver') }}" class="nav-link"><span
                                                 data-key="t-boxicons"><i class="ri-eye-line"></i>Ver Asistencias</span> </a>
                                     </li>
                                 </ul>
@@ -1679,6 +1680,9 @@
     <!-- Dashboard init -->
     <script src="{{ url('dist/assets/js/pages/dashboard-analytics.init.js') }}"></script>
     <script src="{{ url('dist/assets/js/pages/dashboard-projects.init.js') }}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
 
     <!-- App js -->
     @stack('scripts')

@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Asistencia extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $table = 'asistencias';
     protected $primaryKey = 'idAsistencia';
+    public $timestamps = false;
 
     protected $fillable = [
         'idCliente',

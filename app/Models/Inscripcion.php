@@ -12,6 +12,7 @@ class Inscripcion extends Model
 
     protected $table = 'inscripciones';
     protected $primaryKey = 'idInscripcion';
+    public $timestamps = false;
 
     protected $fillable = [
         'idCliente',

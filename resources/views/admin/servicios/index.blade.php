@@ -1,56 +1,77 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
+
+    <!-- Page title and breadcrumb -->
     <div class="row">
         <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
                 <h4 class="mb-sm-0">Gestión de Servicios</h4>
-                <button class="btn btn-primary" onclick="createServicio()">Añadir Servicio</button>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+                        <li class="breadcrumb-item active">Servicios</li>
+                    </ol>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Botón para añadir servicio -->
+    <div class="row mb-3">
+        <div class="col-sm-auto">
+            <div class="d-flex flex-wrap align-items-start gap-2">
+                <button class="btn btn-success add-btn" onclick="createServicio()"><i class="ri-add-line align-bottom me-1"></i> Añadir Servicio</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Servicios -->
     <div class="row">
         <div class="col-12">
             <div class="card">
+                <div class="card-header border-bottom-dashed">
+                    <h5 class="card-title mb-0">Lista de Servicios</h5>
+                </div>
                 <div class="card-body">
-                    <table class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Descripción</th>
-                                <th>Duración</th>
-                                <th>Capacidad Máxima</th>
-                                <th>Precio por Sección (BOB)</th>
-                                <th>Incluye Costo Entrada</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($servicios as $servicio)
+                    <div class="table-responsive">
+                        <table id="reservaTable" class="table table-bordered text-nowrap w-100">
+                            <thead class="table-light text-muted">
                                 <tr>
-                                    <td>{{ $servicio->nombre }}</td>
-                                    <td>{{ $servicio->descripcion }}</td>
-                                    <td>
-                                        @php
-                                            $horas = floor($servicio->duracion / 60);
-                                            $minutos = $servicio->duracion % 60;
-                                        @endphp
-                                        {{ $horas > 0 ? $horas . ' hora' . ($horas > 1 ? 's' : '') : '' }}
-                                        {{ $minutos > 0 ? $minutos . ' minuto' . ($minutos > 1 ? 's' : '') : '' }}
-                                    </td>
-                                    <td>{{ $servicio->capacidadMaxima }}</td>
-                                    <td>{{ number_format($servicio->precioPorSeccion, 2, '.', ',') }} BOB</td>
-                                    <td>{{ $servicio->incluyeCostoEntrada ? 'Sí' : 'No' }}</td>
-                                    <td>
-                                        <button class="btn btn-success btn-sm" onclick="editServicio({{ $servicio }})">Editar</button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteServicio({{ $servicio->idServicio }})">Eliminar</button>
-                                    </td>
+                                    <th>Nombre</th>
+                                    <th>Duración</th>
+                                    <th>Capacidad Máxima</th>
+                                    <th>Precio por Sección (BOB)</th>
+                                    <th>Precio de entrada</th>
+                                    <th>Acciones</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach ($servicios as $servicio)
+                                    <tr>
+                                        <td>{{ $servicio->nombre }}</td>
+                                        <td>
+                                            @php
+                                                $horas = floor($servicio->duracion / 60);
+                                                $minutos = $servicio->duracion % 60;
+                                            @endphp
+                                            {{ $horas > 0 ? $horas . ' hora' . ($horas > 1 ? 's' : '') : '' }}
+                                            {{ $minutos > 0 ? $minutos . ' minuto' . ($minutos > 1 ? 's' : '') : '' }}
+                                        </td>
+                                        <td>{{ $servicio->capacidadMaxima }}</td>
+                                        <td>{{ number_format($servicio->precioPorSeccion, 2, '.', ',') }} BOB</td>
+                                        <td>{{ $servicio->incluyeCostoEntrada ? 'Sí' : 'No' }}</td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-primary btn-sm" onclick="editServicio({{ $servicio }})"><i class="ri-pencil-fill"></i></button>
+                                                <button class="btn btn-danger btn-sm" onclick="deleteServicio({{ $servicio->idServicio }})"><i class="ri-delete-bin-fill"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -59,39 +80,59 @@
 
 <!-- Modal Crear/Editar Servicio -->
 <div class="modal fade" id="modalServicio" tabindex="-1" aria-labelledby="modalServicioLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered"> <!-- Cambié el tamaño del modal a modal-lg para más espacio -->
         <div class="modal-content">
             <form id="formServicio" method="POST">
                 @csrf
                 <input type="hidden" id="servicioId" name="servicioId">
-                <div class="modal-header">
+                <div class="modal-header bg-light p-3">
                     <h5 class="modal-title" id="modalServicioLabel">Añadir/Editar Servicio</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="nombre">Nombre</label>
-                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="capacidadMaxima" class="form-label">Capacidad Máxima</label>
+                                <input type="number" class="form-control" id="capacidadMaxima" name="capacidadMaxima" required>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="descripcion">Descripción</label>
-                        <textarea class="form-control" id="descripcion" name="descripcion"></textarea>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="duracion" class="form-label">Duración (minutos)</label>
+                                <input type="number" class="form-control" id="duracion" name="duracion" required min="60" max="1440">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="precioPorSeccion" class="form-label">Precio por Sección (BOB)</label>
+                                <input type="number" step="0.01" class="form-control" id="precioPorSeccion" name="precioPorSeccion" required>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="duracion">Duración (minutos)</label>
-                        <input type="number" class="form-control" id="duracion" name="duracion" required min="60" max="1440">
-                    </div>                    
-                    <div class="form-group">
-                        <label for="capacidadMaxima">Capacidad Máxima</label>
-                        <input type="number" class="form-control" id="capacidadMaxima" name="capacidadMaxima" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="precioPorSeccion">Precio por Sección (BOB)</label>
-                        <input type="number" step="0.01" class="form-control" id="precioPorSeccion" name="precioPorSeccion" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="incluyeCostoEntrada">Incluye Costo Entrada</label>
-                        <input type="checkbox" id="incluyeCostoEntrada" name="incluyeCostoEntrada" value="1">
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="descripcion" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="descripcion" name="descripcion"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="incluyeCostoEntrada" name="incluyeCostoEntrada" value="1">
+                                <label class="form-check-label" for="incluyeCostoEntrada">Incluye Costo Entrada</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -101,17 +142,15 @@
             </form>
         </div>
     </div>
-</div>
+
 
 @endsection
 
 @push('scripts')
 <script>
-    // Script para manejar la creación, edición y eliminación de servicios
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('formServicio');
         
-        // Función para abrir el modal de creación de un nuevo servicio
         function createServicio() {
             form.reset();
             document.getElementById('servicioId').value = '';
@@ -119,7 +158,6 @@
             new bootstrap.Modal(document.getElementById('modalServicio')).show();
         }
 
-        // Función para abrir el modal de edición de un servicio existente
         function editServicio(servicio) {
             form.reset();
             document.getElementById('servicioId').value = servicio.idServicio;
@@ -133,7 +171,6 @@
             new bootstrap.Modal(document.getElementById('modalServicio')).show();
         }
 
-        // Función para eliminar un servicio
         function deleteServicio(id) {
             Swal.fire({
                 title: '¿Estás seguro?',
@@ -189,7 +226,6 @@
             });
         }
 
-        // Manejar la respuesta del servidor para guardar el servicio
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -244,5 +280,33 @@
         window.editServicio = editServicio;
         window.deleteServicio = deleteServicio;
     });
+    $(document).ready(function() {
+            $('#reservaTable').DataTable({
+                lengthMenu: [5, 10, 25, 50, 100],
+                pageLength: 5,
+                language: {
+                    lengthMenu: "Mostrar _MENU_ registros por página",
+                    decimal: "",
+                    emptyTable: "No hay datos disponibles en la tabla",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                    infoEmpty: "Mostrando 0 a 0 de 0 entradas",
+                    infoFiltered: "(filtrado de _MAX_ entradas totales)",
+                    loadingRecords: "Cargando...",
+                    processing: "Procesando...",
+                    search: "Buscar:",
+                    zeroRecords: "No se encontraron registros coincidentes",
+                    paginate: {
+                        first: "Primero",
+                        last: "Último",
+                        next: "Siguiente",
+                        previous: "Anterior"
+                    },
+                    aria: {
+                        sortAscending: ": activar para ordenar la columna de manera ascendente",
+                        sortDescending: ": activar para ordenar la columna de manera descendente"
+                    }
+                },
+            });
+        });
 </script>
 @endpush

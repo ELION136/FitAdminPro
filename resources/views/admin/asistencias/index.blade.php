@@ -1,210 +1,174 @@
-@extends('layouts.admin')
+@extends('layouts.app')
+
 @section('content')
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
-                <h4 class="mb-sm-0">Lista de Asistencias</h4>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Registrar Asistencia Manual</h1>
 
-                <div class="page-title-right">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="javascript: void(0);">Paginas</a></li>
-                        <li class="breadcrumb-item active">Asistencias</li>
-                    </ol>
+        <!-- Reloj Digital y Fecha Literal -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-6 text-center">
+                <div class="reloj-digital">
+                    <h2 id="relojDigital" class="display-4"></h2>
+                    <h4 id="fechaLiteral"></h4>
                 </div>
             </div>
         </div>
+
+        <!-- Select2 para buscar cliente -->
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <label for="clienteSelect" class="form-label">Buscar Cliente:</label>
+                <select id="clienteSelect" class="form-control"></select>
+            </div>
+        </div>
+
+        <!-- Mostrar tarjeta con detalles del cliente seleccionado -->
+        <div id="resultadoCliente" class="row justify-content-center mt-4"></div>
     </div>
 
-    <!-- Mensaje de alerta -->
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @elseif (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
+    @push('scripts')
+    <script>
+        $(document).ready(function() {
+            // Inicializar Select2 con AJAX para búsqueda de clientes
+            $('#clienteSelect').select2({
+                placeholder: 'Escriba el nombre del cliente',
+                ajax: {
+                    url: '{{ route('admin.asistencias.buscar') }}',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            q: params.term // término de búsqueda
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: $.map(data, function(cliente) {
+                                return {
+                                    id: cliente.idCliente,
+                                    text: cliente.nombre + ' ' + cliente.primerApellido
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 2
+            });
 
-    <!-- Estadísticas en tarjetas -->
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card bg-info mb-3">
-                <div class="card-header">Total de Asistencias</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ $asistencias->count() }}</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card  bg-success mb-3">
-                <div class="card-header">Asistencias de Hoy</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ $asistencias->where('fecha', now()->format('Y-m-d'))->count() }}</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-warning mb-3">
-                <div class="card-header">Clientes sin Hora de Salida</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ $asistencias->whereNull('horaSalida')->count() }}</h5>
-                </div>
-            </div>
-        </div>
-    </div>
+            // Evento cuando se selecciona un cliente
+            $('#clienteSelect').on('select2:select', function(e) {
+                let clienteId = e.params.data.id;
 
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card" id="customerList">
-                <div class="card-header border-bottom-dashed">
-                    <h5 class="card-title mb-0">Lista de Miembros</h5>
-                </div>
-                <div class="card-body border-bottom-dashed border-bottom">
-                    <form method="GET" action="{{ route('admin.asistencias.index') }}" class="mb-4">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="cliente_id" class="form-label">Cliente</label>
-                                <select name="cliente_id" class="form-select">
-                                    <option value="">Todos los clientes</option>
-                                    @foreach ($clientes as $cliente)
-                                        <option value="{{ $cliente->idCliente }}"
-                                            {{ request('cliente_id') == $cliente->idCliente ? 'selected' : '' }}>
-                                            {{ $cliente->nombre }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="fechaInicio" class="form-label">Fecha Inicio</label>
-                                <input type="date" name="fechaInicio" class="form-control"
-                                    value="{{ request('fechaInicio', $fechaInicio) }}">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="fechaFin" class="form-label">Fecha Fin</label>
-                                <input type="date" name="fechaFin" class="form-control"
-                                    value="{{ request('fechaFin', $fechaFin) }}">
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-3">Filtrar</button>
-                    </form>
-                </div>
+                // Realizar una llamada AJAX para obtener detalles del cliente seleccionado
+                $.ajax({
+                    url: '{{ route('admin.asistencias.buscar') }}',
+                    type: 'GET',
+                    data: {
+                        id: clienteId
+                    },
+                    success: function(cliente) {
+                        if (cliente && cliente.inscripciones && cliente.inscripciones.length > 0) {
+                            // Verificar si tiene una inscripción activa
+                            let inscripcionActiva = cliente.inscripciones[0]; // Suponemos que siempre se obtiene la inscripción activa
 
-                <!-- Tabla de asistencias -->
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="reservaTable" class="table table-hover table-striped table-bordered w-100">
-                            <thead >
-                                <tr>
-                                    <th>#</th>
-                                    <th>Cliente</th>
-                                    <th>Fecha</th>
-                                    <th>Hora Entrada</th>
-                                    <th>Hora Salida</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($asistencias as $asistencia)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $asistencia->cliente->nombre }}</td>
-                                        <td>{{ $asistencia->fecha }}</td>
-                                        <td>{{ $asistencia->horaEntrada }}</td>
-                                        <td>{{ $asistencia->horaSalida ?? 'No registrada' }}</td>
-                                        <td>
-                                            <!-- Botón para abrir modal de edición -->
-                                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#editAsistenciaModal{{ $asistencia->idAsistencia }}">
-                                                <i class="fas fa-edit"></i> Editar
-                                            </button>
+                            // Verificar si detalle_inscripciones existe
+                            if (inscripcionActiva.detalle_inscripciones && Array.isArray(inscripcionActiva.detalle_inscripciones)) {
+                                // Buscar el detalle de membresía
+                                let detalleMembresia = inscripcionActiva.detalle_inscripciones.find(function(detalle) {
+                                    return detalle.tipoProducto === 'membresia';
+                                });
 
-                                            <!-- Modal de edición -->
-                                            <div class="modal fade" id="editAsistenciaModal{{ $asistencia->idAsistencia }}"
-                                                tabindex="-1" aria-labelledby="editAsistenciaModalLabel"
-                                                aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="editAsistenciaModalLabel">Editar
-                                                                Asistencia</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
-                                                        </div>
-                                                        <form method="POST"
-                                                            action="{{ route('admin.asistencias.update', $asistencia->idAsistencia) }}">
+                                let membresiaNombre = detalleMembresia && detalleMembresia.membresia ? detalleMembresia.membresia.nombre : 'No tiene membresía activa';
+                                
+                                // Días restantes y estado de la inscripción
+                                let diasRestantes = inscripcionActiva.diasRestantes !== null ? inscripcionActiva.diasRestantes : 'No disponible';
+                                let estadoInscripcion = inscripcionActiva.estado === 'activa' ? 'Activa' : 'Inactiva';
+
+                                // Determinar la ruta de la imagen
+                                let imageUrl = cliente.image ? `/storage/${cliente.image}` : `/images/default-profile.png`;
+
+                                let tarjetaCliente = `
+                                    <div class="col-md-8">
+                                        <div class="card mb-3">
+                                            <div class="row no-gutters">
+                                                <div class="col-md-4">
+                                                    <img src="${imageUrl}" class="card-img" alt="${cliente.nombre}">
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">${cliente.nombre} ${cliente.primerApellido}</h5>
+                                                        <p class="card-text"><strong>Membresía activa:</strong> ${membresiaNombre}</p>
+                                                        <p class="card-text"><strong>Días Restantes:</strong> ${diasRestantes}</p>
+                                                        <p class="card-text"><strong>Estado:</strong> ${estadoInscripcion}</p>
+                                                        <form method="POST" action="{{ route('admin.asistencias.registrar') }}">
                                                             @csrf
-                                                            @method('PUT')
-                                                            <div class="modal-body">
-                                                                <div class="mb-3">
-                                                                    <label for="horaEntrada" class="form-label">Hora
-                                                                        Entrada</label>
-                                                                    <input type="time" name="horaEntrada"
-                                                                        class="form-control"
-                                                                        value="{{ $asistencia->horaEntrada }}" required>
-                                                                </div>
-                                                                <div class="mb-3">
-                                                                    <label for="horaSalida" class="form-label">Hora
-                                                                        Salida</label>
-                                                                    <input type="time" name="horaSalida"
-                                                                        class="form-control"
-                                                                        value="{{ $asistencia->horaSalida }}">
-                                                                </div>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary"
-                                                                    data-bs-dismiss="modal">Cerrar</button>
-                                                                <button type="submit" class="btn btn-primary">Guardar
-                                                                    Cambios</button>
-                                                            </div>
+                                                            <input type="hidden" name="idCliente" value="${cliente.idCliente}">
+                                                            <input type="hidden" name="idInscripcion" value="${inscripcionActiva.idInscripcion}">
+                                                            <button type="submit" class="btn btn-success">Registrar Asistencia</button>
                                                         </form>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-@endsection
-
-@push('scripts')
-    <script>
-        $(document).ready(function() {
-            $('#reservaTable').DataTable({
-                responsive: true,
-                lengthMenu: [5, 10, 25, 50, 100],
-                pageLength: 5,
-                language: {
-                    lengthMenu: "Mostrar _MENU_ registros por página",
-                    decimal: "",
-                    emptyTable: "No hay datos disponibles en la tabla",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-                    infoEmpty: "Mostrando 0 a 0 de 0 entradas",
-                    infoFiltered: "(filtrado de _MAX_ entradas totales)",
-                    loadingRecords: "Cargando...",
-                    processing: "Procesando...",
-                    search: "Buscar:",
-                    zeroRecords: "No se encontraron registros coincidentes",
-                    paginate: {
-                        first: "Primero",
-                        last: "Último",
-                        next: "Siguiente",
-                        previous: "Anterior"
+                                        </div>
+                                    </div>
+                                `;
+                                $('#resultadoCliente').html(tarjetaCliente);
+                            } else {
+                                $('#resultadoCliente').html('<p class="text-center text-warning">No se encontraron detalles de membresía.</p>');
+                            }
+                        } else {
+                            $('#resultadoCliente').html('<p class="text-center text-warning">Este cliente no tiene inscripciones activas.</p>');
+                        }
                     },
-                    aria: {
-                        sortAscending: ": activar para ordenar la columna de manera ascendente",
-                        sortDescending: ": activar para ordenar la columna de manera descendente"
+                    error: function() {
+                        $('#resultadoCliente').html('<p class="text-center text-danger">Error al obtener los datos del cliente.</p>');
                     }
-                },
+                });
             });
+
+            // Función para actualizar el reloj digital y la fecha literal
+            function actualizarRelojYFecha() {
+                const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+                const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+                let ahora = new Date();
+                let hora = String(ahora.getHours()).padStart(2, '0');
+                let minutos = String(ahora.getMinutes()).padStart(2, '0');
+                let segundos = String(ahora.getSeconds()).padStart(2, '0');
+
+                // Reloj digital en formato HH:MM:SS
+                document.getElementById('relojDigital').textContent = `${hora}:${minutos}:${segundos}`;
+
+                // Fecha literal en formato "Día, DD de Mes de YYYY"
+                let diaSemana = diasSemana[ahora.getDay()];
+                let dia = ahora.getDate();
+                let mes = meses[ahora.getMonth()];
+                let anio = ahora.getFullYear();
+                document.getElementById('fechaLiteral').textContent = `${diaSemana}, ${dia} de ${mes} de ${anio}`;
+            }
+
+            // Inicializar la fecha literal y el reloj digital
+            actualizarRelojYFecha();
+            setInterval(actualizarRelojYFecha, 1000);
+
+            // SweetAlert para mensajes de éxito/error
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: '{{ session('success') }}',
+                });
+            @elseif (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '{{ session('error') }}',
+                });
+            @endif
         });
     </script>
 @endpush
+
+
+@endsection

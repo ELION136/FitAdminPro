@@ -18,33 +18,53 @@
     </div>
 
     <!-- Estadísticas de Reservas -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <h5 class="card-title">Total Reservas</h5>
-                    <p class="card-text">{{ $totalReservas }}</p>
+    <div class="row mt-4">
+        <!-- Tarjeta Total de Asistencias -->
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <i class="ri-check-line me-2" style="font-size: 2rem;"></i>
+                        <div>
+                            <h5 class="card-title mb-1">Total de Asistencias</h5>
+                            <h3>{{ $asistencias->count() }}</h3>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <h5 class="card-title">Reservas Pagadas</h5>
-                    <p class="card-text">{{ $reservasPagadas }}</p>
+    
+        <!-- Tarjeta Asistencias de Hoy -->
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <i class="ri-calendar-line me-2" style="font-size: 2rem;"></i>
+                        <div>
+                            <h5 class="card-title mb-1">Asistencias de Hoy</h5>
+                            <h3>{{ $asistenciasHoy }}</h3>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <h5 class="card-title">Reservas Pendientes</h5>
-                    <p class="card-text">{{ $reservasPendientes }}</p>
+    
+        <!-- Tarjeta Clientes sin Asistencia -->
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <i class="ri-user-line me-2" style="font-size: 2rem;"></i>
+                        <div>
+                            <h5 class="card-title mb-1">Clientes sin Asistencia</h5>
+                            <h3>0</h3> <!-- Cambia por la variable adecuada -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <!-- Filtros Mejorados -->
 
     <div class="row">
