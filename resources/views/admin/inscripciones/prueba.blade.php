@@ -19,6 +19,7 @@
 
     <!-- Tarjetas con contadores -->
     <div class="row mb-4">
+        <!-- Tarjeta de Membresías -->
         <div class="col-md-3">
             <div class="card bg-primary text-white">
                 <div class="card-body">
@@ -32,6 +33,7 @@
                 </div>
             </div>
         </div>
+        <!-- Tarjeta de Servicios -->
         <div class="col-md-3">
             <div class="card bg-secondary text-white">
                 <div class="card-body">
@@ -45,6 +47,7 @@
                 </div>
             </div>
         </div>
+        <!-- Tarjeta de Inscripciones Activas -->
         <div class="col-md-2">
             <div class="card bg-success text-white">
                 <div class="card-body">
@@ -58,6 +61,7 @@
                 </div>
             </div>
         </div>
+        <!-- Tarjeta de Inscripciones Vencidas -->
         <div class="col-md-2">
             <div class="card bg-danger text-white">
                 <div class="card-body">
@@ -71,6 +75,7 @@
                 </div>
             </div>
         </div>
+        <!-- Tarjeta de Inscripciones Canceladas -->
         <div class="col-md-2">
             <div class="card bg-warning text-white">
                 <div class="card-body">
@@ -104,38 +109,43 @@
                     <!-- Formulario de filtros -->
                     <form method="GET" action="{{ route('admin.inscripciones.index') }}" class="mb-4">
                         <div class="row g-3">
-                            <div class="col-md-3">
-                                <label for="fecha_inicio">Fecha de Inicio</label>
-                                <input type="date" name="fecha_inicio" class="form-control"
-                                    value="{{ request('fecha_inicio') }}">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="fecha_fin">Fecha de Fin</label>
-                                <input type="date" name="fecha_fin" class="form-control"
-                                    value="{{ request('fecha_fin') }}">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="estado">Estado</label>
-                                <select name="estado" class="form-control">
-                                    <option value="">Todos los estados</option>
-                                    <option value="activa" {{ request('estado') == 'activa' ? 'selected' : '' }}>Activa
-                                    </option>
-                                    <option value="vencida" {{ request('estado') == 'vencida' ? 'selected' : '' }}>
-                                        Vencida
-                                    </option>
-                                    <option value="cancelada" {{ request('estado') == 'cancelada' ? 'selected' : '' }}>
-                                        Cancelada</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="ri-equalizer-fill me-2 align-bottom"></i> Aplicar Filtros
-                                </button>
-                            </div>
-                            <div class="col-md-3 d-flex align-items-end">
-                                <a href="{{ route('admin.inscripciones.index') }}" class="btn btn-secondary w-100">
-                                    <i class="ri-refresh-fill me-2 align-bottom"></i> Limpiar Filtros
-                                </a>
+                            <div class="row g-3">
+                                <div class="col-sm-3">
+                                    <label for="fecha_inicio">Fecha de Inicio</label>
+                                    <input type="date" name="fecha_inicio" class="form-control"
+                                        value="{{ request('fecha_inicio') }}">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label for="fecha_fin">Fecha de Fin</label>
+                                    <input type="date" name="fecha_fin" class="form-control"
+                                        value="{{ request('fecha_fin') }}">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label for="estado">Estado</label>
+                                    <select name="estado" class="form-control">
+                                        <option value="">Todos los estados</option>
+                                        <option value="activa" {{ request('estado') == 'activa' ? 'selected' : '' }}>Activa
+                                        </option>
+                                        <option value="vencida" {{ request('estado') == 'vencida' ? 'selected' : '' }}>
+                                            Vencida
+                                        </option>
+                                        <option value="cancelada" {{ request('estado') == 'cancelada' ? 'selected' : '' }}>
+                                            Cancelada</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Botón para aplicar filtros -->
+                                <div class="col-sm-3">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="ri-equalizer-fill me-2 align-bottom"></i> Aplicar Filtros
+                                    </button>
+                                </div>
+                                <!-- Botón para limpiar filtros -->
+                                <div class="col-sm-3">
+                                    <a href="{{ route('admin.inscripciones.index') }}" class="btn btn-secondary w-100">
+                                        <i class="ri-refresh-fill me-2 align-bottom"></i> Limpiar Filtros
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -145,11 +155,11 @@
                 <div class="card-body">
                     <ul class="nav nav-tabs" id="inscripcionesTab" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" id="membresias-tab" data-bs-toggle="tab" href="#membresias"
+                            <a class="nav-link active" id="membresias-tab" data-toggle="tab" href="#membresias"
                                 role="tab" aria-controls="membresias" aria-selected="true">Membresías</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="servicios-tab" data-bs-toggle="tab" href="#servicios" role="tab"
+                            <a class="nav-link" id="servicios-tab" data-toggle="tab" href="#servicios" role="tab"
                                 aria-controls="servicios" aria-selected="false">Servicios</a>
                         </li>
                     </ul>
@@ -349,7 +359,28 @@
                     </div>
                 </div>
 
-                <!-- Modal para ver detalle (mantener igual) -->
+                <!-- Modal para ver detalle (puedes mantenerlo como está) -->
+                <div class="modal fade" id="detalleModal" tabindex="-1" role="dialog"
+                    aria-labelledby="detalleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <!-- Contenido del modal -->
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="detalleModalLabel">Detalle de Venta</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Aquí se cargará el detalle mediante AJAX -->
+                                <div id="detalleContenido"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- ... -->
             </div>
         </div>
@@ -366,6 +397,7 @@
                 pageLength: 10,
                 language: {
                     lengthMenu: "Mostrar _MENU_ registros por página",
+                    // Resto de configuraciones de idioma
                 },
             });
 
@@ -375,10 +407,11 @@
                 pageLength: 10,
                 language: {
                     lengthMenu: "Mostrar _MENU_ registros por página",
+                    // Resto de configuraciones de idioma
                 },
             });
 
-            // Evento para abrir el modal y cargar el detalle
+            // Evento para abrir el modal y cargar el detalle (ajusta la URL según el tipo de producto)
             $('.btn-detalle').on('click', function() {
                 var idInscripcion = $(this).data('id');
                 $('#detalleContenido').html('<p>Cargando...</p>');
@@ -388,6 +421,7 @@
                     url: '/admin/inscripciones/' + idInscripcion + '/detalle',
                     method: 'GET',
                     success: function(data) {
+                        // Procesar y mostrar los detalles en el modal
                         var contenido = '<p><strong>Cliente:</strong> ' + data.cliente.nombre +
                             ' ' + data.cliente.primerApellido + '</p>';
                         contenido += '<p><strong>Fecha de Inscripción:</strong> ' + data

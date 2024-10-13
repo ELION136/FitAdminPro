@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 class Inscripcion extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $table = 'inscripciones';
     protected $primaryKey = 'idInscripcion';
@@ -52,6 +52,8 @@ class Inscripcion extends Model
     {
         return $this->estado === 'activa' && Carbon::now()->between($this->fechaInicio, $this->fechaFin);
     }
+
+    
 
 
 }

@@ -32,6 +32,12 @@ class DetalleInscripcion extends Model
         return $this->belongsTo(Membresia::class, 'idMembresia', 'idMembresia');
     }
 
+    public function servicio()
+    {
+        return $this->belongsTo(Servicio::class, 'idServicio', 'idServicio');
+    }
+
+
     public function seccion()
     {
         return $this->belongsTo(Seccion::class, 'idSeccion', 'idSeccion');

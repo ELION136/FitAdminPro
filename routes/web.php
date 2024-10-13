@@ -86,10 +86,18 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'destroy'])->name('admin.secciones.destroy');
 
 
-});
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/admin/clientes', [App\Http\Controllers\ClienteController::class, 'index'])->name('admin.clientes.index');
+    Route::get('/admin/inscripciones', [App\Http\Controllers\InscripcionController::class, 'index'])->name('admin.inscripciones.index');
+    Route::put('/admin/inscripciones/{id}/cancelar', [App\Http\Controllers\InscripcionController::class, 'cancelar'])->name('admin.inscripciones.cancelar');
+    Route::get('/admin/inscripciones/{id}/detalle', [App\Http\Controllers\InscripcionController::class, 'detalle'])->name('admin.inscripciones.detalle');
+    Route::get('/admin/inscripciones/{id}/generar-credencial', [App\Http\Controllers\InscripcionController::class, 'generarCredencial'])->name('admin.inscripciones.generarCredencial');
+    Route::get('/admin/inscripciones/{id}/enviar-whatsapp', [App\Http\Controllers\InscripcionController::class, 'enviarWhatsapp'])->name('admin.inscripciones.enviarWhatsapp');
+    Route::get('/admin/inscripciones/{id}/generar-pase', [App\Http\Controllers\InscripcionController::class, 'generarPase'])->name('admin.inscripciones.generarPase');
+   
+
+
+
+Route::get('/admin/clientes', [App\Http\Controllers\ClienteController::class, 'index'])->name('admin.clientes.index');
     Route::get('/admin/clientes/create', [App\Http\Controllers\ClienteController::class, 'create'])->name('admin.clientes.create');
     Route::post('/admin/clientes', [App\Http\Controllers\ClienteController::class, 'store'])->name('admin.clientes.store');
     Route::get('/admin/clientes/{id}/edit', [App\Http\Controllers\ClienteController::class, 'edit'])->name('admin.clientes.edit');
@@ -104,6 +112,15 @@ Route::middleware(['auth'])->group(function () {
     //Route::get('admin/clientes/export-excel', [App\Http\Controllers\ClienteController::class, 'exportExcel'])->name('admin.clientes.exportExcel');
 
 
+
+
+
+
+
+});
+
+Route::middleware(['auth'])->group(function () {
+    
 
 
 
@@ -136,20 +153,20 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/admin/inscripciones/crear', [App\Http\Controllers\InscripcionController::class, 'create'])->name('admin.inscripciones.create');
-    Route::post('/admin/inscripciones', [App\Http\Controllers\InscripcionController::class, 'store'])->name('admin.inscripciones.store');
-    Route::get('/admin/inscripciones/resgistro', [App\Http\Controllers\InscripcionController::class, 'index'])->name('admin.inscripciones.index');
-    Route::get('/membresias/historial', [App\Http\Controllers\MembresiaController::class, 'historial'])->name('admin.membresias.historial');
-    Route::get('/admin/membresias/reporte', [App\Http\Controllers\MembresiaController::class, 'generarPDF'])->name('admin.membresias.generarPDF');
+    //Route::get('/admin/inscripciones/crear', [App\Http\Controllers\InscripcionController::class, 'create'])->name('admin.inscripciones.create');
+    //Route::post('/admin/inscripciones', [App\Http\Controllers\InscripcionController::class, 'store'])->name('admin.inscripciones.store');
+    //Route::get('/admin/inscripciones/resgistro', [App\Http\Controllers\InscripcionController::class, 'index'])->name('admin.inscripciones.index');
+    //Route::get('/membresias/historial', [App\Http\Controllers\MembresiaController::class, 'historial'])->name('admin.membresias.historial');
+    //Route::get('/admin/membresias/reporte', [App\Http\Controllers\MembresiaController::class, 'generarPDF'])->name('admin.membresias.generarPDF');
 
-    Route::get('/admin/membresias/credencial/{id}', [App\Http\Controllers\MembresiaController::class, 'generarCredencial'])->name('admin.membresias.generarCredencial');
+    //Route::get('/admin/membresias/credencial/{id}', [App\Http\Controllers\MembresiaController::class, 'generarCredencial'])->name('admin.membresias.generarCredencial');
 
-    route::get('/admin/inscripciones/cliente/{id}', [App\Http\Controllers\InscripcionController::class, 'obtenerCliente']);
-    Route::resource('inscripciones', App\Http\Controllers\InscripcionController::class)->except(['show']);
+    //route::get('/admin/inscripciones/cliente/{id}', [App\Http\Controllers\InscripcionController::class, 'obtenerCliente']);
+    //Route::resource('inscripciones', App\Http\Controllers\InscripcionController::class)->except(['show']);
 
     // Rutas para actualizar el estado y el estado de pago
-    Route::post('inscripciones/{id}/estado', [App\Http\Controllers\InscripcionController::class, 'updateEstado'])->name('admin.inscripciones.updateEstado');
-    Route::post('inscripciones/{id}/estadoPago', [App\Http\Controllers\InscripcionController::class, 'updateEstadoPago'])->name('admin.inscripciones.updateEstadoPago');
+    //Route::post('inscripciones/{id}/estado', [App\Http\Controllers\InscripcionController::class, 'updateEstado'])->name('admin.inscripciones.updateEstado');
+    //Route::post('inscripciones/{id}/estadoPago', [App\Http\Controllers\InscripcionController::class, 'updateEstadoPago'])->name('admin.inscripciones.updateEstadoPago');
     //Route::get('/admin/pagos', [App\Http\Controllers\PagoController::class, 'index'])->name('admin.pagos.index');
     // Route::get('/admin/pagos/reporte', [App\Http\Controllers\PagoController::class, 'generarReporte'])->name('admin.pagos.reporte');
 

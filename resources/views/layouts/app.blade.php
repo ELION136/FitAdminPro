@@ -287,32 +287,7 @@
                                 </ul>
                             </div>
 
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarIcons" data-bs-toggle="collapse"
-                                role="button" aria-expanded="false" aria-controls="sidebarIcons">
-                                <i class="ri-check-double-line"></i> <span data-key="t-icons">Asistencias </span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarIcons">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.asistencias.cliente') }}" class="nav-link"><span
-                                                data-key="t-remix">Registrar</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('qr.scanner') }}" class="nav-link"><span
-                                                data-key="t-remix">QrRegistrar</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.asistencias.index') }}" class="nav-link"><span
-                                                data-key="t-boxicons">Asistencias</span> </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('qr.generateAll') }}" class="nav-link"><span
-                                                data-key="t-boxicons">vista</span> </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
+
 
                         </li> <!-- end Dashboard Menu -->
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Paginas</span>
@@ -359,8 +334,6 @@
                                 </ul>
                             </div>
                         </li>
-
-                        <!-- Clientes -->
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="#sidebarClientes" data-bs-toggle="collapse"
                                 role="button" aria-expanded="false" aria-controls="sidebarClientes">
@@ -383,10 +356,6 @@
                                 </ul>
                             </div>
                         </li>
-
-
-
-
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="#sidebarForms" data-bs-toggle="collapse"
                                 role="button" aria-expanded="false" aria-controls="sidebarForms">
@@ -395,68 +364,60 @@
                             <div class="collapse menu-dropdown" id="sidebarForms">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.inscripciones.create') }}" class="nav-link"
-                                            data-key="t-basic-elements">inscripcion a
-                                            membresias</a>
+                                        <a href="" class="nav-link"
+                                            data-key="t-basic-elements"><i class="ri-file-add-line"></i>Crear nueva inscripcion</a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.inscripciones.index') }}" class="nav-link"
-                                            data-key="t-form-select"> Historial de
-                                            inscripciones </a>
+                                            data-key="t-form-select"><i class="ri-file-list-2-line"></i>Ver Inscripciones</a>
                                     </li>
                                 </ul>
                             </div>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link menu-link" href="#sidebarIcons" data-bs-toggle="collapse"
+                                role="button" aria-expanded="false" aria-controls="sidebarIcons">
+                                <i class="ri-check-double-line"></i> <span data-key="t-icons">Asistencias </span>
+                            </a>
+                            <div class="collapse menu-dropdown" id="sidebarIcons">
+                                <ul class="nav nav-sm flex-column">
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.asistencias.cliente') }}" class="nav-link"><span
+                                                data-key="t-remix"><i class="ri-edit-line"></i>Registrar</span></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('qr.scanner') }}" class="nav-link"><span
+                                                data-key="t-remix"><i class="ri-qr-code-line"></i>QrRegistrar</span></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.asistencias.index') }}" class="nav-link"><span
+                                                data-key="t-boxicons"><i class="ri-eye-line"></i>Ver Asistencias</span> </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
+                        <li class="nav-item">
                             <a class="nav-link menu-link" href="#sidebarTables" data-bs-toggle="collapse"
                                 role="button" aria-expanded="false" aria-controls="sidebarTables">
-                                <i class="ri-vip-crown-line"></i> <span data-key="t-tables">Membresias</span>
+                                <i class="ri-vip-crown-line"></i> <span data-key="t-tables">Planes y Servicios</span>
                             </a>
                             <div class="collapse menu-dropdown" id="sidebarTables">
                                 <ul class="nav nav-sm flex-column">
 
                                     <li class="nav-item">
                                         <a href="{{ route('admin.membresias.index') }}" class="nav-link"
-                                            data-key="t-grid-js">Planes de
+                                            data-key="t-grid-js"><i class="ri-price-tag-3-line"></i>Planes de
                                             Membresias</a>
                                     </li>
-                                </ul>
-                            </div>
-                        </li>
-
-
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarServicios" data-bs-toggle="collapse"
-                                role="button" aria-expanded="false" aria-controls="sidebarMaps">
-                                <i class="ri-service-line"></i> <span data-key="t-maps">Actividades</span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarServicios">
-                                <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.servicios.index') }}" class="nav-link"
-                                            data-key="t-form-select">Lista de Servicios</a>
+                                            data-key="t-form-select"><i class="ri-service-line"></i>Lista de Servicios</a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('admin.secciones.index') }}" class="nav-link"
-                                            data-key="t-list-js">Secciones</a>
+                                            data-key="t-list-js"><i class="ri-layout-grid-line"></i>Secciones</a>
                                     </li>
-
-                                </ul>
-                            </div>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarPagos" data-bs-toggle="collapse"
-                                role="button" aria-expanded="false" aria-controls="sidebarMaps">
-                                <i class="ri-money-dollar-circle-line"></i> <span data-key="t-maps">Pagos</span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarPagos">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.pagos.index') }}" class="nav-link"
-                                            data-key="t-form-select">historial de pagos</a>
-                                    </li>
-
                                 </ul>
                             </div>
                         </li>
@@ -469,17 +430,57 @@
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.reportes.inscripciones') }}" class="nav-link"
-                                            data-key="t-form-select">Reportes de inscripciones </a>
+                                            data-key="t-form-select">Reportes de inscripciones</a>
                                     </li>
-
-
-
                                     <li class="nav-item">
-                                        <a href="{{ route('admin.reportes.reservas') }}" class="nav-link"><span
-                                                data-key="t-material-design">Reportes
-                                                reservas</span>
+                                        <a href="" class="nav-link"><span
+                                                data-key="t-material-design">Reporte de Inscripciones por Tipo de Producto
+                                            </span>
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a href="" class="nav-link"><span
+                                                data-key="t-material-design"> Reporte de Inscripciones por Periodo de Tiempo
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="" class="nav-link"><span
+                                                data-key="t-material-design">Reporte de Capacidad y Ocupación de Secciones
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="" class="nav-link"><span
+                                                data-key="t-material-design">Reporte de Clientes Activos e Inactivos
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="" class="nav-link"><span
+                                                data-key="t-material-design">Reporte de Ingresos por Entrenador
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="" class="nav-link"><span
+                                                data-key="t-material-design">Reporte de Ingresos por Vendedor
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="" class="nav-link"><span
+                                                data-key="t-material-design">Reporte de Asistencias Asociadas a Membresías
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="" class="nav-link"><span
+                                                data-key="t-material-design">Reporte de Tendencias de Inscripción
+                                            </span>
+                                        </a>
+                                    </li>
+                                    
                                 </ul>
                             </div>
                         </li>

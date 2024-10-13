@@ -159,8 +159,6 @@ class InscripcionController extends Controller
 
 
 
-
-
     public function obtenerCliente($id)
     {
         $cliente = Cliente::find($id); // Asegúrate de usar el modelo correcto
@@ -169,56 +167,186 @@ class InscripcionController extends Controller
 
 
 
+
+    
     public function index(Request $request)
     {
         // Filtros
         $fecha_inicio = $request->input('fecha_inicio');
         $fecha_fin = $request->input('fecha_fin');
         $estado = $request->input('estado');
-        $estadoPago = $request->input('estadoPago');
 
-        // Query base de inscripciones
-        $query = Inscripcion::query();
+        // Consulta base para membresías
+        $queryMembresias = Inscripcion::whereHas('detalleInscripciones', function ($q) {
+            $q->where('tipoProducto', 'membresia');
+        });
 
-        // Aplicar filtros
+        // Consulta base para servicios
+        $queryServicios = Inscripcion::whereHas('detalleInscripciones', function ($q) {
+            $q->where('tipoProducto', 'servicio');
+        });
+
+        // Aplicar filtros a ambas consultas
         if ($fecha_inicio) {
-            $query->where('fechaInicio', '>=', $fecha_inicio);
+            $queryMembresias->where('fechaInscripcion', '>=', $fecha_inicio);
+            $queryServicios->where('fechaInscripcion', '>=', $fecha_inicio);
         }
 
         if ($fecha_fin) {
-            $query->where('fechaFin', '<=', $fecha_fin);
+            $queryMembresias->where('fechaInscripcion', '<=', $fecha_fin);
+            $queryServicios->where('fechaInscripcion', '<=', $fecha_fin);
         }
 
         if ($estado) {
-            $query->where('estado', $estado);
+            $queryMembresias->where('estado', $estado);
+            $queryServicios->where('estado', $estado);
         }
 
-        if ($estadoPago) {
-            $query->where('estadoPago', $estadoPago);
+        // Obtener inscripciones con relaciones necesarias
+        $inscripcionesMembresias = $queryMembresias->with(['cliente', 'detalleInscripciones.membresia'])->get();
+        $inscripcionesServicios = $queryServicios->with(['cliente', 'detalleInscripciones.servicio'])->get();
+
+        // Procesar inscripciones de membresías
+        foreach ($inscripcionesMembresias as $inscripcion) {
+            $detalle = $inscripcion->detalleInscripciones->where('tipoProducto', 'membresia')->first();
+            if ($detalle && $detalle->membresia) {
+                $inscripcion->producto = $detalle->membresia->nombre;
+                $inscripcion->fechaInicio = Carbon::parse($inscripcion->fechaInscripcion);
+                $inscripcion->fechaFin = Carbon::parse($inscripcion->fechaInscripcion)->addDays($detalle->membresia->duracionDias);
+            } else {
+                $inscripcion->producto = 'Membresía no especificada';
+                $inscripcion->fechaInicio = null;
+                $inscripcion->fechaFin = null;
+            }
+            $inscripcion->montoPago = $inscripcion->detalleInscripciones->sum('precio');
         }
 
-        // Obtener inscripciones paginadas
-        $inscripciones = $query->with('cliente', 'membresia');
-                               //->paginate(10);
+        // Procesar inscripciones de servicios
+        foreach ($inscripcionesServicios as $inscripcion) {
+            $detalle = $inscripcion->detalleInscripciones->where('tipoProducto', 'servicio')->first();
+            if ($detalle && $detalle->servicio) {
+                $inscripcion->producto = $detalle->servicio->nombre;
+                $inscripcion->fechaInicio = Carbon::parse($inscripcion->fechaInscripcion);
+                $inscripcion->fechaFin = null; // O asigna la fecha si aplica
+            } else {
+                $inscripcion->producto = 'Servicio no especificado';
+                $inscripcion->fechaInicio = null;
+                $inscripcion->fechaFin = null;
+            }
+            $inscripcion->montoPago = $inscripcion->detalleInscripciones->sum('precio');
+        }
 
-        // Contadores de tarjetas
-        $membresiasActivas = Inscripcion::where('estado', 'activa')->count();
-        $membresiasVencidas = Inscripcion::where('estado', 'vencida')->count();
-        $membresiasPendientesPago = Inscripcion::where('estadoPago', 'pendiente')->count();
+        // Contadores para las tarjetas (opcional, puedes ajustarlos según tus necesidades)
+        $totalMembresias = $inscripcionesMembresias->count();
+        $totalServicios = $inscripcionesServicios->count();
 
-        return view('admin.inscripciones.index', compact('inscripciones', 'membresiasActivas', 'membresiasVencidas', 'membresiasPendientesPago'));
+        $totalActivas = Inscripcion::where('estado', 'activa')->count();
+        $totalVencidas = Inscripcion::where('estado', 'vencida')->count();
+        $totalCanceladas = Inscripcion::where('estado', 'cancelada')->count();
+
+        return view('admin.inscripciones.index', compact(
+            'inscripcionesMembresias',
+            'inscripcionesServicios',
+            'fecha_inicio',
+            'fecha_fin',
+            'estado',
+            'totalMembresias',
+            'totalServicios',
+            'totalActivas',
+            'totalVencidas',
+            'totalCanceladas'
+        ));
     }
 
-    // Actualizar el estado de la inscripción
+    public function detalle($id)
+    {
+        $inscripcion = Inscripcion::with(['cliente', 'detalleInscripciones.membresia', 'detalleInscripciones.servicio'])->findOrFail($id);
+
+        // Devolver los datos en formato JSON para el modal
+        return response()->json($inscripcion);
+    }
+
+    public function cancelar(Request $request, $id)
+    {
+        $inscripcion = Inscripcion::findOrFail($id);
+        $inscripcion->estado = 'cancelada';
+        $inscripcion->save();
+
+        return redirect()->back()->with('success', 'La venta ha sido anulada.');
+    }
+
+    public function generarCredencial($id)
+    {
+        $inscripcion = Inscripcion::with(['detalleInscripciones.membresia'])->findOrFail($id);
+
+        // Verificar si es membresía y está activa
+        $detalleMembresia = $inscripcion->detalleInscripciones->where('tipoProducto', 'membresia')->first();
+
+        if ($detalleMembresia && $inscripcion->estado == 'activa') {
+            // Lógica para generar credencial con QR
+            return response()->download('path/to/credencial.pdf');
+        } else {
+            return redirect()->back()->with('error', 'No es una membresía activa.');
+        }
+    }
+
+    public function enviarWhatsapp($id)
+    {
+        $inscripcion = Inscripcion::with(['detalleInscripciones.membresia', 'cliente'])->findOrFail($id);
+
+        // Verificar si es membresía
+        $detalleMembresia = $inscripcion->detalleInscripciones->where('tipoProducto', 'membresia')->first();
+
+        if ($detalleMembresia) {
+            // Lógica para enviar QR por WhatsApp
+            return redirect()->back()->with('success', 'QR enviado por WhatsApp.');
+        } else {
+            return redirect()->back()->with('error', 'No es una membresía.');
+        }
+    }
+
+    public function generarPase($id)
+    {
+        $inscripcion = Inscripcion::with(['detalleInscripciones.servicio'])->findOrFail($id);
+
+        // Verificar si es servicio
+        $detalleServicio = $inscripcion->detalleInscripciones->where('tipoProducto', 'servicio')->first();
+
+        if ($detalleServicio) {
+            // Lógica para generar pase de entrada
+            return response()->download('path/to/pase_entrada.pdf');
+        } else {
+            return redirect()->back()->with('error', 'No es un servicio.');
+        }
+    }
     public function updateEstado(Request $request, $id)
     {
         $inscripcion = Inscripcion::findOrFail($id);
         $inscripcion->estado = $request->input('estado');
         $inscripcion->save();
 
-        return redirect()->route('admin.inscripciones.index')->with('success', 'El estado de la inscripción se ha actualizado correctamente.');
+        return redirect()->back()->with('success', 'Estado actualizado correctamente.');
     }
 
+  /*  public function updateEstadoPago(Request $request, $id)
+    {
+        $inscripcion = Inscripcion::findOrFail($id);
+        $inscripcion->estadoPago = $request->input('estadoPago');
+        $inscripcion->save();
+
+        return redirect()->back()->with('success', 'Estado de pago actualizado correctamente.');
+    }*/
+
+    // Actualizar el estado de la inscripción
+   /* public function updateEstado(Request $request, $id)
+    {
+        $inscripcion = Inscripcion::findOrFail($id);
+        $inscripcion->estado = $request->input('estado');
+        $inscripcion->save();
+
+        return redirect()->route('admin.inscripciones.index')->with('success', 'El estado de la inscripción se ha actualizado correctamente.');
+    }*/
+    /*
     // Actualizar el estado de pago de la inscripción
     public function updateEstadoPago(Request $request, $id)
     {
@@ -228,7 +356,7 @@ class InscripcionController extends Controller
 
         return redirect()->route('admin.inscripciones.index')->with('success', 'El estado de pago se ha actualizado correctamente.');
     }
-
+*/
     // Eliminar inscripción
     public function destroy($id)
     {
