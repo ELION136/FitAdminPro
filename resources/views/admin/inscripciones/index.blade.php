@@ -17,81 +17,59 @@
         </div>
     </div>
 
-    <!-- Tarjetas con contadores -->
     <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
+        <!-- Tarjeta de Membresías -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white mb-4">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <i class="ri-bar-chart-fill me-2" style="font-size: 2rem;"></i>
-                        <div>
-                            <h5 class="card-title">Total Membresías</h5>
-                            <h3>{{ $totalMembresias }}</h3>
-                        </div>
-                    </div>
+                    <i class="ri-bar-chart-fill me-2 align-bottom"></i> 
+                    Total Membresías: {{ $totalMembresias }}
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-secondary text-white">
+    
+        <!-- Tarjeta de Servicios -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-secondary text-white mb-4">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <i class="ri-service-fill me-2" style="font-size: 2rem;"></i>
-                        <div>
-                            <h5 class="card-title">Total Servicios</h5>
-                            <h3>{{ $totalServicios }}</h3>
-                        </div>
-                    </div>
+                    <i class="ri-service-fill me-2 align-bottom"></i> 
+                    Total Servicios: {{ $totalServicios }}
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card bg-success text-white">
+    
+        <!-- Tarjeta de Activas -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <i class="ri-check-line me-2" style="font-size: 2rem;"></i>
-                        <div>
-                            <h5 class="card-title">Activas</h5>
-                            <h3>{{ $totalActivas }}</h3>
-                        </div>
-                    </div>
+                    <i class="ri-check-line me-2 align-bottom"></i> 
+                    Activas: {{ $totalActivas }}
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card bg-danger text-white">
+    
+        <!-- Tarjeta de Vencidas -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-danger text-white mb-4">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <i class="ri-close-line me-2" style="font-size: 2rem;"></i>
-                        <div>
-                            <h5 class="card-title">Vencidas</h5>
-                            <h3>{{ $totalVencidas }}</h3>
-                        </div>
-                    </div>
+                    <i class="ri-close-line me-2 align-bottom"></i> 
+                    Vencidas: {{ $totalVencidas }}
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card bg-warning text-white">
+    
+        <!-- Tarjeta de Canceladas -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white mb-4">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <i class="ri-forbid-line me-2" style="font-size: 2rem;"></i>
-                        <div>
-                            <h5 class="card-title">Canceladas</h5>
-                            <h3>{{ $totalCanceladas }}</h3>
-                        </div>
-                    </div>
+                    <i class="ri-forbid-line me-2 align-bottom"></i> 
+                    Canceladas: {{ $totalCanceladas }}
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Botón para nueva inscripción -->
-    <div class="mb-3">
-        <a href="#" class="btn btn-success">
-            <i class="ri-add-line me-1"></i> Nueva Inscripción
-        </a>
-    </div>
+    
+    
 
     <!-- Pestañas para membresías y servicios -->
     <div class="row">
@@ -99,6 +77,12 @@
             <div class="card" id="customerList">
                 <div class="card-header border-bottom-dashed">
                     <h5 class="card-title mb-0">Lista de Inscripciones</h5>
+                    <div class="mb-3">
+                        <a href="#" class="btn btn-success">
+                            <i class="ri-add-line me-1"></i> Nueva Inscripción
+                        </a>
+                    </div>
+
                 </div>
                 <div class="card-body border-bottom-dashed border-bottom">
                     <!-- Formulario de filtros -->
@@ -149,8 +133,8 @@
                                 role="tab" aria-controls="membresias" aria-selected="true">Membresías</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="servicios-tab" data-bs-toggle="tab" href="#servicios" role="tab"
-                                aria-controls="servicios" aria-selected="false">Servicios</a>
+                            <a class="nav-link" id="servicios-tab" data-bs-toggle="tab" href="#servicios"
+                                role="tab" aria-controls="servicios" aria-selected="false">Servicios</a>
                         </li>
                     </ul>
                     <div class="tab-content" id="inscripcionesTabContent">
@@ -261,7 +245,8 @@
                                         <tr>
                                             <th>Cliente</th>
                                             <th>Servicio</th>
-                                            <th>Fecha</th>
+                                            <th>Fecha Inicio</th>
+                                            <th>Fecha Fin</th>
                                             <th>Estado</th>
                                             <th>Monto Pagado</th>
                                             <th>Acciones</th>
@@ -272,29 +257,52 @@
                                             <tr>
                                                 <td>{{ $inscripcion->cliente->nombre }}
                                                     {{ $inscripcion->cliente->primerApellido }}</td>
-                                                <td>{{ $inscripcion->producto }}</td>
-                                                <td>{{ $inscripcion->fechaInicio ? $inscripcion->fechaInicio->format('d/m/Y') : 'N/A' }}
+
+                                                @php
+                                                    $detalleServicio = $inscripcion->detalleInscripciones->firstWhere(
+                                                        'tipoProducto',
+                                                        'servicio',
+                                                    );
+                                                @endphp
+
+                                                <td>{{ $detalleServicio->seccion->servicio->nombre ?? 'Servicio no disponible' }}
                                                 </td>
+
+                                                <td>
+                                                    @if ($detalleServicio && isset($detalleServicio->seccion->fechaInicio))
+                                                        {{ \Carbon\Carbon::parse($detalleServicio->seccion->fechaInicio)->format('d/m/Y') }}
+                                                    @else
+                                                        N/A
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if ($detalleServicio && isset($detalleServicio->seccion->fechaFin))
+                                                        {{ \Carbon\Carbon::parse($detalleServicio->seccion->fechaFin)->format('d/m/Y') }}
+                                                    @else
+                                                        N/A
+                                                    @endif
+                                                </td>
+
                                                 <td>
                                                     <span
                                                         class="badge text-{{ $inscripcion->estado == 'activa' ? 'info' : ($inscripcion->estado == 'vencida' ? 'danger' : 'warning') }} fw-bold">
                                                         {{ ucfirst($inscripcion->estado) }}
                                                     </span>
                                                 </td>
-                                                <td>{{ number_format($inscripcion->montoPago, 2) }}</td>
+
+                                                <td>{{ number_format($inscripcion->totalPago, 2) }}</td>
+
                                                 <td>
-                                                    <!-- Botón para ver detalle (modal) -->
+                                                    <!-- Botones de acciones -->
                                                     <button class="btn btn-info btn-sm btn-detalle"
                                                         data-id="{{ $inscripcion->idInscripcion }}" title="Ver Detalle">
                                                         <i class="ri-eye-line"></i>
                                                     </button>
 
-                                                    <!-- Botón para imprimir comprobante (no funcional) -->
                                                     <button class="btn btn-secondary btn-sm" title="Imprimir Comprobante">
                                                         <i class="ri-printer-line"></i>
                                                     </button>
 
-                                                    <!-- Botón para anular venta -->
                                                     @if ($inscripcion->estado != 'cancelada')
                                                         <form
                                                             action="{{ route('admin.inscripciones.cancelar', $inscripcion->idInscripcion) }}"
@@ -308,41 +316,16 @@
                                                         </form>
                                                     @endif
 
-                                                    @php
-                                                        $esMembresia = $inscripcion->detalleInscripciones
-                                                            ->where('tipoProducto', 'membresia')
-                                                            ->isNotEmpty();
-                                                        $esServicio = $inscripcion->detalleInscripciones
-                                                            ->where('tipoProducto', 'servicio')
-                                                            ->isNotEmpty();
-                                                    @endphp
-
-                                                    @if ($esMembresia && $inscripcion->estado == 'activa')
-                                                        <!-- Botón para generar credencial -->
-                                                        <a href="{{ route('admin.inscripciones.generarCredencial', $inscripcion->idInscripcion) }}"
-                                                            class="btn btn-primary btn-sm" title="Generar Credencial">
-                                                            <i class="ri-qr-code-line"></i>
-                                                        </a>
-
-                                                        <!-- Botón para enviar QR por WhatsApp -->
-                                                        <a href="{{ route('admin.inscripciones.enviarWhatsapp', $inscripcion->idInscripcion) }}"
-                                                            class="btn btn-success btn-sm" title="Enviar QR por WhatsApp">
-                                                            <i class="ri-whatsapp-line"></i>
-                                                        </a>
-                                                    @endif
-
-                                                    @if ($esServicio)
-                                                        <!-- Botón para generar pase de entrada -->
-                                                        <a href="{{ route('admin.inscripciones.generarPase', $inscripcion->idInscripcion) }}"
-                                                            class="btn btn-warning btn-sm"
-                                                            title="Generar Pase de Entrada">
-                                                            <i class="ri-ticket-line"></i>
-                                                        </a>
-                                                    @endif
+                                                    <a href="{{ route('admin.inscripciones.generarPase', $inscripcion->idInscripcion) }}"
+                                                        class="btn btn-warning btn-sm" title="Generar Pase de Entrada">
+                                                        <i class="ri-ticket-line"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
+
+
                                 </table>
                             </div>
                         </div>
@@ -361,11 +344,30 @@
         $(document).ready(function() {
             // Inicializar DataTables para cada tabla
             $('#membresiasTable').DataTable({
-                responsive: true,
+                responsive: false,
                 lengthMenu: [5, 10, 25, 50, 100],
                 pageLength: 10,
                 language: {
                     lengthMenu: "Mostrar _MENU_ registros por página",
+                    decimal: "",
+                    emptyTable: "No hay datos disponibles en la tabla",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                    infoEmpty: "Mostrando 0 a 0 de 0 entradas",
+                    infoFiltered: "(filtrado de _MAX_ entradas totales)",
+                    loadingRecords: "Cargando...",
+                    processing: "Procesando...",
+                    search: "Buscar:",
+                    zeroRecords: "No se encontraron registros coincidentes",
+                    paginate: {
+                        first: "Primero",
+                        last: "Último",
+                        next: "Siguiente",
+                        previous: "Anterior"
+                    },
+                    aria: {
+                        sortAscending: ": activar para ordenar la columna de manera ascendente",
+                        sortDescending: ": activar para ordenar la columna de manera descendente"
+                    }
                 },
             });
 
@@ -375,6 +377,25 @@
                 pageLength: 10,
                 language: {
                     lengthMenu: "Mostrar _MENU_ registros por página",
+                    decimal: "",
+                    emptyTable: "No hay datos disponibles en la tabla",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                    infoEmpty: "Mostrando 0 a 0 de 0 entradas",
+                    infoFiltered: "(filtrado de _MAX_ entradas totales)",
+                    loadingRecords: "Cargando...",
+                    processing: "Procesando...",
+                    search: "Buscar:",
+                    zeroRecords: "No se encontraron registros coincidentes",
+                    paginate: {
+                        first: "Primero",
+                        last: "Último",
+                        next: "Siguiente",
+                        previous: "Anterior"
+                    },
+                    aria: {
+                        sortAscending: ": activar para ordenar la columna de manera ascendente",
+                        sortDescending: ": activar para ordenar la columna de manera descendente"
+                    }
                 },
             });
 
@@ -400,7 +421,7 @@
                         contenido += '<ul>';
                         data.detalle_inscripciones.forEach(function(detalle) {
                             var producto = detalle.tipoProducto.charAt(0)
-                            .toUpperCase() + detalle.tipoProducto.slice(1);
+                                .toUpperCase() + detalle.tipoProducto.slice(1);
                             if (detalle.tipoProducto === 'membresia' && detalle
                                 .membresia) {
                                 producto += ' - ' + detalle.membresia.nombre;

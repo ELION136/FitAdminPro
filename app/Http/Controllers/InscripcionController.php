@@ -168,7 +168,7 @@ class InscripcionController extends Controller
 
 
 
-    
+
     public function index(Request $request)
     {
         // Filtros
@@ -204,7 +204,9 @@ class InscripcionController extends Controller
 
         // Obtener inscripciones con relaciones necesarias
         $inscripcionesMembresias = $queryMembresias->with(['cliente', 'detalleInscripciones.membresia'])->get();
-        $inscripcionesServicios = $queryServicios->with(['cliente', 'detalleInscripciones.servicio'])->get();
+        $inscripcionesServicios = Inscripcion::whereHas('detalleInscripciones', function ($q) {
+            $q->where('tipoProducto', 'servicio');
+        })->with(['cliente', 'detalleInscripciones.seccion.servicio'])->get();
 
         // Procesar inscripciones de membresías
         foreach ($inscripcionesMembresias as $inscripcion) {
@@ -328,24 +330,24 @@ class InscripcionController extends Controller
         return redirect()->back()->with('success', 'Estado actualizado correctamente.');
     }
 
-  /*  public function updateEstadoPago(Request $request, $id)
-    {
-        $inscripcion = Inscripcion::findOrFail($id);
-        $inscripcion->estadoPago = $request->input('estadoPago');
-        $inscripcion->save();
+    /*  public function updateEstadoPago(Request $request, $id)
+      {
+          $inscripcion = Inscripcion::findOrFail($id);
+          $inscripcion->estadoPago = $request->input('estadoPago');
+          $inscripcion->save();
 
-        return redirect()->back()->with('success', 'Estado de pago actualizado correctamente.');
-    }*/
+          return redirect()->back()->with('success', 'Estado de pago actualizado correctamente.');
+      }*/
 
     // Actualizar el estado de la inscripción
-   /* public function updateEstado(Request $request, $id)
-    {
-        $inscripcion = Inscripcion::findOrFail($id);
-        $inscripcion->estado = $request->input('estado');
-        $inscripcion->save();
+    /* public function updateEstado(Request $request, $id)
+     {
+         $inscripcion = Inscripcion::findOrFail($id);
+         $inscripcion->estado = $request->input('estado');
+         $inscripcion->save();
 
-        return redirect()->route('admin.inscripciones.index')->with('success', 'El estado de la inscripción se ha actualizado correctamente.');
-    }*/
+         return redirect()->route('admin.inscripciones.index')->with('success', 'El estado de la inscripción se ha actualizado correctamente.');
+     }*/
     /*
     // Actualizar el estado de pago de la inscripción
     public function updateEstadoPago(Request $request, $id)

@@ -221,7 +221,7 @@
     <script>
        $(document).ready(function() {
             $('#reservaTable').DataTable({
-                responsive: true,
+                responsive: false,
                 lengthMenu: [5, 10, 25, 50, 100],
                 pageLength: 10,
                 language: {
