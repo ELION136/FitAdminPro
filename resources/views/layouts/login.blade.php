@@ -1,23 +1,20 @@
 <!doctype html>
 <html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
-    data-sidebar-image="none" data-preloader="disable" data-theme="saas" data-theme-colors="default" data-bs-theme="dark">
+    data-sidebar-image=img-4 data-sidebar-image="none" data-preloader="disable" data-theme="saas"
+    data-theme-colors="default" data-bs-theme="ligth">
+
 
 <head>
     <meta charset="utf-8" />
-    <title>FitAdminPro</title>
+    <title>@yield('title', 'FitAdminPro')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
 
-
-    <link rel="shortcut icon" href="{{ url('dist/assets/images/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url('dist/assets/images/logo1.png') }}">
 
     <!-- plugin css -->
     <link href="{{ url('dist/assets/libs/jsvectormap/css/jsvectormap.min.css') }}" rel="stylesheet" type="text/css" />
-
-
-
-
     <!-- Layout config Js -->
     <script src="{{ url('dist/assets/js/layout.js') }}"></script>
     <!-- Bootstrap Css -->
@@ -28,171 +25,94 @@
     <link href="{{ url('dist/assets/css/app.min.css') }}" rel="stylesheet" type="text/css" />
     <!-- custom Css-->
     <link href="{{ url('dist/assets/css/custom.min.css') }}" rel="stylesheet" type="text/css" />
-
     <link href="{{ asset('package/dist/sweetalert2.min.css') }}" rel="stylesheet">
     <script src="{{ asset('package/dist/sweetalert2.all.min.js') }}"></script>
 
     <style>
-        .custom-page {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            position: relative;
-            z-index: 1;
-            background: linear-gradient(rgba(2, 39, 75, 0.75), rgba(48, 63, 78, 0.413)),
-                url('{{ url('styles/img/f3.jpg') }}') no-repeat center center fixed;
+        /* Fondo que ocupa toda la pantalla */
+        .auth-one-bg-position {
+            background: linear-gradient(to bottom, rgba(33, 32, 32, 0.8), rgba(0, 0, 0, 0.8)), url('{{ url('styles/img/f3.jpg') }}');
             background-size: cover;
-            color: #ffffff;
-
-
-        }
-
-        .card-sigin {
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            padding: 2rem;
-            max-width: 800px;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+            /* Ocupar toda la altura de la ventana */
             width: 100%;
-            margin: 20px;
-            background-color: rgba(22, 41, 75, 0.076);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .form-group {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-control {
-            border-radius: 6px;
-            padding: 1rem;
-            font-size: 12px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-        }
-
-        .form-control:focus {
-            border-color: #e2a34a;
-            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.25);
-            background-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .form-label {
-            position: absolute;
-            top: 50%;
-            left: 1.25rem;
-            transform: translateY(-50%);
-            background-color: transparent;
-            padding: 0 0.25rem;
-            transition: all 0.2s;
-            color: #f4f5f7;
-        }
-
-        .form-control:focus+.form-label,
-        .form-control:not(:placeholder-shown)+.form-label {
-            top: -0.5rem;
-            left: 0.75rem;
-            font-size: 12px;
-            color: #e2964a;
-        }
-
-        .is-invalid {
-            border-color: #e53e3e;
-        }
-
-        .invalid-feedback {
-            display: block;
-            color: #e53e3e;
-            font-size: 0.875em;
-            margin-top: 0.25rem;
-        }
-
-        .btn-primary {
-            border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            background-color: #ec7d0d;
-            border-color: #0c0b0b;
-        }
-
-        .btn-primary:hover {
-            background-color: #f34814;
-            border-color: #f22e0c;
-        }
-
-        .main-signup-header {
-            text-align: center;
-        }
-
-        .main-signup-header h2 {
-            font-weight: bold;
-            color: #ffffff;
-        }
-
-        .main-signup-header h5 {
-            color: #a0aec0;
-        }
-
-        .text-primary {
-            color: #83b4eb !important;
-        }
-
-        .form-check-label,
-        .text-muted {
-            color: #d9e7f8 !important;
-        }
-
-        a {
-            color: #e29e4a;
-        }
-
-        a:hover {
-            color: #d57d3a;
-        }
-
-        .logo-luminoso {
-            max-height: 40px;
-            /* Ajusta la altura del logo */
-            vertical-align: middle;
-            filter: drop-shadow(0 0 10px rgba(226, 158, 74, 0.7));
-            /* Sombra luminosa alrededor del logo */
-            transition: all 0.3s ease;
-            /* Transición suave para los efectos */
-        }
-
-        .logo-luminoso:hover {
-            filter: drop-shadow(0 0 20px rgb(226, 158, 74)) brightness(1.2);
-            /* Aumenta el brillo al pasar el cursor */
-            transform: scale(1.05);
-            /* Pequeño efecto de zoom */
+            /* Ocupar toda la anchura de la ventana */
+            display: flex;
+            align-items: center;
+            /* Centrar contenido verticalmente */
+            justify-content: center;
+            /* Centrar contenido horizontalmente */
         }
     </style>
+
+
+    @stack('head') <!-- Sección para incluir scripts o estilos adicionales -->
 </head>
 
 <body>
 
-
-    <div class="container-fluid custom-page">
-
-
-
+    <div class="auth-one-bg-position">
         @yield('content')
-
-        <!-- Scripts -->
-
-
     </div>
 
+    <!-- Scripts -->
     <script src="{{ url('dist/assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url('dist/assets/libs/simplebar/simplebar.min.js') }}"></script>
     <script src="{{ url('dist/assets/libs/node-waves/waves.min.js') }}"></script>
     <script src="{{ url('dist/assets/libs/feather-icons/feather.min.js') }}"></script>
     <script src="{{ url('dist/assets/js/pages/plugins/lord-icon-2.1.0.js') }}"></script>
     <script src="{{ url('dist/assets/js/plugins.js') }}"></script>
+    <script src="{{ url('dist/assets/js/pages/datatables.init.js') }}"></script>
+    <!-- apexcharts -->
+    <script src="{{ url('dist/assets/libs/apexcharts/apexcharts.min.js') }}"></script>
+    <!-- Vector map-->
+    <script src="{{ url('dist/assets/libs/jsvectormap/js/jsvectormap.min.js') }}"></script>
+    <script src="{{ url('dist/assets/libs/jsvectormap/maps/world-merc.js') }}"></script>
+    <script src="{{ url('dist/assets/js/pages/profile-setting.init.js') }}"></script>
+    <!-- calendar min js -->
+    <script src="{{ url('dist/assets/libs/fullcalendar/index.global.min.js') }}"></script>
+    <!-- Calendar init -->
+    <script src="{{ url('dist/assets/js/pages/calendar.init.js') }}"></script>
+    <!-- Dashboard init -->
+    <script src="{{ url('dist/assets/js/pages/dashboard-analytics.init.js') }}"></script>
+    <script src="{{ url('dist/assets/js/pages/dashboard-projects.init.js') }}"></script>
+    <!-- App js -->
+    @stack('scripts') <!-- Para incluir scripts adicionales en vistas específicas -->
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var mybutton = document.getElementById("back-to-top");
 
+            function scrollFunction() {
+                if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                    mybutton.style.display = "block";
+                } else {
+                    mybutton.style.display = "none";
+                }
+            }
+
+            function topFunction() {
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
+
+            if (mybutton) {
+                window.onscroll = function() {
+                    scrollFunction();
+                };
+
+                mybutton.addEventListener("click", topFunction);
+            }
+        });
+    </script>
+    <script src="{{ url('dist/assets/js/app.js') }}"></script>
+    <script src="{{ url('dist/assets/js/pages/password-addon.init.js') }}"></script>
+    <!-- particles js -->
+    <script src="{{ url('dist/assets/libs/particles.js/particles.js') }}"></script>
+    <!-- particles app js -->
+    <script src="{{ url('dist/assets/js/pages/particles.app.js') }}"></script>
 </body>
 
 </html>

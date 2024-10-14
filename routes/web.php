@@ -29,6 +29,9 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 //primero creamos un controlador php artisa make:controller AdminController modificar esta ruta para ruta
 //rutas para el administrador
 //http://localhost/GYMU/siswebgym/public/admin
+// Rutas para restablecer contraseña
+Auth::routes(['verify' => true]);
+
 Route::get('/admin', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.index')->middleware('auth');
 Route::get('/admin/home', [App\Http\Controllers\AdminController::class, 'home'])->name('admin.home')->middleware('auth');
 
@@ -119,6 +122,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/asistencias/anular/{idAsistencia}', [App\Http\Controllers\AsistenciaController::class, 'verDetalles'])->name('admin.asistencias.anular');
     Route::get('/admin/asistencias/{idAsistencia}/detalles', [App\Http\Controllers\AsistenciaController::class, 'anularAsistencia'])->name('admin.asistencias.detalles');
 
+
+
+    Route::get('/admin/reportes/inscripciones', [App\Http\Controllers\ReportesController::class, 'inscripciones'])->name('admin.reportes.inscripciones');
+    Route::get('/reportes/inscripciones/pdf', [App\Http\Controllers\ReportesController::class, 'generarPDFInscripciones'])->name('admin.reportes.inscripcionesPDF');
+    Route::get('/reportes/inscripciones/excel', [App\Http\Controllers\ReportesController::class, 'generarExcelInscripciones'])->name('admin.reportes.inscripcionesExcel');
 
 });
 
@@ -233,13 +241,13 @@ Route::middleware(['auth'])->group(function () {
     // Route::get('/admin/reportes/inscripciones', [App\Http\Controllers\ReporteInscripcionController::class, 'index'])->name('admin.reportes.inscripciones');
     // Route::get('/admin/reportes/exportPDF', [App\Http\Controllers\ReporteInscripcionController::class, 'exportPDF'])->name('admin.reportes.exportPDF');
 
-    Route::get('/admin/reportes/inscripciones', [App\Http\Controllers\ReporteInscripcionController::class, 'index'])->name('admin.reportes.inscripciones');
+    // Route::get('/admin/reportes/inscripciones', [App\Http\Controllers\ReporteInscripcionController::class, 'index'])->name('admin.reportes.inscripciones');
 
     // Ruta para Exportar en PDF
-    Route::get('/admin/reportes/inscripciones/exportar/pdf', [App\Http\Controllers\ReporteInscripcionController::class, 'exportPDF'])->name('admin.reportes.inscripciones.exportar.pdf');
+    //  Route::get('/admin/reportes/inscripciones/exportar/pdf', [App\Http\Controllers\ReporteInscripcionController::class, 'exportPDF'])->name('admin.reportes.inscripciones.exportar.pdf');
 
     // Ruta para Exportar en Excel
-    Route::get('/admin/reportes/inscripciones/exportar/excel', [App\Http\Controllers\ReporteInscripcionController::class, 'exportExcel'])->name('admin.reportes.inscripciones.exportar.excel');
+    // Route::get('/admin/reportes/inscripciones/exportar/excel', [App\Http\Controllers\ReporteInscripcionController::class, 'exportExcel'])->name('admin.reportes.inscripciones.exportar.excel');
 
 
 
@@ -258,10 +266,10 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-    Route::get('admin/reportes/asistencias', [App\Http\Controllers\ReporteAsistenciasController::class, 'index'])->name('admin.reportes.asistencias');
-    Route::get('admin/reportes/asistencias/export/excel', [App\Http\Controllers\ReporteAsistenciasController::class, 'exportExcel'])->name('admin.asistencias.reporte_excel');
-    Route::get('admin/reportes/asistencias/export/pdf', [App\Http\Controllers\ReporteAsistenciasController::class, 'exportPDF'])->name('admin.asistencias.reporte_pdf');
-    Route::get('clientes/search', [App\Http\Controllers\ReporteAsistenciasController::class, 'searchClientes'])->name('clientes.search');
+    // Route::get('admin/reportes/asistencias', [App\Http\Controllers\ReporteAsistenciasController::class, 'index'])->name('admin.reportes.asistencias');
+    //Route::get('admin/reportes/asistencias/export/excel', [App\Http\Controllers\ReporteAsistenciasController::class, 'exportExcel'])->name('admin.asistencias.reporte_excel');
+    //Route::get('admin/reportes/asistencias/export/pdf', [App\Http\Controllers\ReporteAsistenciasController::class, 'exportPDF'])->name('admin.asistencias.reporte_pdf');
+    // Route::get('clientes/search', [App\Http\Controllers\ReporteAsistenciasController::class, 'searchClientes'])->name('clientes.search');
 
 
     Route::get('reservas/{id}/comprobante', [App\Http\Controllers\ReservaController::class, 'generarComprobante'])->name('admin.reservas.comprobante');
@@ -318,3 +326,6 @@ Route::get('/qr/{cliente}', [QRCheckController::class, 'generateQR'])->name('qr.
 Route::post('/check', [QRCheckController::class, 'processCheck'])->name('qr.check');
 Route::get('/scanner', [QRCheckController::class, 'show'])->name('qr.scanner');
 Route::post('/scanner/process', [QRCheckController::class, 'process'])->name('qr.process');
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

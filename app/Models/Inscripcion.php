@@ -25,8 +25,10 @@ class Inscripcion extends Model
     ];
 
     protected $casts = [
-        'fechaCreacion' => 'datetime',
+        
         'fechaModificacion' => 'datetime',
+        'fechaInscripcion' => 'datetime',
+
     ];
 
     public function cliente()

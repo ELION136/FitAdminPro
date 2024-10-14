@@ -1,4 +1,4 @@
-@extends('layouts.admin') <!-- Asegúrate de que este es el layout correcto -->
+@extends('layouts.app') <!-- Asegúrate de que este es el layout correcto -->
 
 @section('content')
     <div class="row">
@@ -48,17 +48,7 @@
                                         Cancelada</option>
                                 </select>
                             </div>
-                            <div class="col-md-2">
-                                <label for="estadoPago" class="form-label">Estado de Pago</label>
-                                <select name="estadoPago" class="form-select" data-plugin="choices"
-                                    data-choices-search-false>
-                                    <option value="">Todos</option>
-                                    <option value="pendiente" {{ request('estadoPago') == 'pendiente' ? 'selected' : '' }}>
-                                        Pendiente</option>
-                                    <option value="completado"
-                                        {{ request('estadoPago') == 'completado' ? 'selected' : '' }}>Completado</option>
-                                </select>
-                            </div>
+                            
                             <div class="col-md-2">
                                 <label for="cliente_nombre" class="form-label">Cliente</label>
                                 <input type="text" name="cliente_nombre" class="form-control"
@@ -70,10 +60,10 @@
                                             class="ri-equalizer-fill align-bottom me-1"></i> Filtrar</button>
                                     <a href="{{ route('admin.reportes.inscripciones') }}" class="btn btn-secondary"><i
                                             class="ri-refresh-line align-bottom me-1"></i> Limpiar Filtros</a>
-                                    <a href="{{ route('admin.reportes.inscripciones.exportar.pdf', request()->all()) }}"
+                                    <a href="{{ route('admin.reportes.inscripcionesPDF', request()->all()) }}"
                                         class="btn btn-danger"><i class="ri-file-download-line align-bottom me-1"></i>
                                         Exportar PDF</a>
-                                    <a href="{{ route('admin.reportes.inscripciones.exportar.excel', request()->all()) }}"
+                                    <a href="{{ route('admin.reportes.inscripcionesExcel', request()->all()) }}"
                                         class="btn btn-success"><i class="ri-file-download-line align-bottom me-1"></i>
                                         Exportar Excel</a>
                                 </div>
@@ -86,40 +76,41 @@
                 <!-- Tabla de Resultados -->
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered text-nowrap w-100" id="tablita">
+                        <table class="table table-bordered text-nowrap w-100" id="reservaTable">
                             <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>Cliente</th>
-                                    <th>Membresía</th>
-                                    <th>Fecha Inicio</th>
-                                    <th>Fecha Fin</th>
+                                    <th>tipo</th>
+                                    <th>Fecha de inscripcion</th>
                                     <th>Estado</th>
                                     <th>Monto de Pago (Bs.)</th>
-                                    <th>Estado de Pago</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($inscripciones as $inscripcion)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $inscripcion->cliente->nombre }}</td>
-                                        <td>{{ $inscripcion->membresia->nombre }}</td>
-                                        <td>{{ $inscripcion->fechaInicio->format('d/m/Y') }}</td>
-                                        <td>{{ $inscripcion->fechaFin->format('d/m/Y') }}</td>
-                                        <td>{{ ucfirst($inscripcion->estado) }}</td>
-                                        <td>{{ number_format($inscripcion->montoPago, 2, ',', '.') }} Bs.</td>
-                                        <td>{{ ucfirst($inscripcion->estadoPago) }}</td>
-                                    </tr>
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <!-- Verifica si el cliente existe antes de acceder a sus propiedades -->
+                                    <td>{{ $inscripcion->cliente ? $inscripcion->cliente->nombre : 'Sin cliente' }}</td>
+
+                                    <!-- Acceder a la membresía a través de detalleInscripciones -->
+                                    <td>
+                                        @php
+                                            $detalleMembresia = $inscripcion->detalleInscripciones->where('tipoProducto', 'membresia')->first();
+                                        @endphp
+                                        {{ $detalleMembresia && $detalleMembresia->membresia ? $detalleMembresia->membresia->nombre : 'Sin membresía' }}
+                                    </td>
+
+                                    <!-- Fecha de inscripción -->
+                                    <td>{{ $inscripcion->fechaInscripcion ? \Carbon\Carbon::parse($inscripcion->fechaInscripcion)->format('d/m/Y') : 'Sin fecha' }}</td>
+
+                                    <td>{{ ucfirst($inscripcion->estado) }}</td>
+                                    <td>{{ number_format($inscripcion->totalPago, 2, ',', '.') }} Bs.</td>
+                                </tr>
                                 @endforeach
                             </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th colspan="6" style="text-align:right">Total:</th>
-                                    <th></th> <!-- Aquí irá el total de "Monto de Pago" -->
-                                    <th></th> <!-- Para el "Estado de Pago" (vacío) -->
-                                </tr>
-                            </tfoot>
+        
                         </table>
                     </div>
 
@@ -135,19 +126,20 @@
                                 </div>
                             </div>
                         </div>
-                    
-                        <!-- Total de Pagos Completados -->
+
+                        <!-- Total de Ingresos -->
                         <div class="col-md-6">
                             <div class="card text-center">
                                 <div class="card-body">
                                     <i class="ri-money-dollar-circle-line display-5 text-success"></i>
-                                    <h5 class="card-title mt-3">Total de Pagos Completados</h5>
-                                    <p class="card-text fs-4"><strong>{{ number_format($totalPagos, 2, ',', '.') }} Bs.</strong></p>
+                                    <h5 class="card-title mt-3">Total de Ingresos</h5>
+                                    <p class="card-text fs-4"><strong>{{ number_format($totalIngresos, 2, ',', '.') }}
+                                            Bs.</strong></p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
         </div>
@@ -156,96 +148,112 @@
 
 @push('scripts')
     <script>
-       $(document).ready(function() {
-    @if ($inscripciones->count() > 0)
-    $('#tablita').DataTable({
-        dom: 'Bfrtip',
-        responsive: true,
-        lengthMenu: [5, 10, 25, 50, 75, 100],
-        pageLength: 100,
-        buttons: [{
-                extend: 'copyHtml5',
-                text: '<i class="fas fa-copy"></i> Copiar',
-                titleAttr: 'Copiar al portapapeles',
-                className: 'btn btn-primary'
-            },
-            {
-                extend: 'csvHtml5',
-                text: '<i class="fas fa-file-csv"></i> CSV',
-                titleAttr: 'Exportar a CSV',
-                className: 'btn btn-success'
-            },
-            {
-                extend: 'excelHtml5',
-                text: '<i class="fas fa-file-excel"></i> Excel',
-                titleAttr: 'Exportar a Excel',
-                className: 'btn btn-success'
-            },
-            {
-                extend: 'print',
-                text: '<i class="fas fa-print"></i> Imprimir',
-                titleAttr: 'Imprimir',
-                className: 'btn btn-info'
-            }
-        ],
-        language: {
-            lengthMenu: "Mostrar _MENU_ registros por página",
-            decimal: "",
-            emptyTable: "No hay datos disponibles en la tabla",
-            info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-            infoEmpty: "Mostrando 0 a 0 de 0 entradas",
-            infoFiltered: "(filtrado de _MAX_ entradas totales)",
-            loadingRecords: "Cargando...",
-            processing: "Procesando...",
-            search: "Buscar:",
-            zeroRecords: "No se encontraron registros coincidentes",
-            paginate: {
-                first: "Primero",
-                last: "Último",
-                next: "Siguiente",
-                previous: "Anterior"
-            },
-            aria: {
-                sortAscending: ": activar para ordenar la columna de manera ascendente",
-                sortDescending: ": activar para ordenar la columna de manera descendente"
-            }
-        },
-        footerCallback: function(row, data, start, end, display) {
-            var api = this.api();
+        $(document).ready(function() {
+            $('#reservaTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    // Botón de exportar a Excel
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fa fa-file-excel-o"></i> Exportar a Excel',
+                        titleAttr: 'Exportar a Excel',
+                        className: 'btn btn-success',
+                        exportOptions: {
+                            columns: ':visible',
+                            format: {
+                                header: function (data, columnIdx) {
+                                    return data.toUpperCase();
+                                }
+                            }
+                        },
+                        filename: 'Nombre_del_archivo_excel',
+                    },
+                    // Botón de exportar a PDF (ajustado)
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa fa-file-pdf-o"></i> Exportar a PDF',
+                        titleAttr: 'Exportar a PDF',
+                        className: 'btn btn-danger',
+                        exportOptions: {
+                            columns: ':visible'
+                        },
+                        filename: 'Nombre_del_archivo_pdf',
+                        customize: function (doc) {
+                            // Establecer la fuente a 'Helvetica'
+                            doc.defaultStyle.font = 'Helvetica';
 
-            // Función para convertir los valores de la columna a números
-            var intVal = function(i) {
-                return typeof i === 'string' ?
-                    parseFloat(i.replace(/[\$,Bs.]/g, '').replace(',', '.')) :
-                    typeof i === 'number' ? i : 0;
-            };
+                            // Personalizar el PDF (opcional)
+                            doc.content.splice(0, 0, {
+                                text: 'Título personalizado',
+                                fontSize: 14,
+                                alignment: 'center',
+                                margin: [0, 0, 0, 20]
+                            });
 
-            // Sumar toda la columna del monto de pago
-            var total = api
-                .column(6, { // Índice de la columna del Monto de Pago
-                    page: 'current'
-                })
-                .data()
-                .reduce(function(a, b) {
-                    return intVal(a) + intVal(b);
-                }, 0);
+                            doc.defaultStyle.fontSize = 10;
 
-            // Actualizar el footer con el total formateado
-            $(api.column(6).footer()).html(
-                number_format(total, 2, ',', '.') + ' Bs.'
-            );
-        }
-    });
-    @endif
-});
-
-// Función para formatear números
-function number_format(number, decimals, dec_point, thousands_sep) {
-    number = number.toFixed(decimals);
-    var parts = number.split('.');
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousands_sep);
-    return parts.join(dec_point);
-}
-
+                            doc['footer'] = (function(page, pages) {
+                                return {
+                                    columns: [
+                                        {
+                                            alignment: 'left',
+                                            text: ['Fecha de creación: ', { text: new Date().toLocaleDateString() }]
+                                        },
+                                        {
+                                            alignment: 'right',
+                                            text: ['Página ', { text: page.toString() },  ' de ', { text: pages.toString() }]
+                                        }
+                                    ],
+                                    margin: [10, 0]
+                                }
+                            });
+                        }
+                    },
+                    // Botón de imprimir
+                    {
+                        extend: 'print',
+                        text: '<i class="fa fa-print"></i> Imprimir',
+                        titleAttr: 'Imprimir',
+                        className: 'btn btn-secondary',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    }
+                ],
+                responsive: true,
+                lengthMenu: [5, 10, 25, 50, 100],
+                pageLength: 5,
+                language: {
+                    // Configuración de idioma
+                    lengthMenu: "Mostrar _MENU_ registros por página",
+                    decimal: "",
+                    emptyTable: "No hay datos disponibles en la tabla",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                    infoEmpty: "Mostrando 0 a 0 de 0 entradas",
+                    infoFiltered: "(filtrado de _MAX_ entradas totales)",
+                    loadingRecords: "Cargando...",
+                    processing: "Procesando...",
+                    search: "Buscar:",
+                    zeroRecords: "No se encontraron registros coincidentes",
+                    paginate: {
+                        first: "Primero",
+                        last: "Último",
+                        next: "Siguiente",
+                        previous: "Anterior"
+                    },
+                    aria: {
+                        sortAscending: ": activar para ordenar la columna de manera ascendente",
+                        sortDescending: ": activar para ordenar la columna de manera descendente"
+                    },
+                    buttons: {
+                        copyTitle: 'Copiado al portapapeles',
+                        copySuccess: {
+                            _: '%d líneas copiadas',
+                            1: '1 línea copiada'
+                        }
+                    }
+                },
+            });
+        });
     </script>
 @endpush

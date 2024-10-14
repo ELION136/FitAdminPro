@@ -19,26 +19,41 @@ class InscripcionesExport implements FromCollection, WithHeadings, WithMapping, 
     /**
      * Retorna la colección de inscripciones.
      */
-    public function collection()
+
+
+
+    protected $inscripciones;
+
+    public function __construct($inscripciones)
     {
-        return Inscripcion::with('cliente', 'membresia')->get();
+        $this->inscripciones = $inscripciones;
     }
 
-    /**
-     * Define las cabeceras para el archivo Excel.
-     */
+    public function collection()
+    {
+        return $this->inscripciones->map(function ($inscripcion) {
+            $detalleProducto = (isset($inscripcion->detalleInscripciones[0]))
+                ? $inscripcion->detalleInscripciones[0]->tipoProducto
+                : 'No definido';
+
+            return [
+                $inscripcion->cliente->nombre . ' ' . $inscripcion->cliente->primerApellido,
+                $detalleProducto,
+                $inscripcion->estado,
+                $inscripcion->fechaInscripcion,
+                $inscripcion->totalPago
+            ];
+        });
+    }
+
     public function headings(): array
     {
         return [
-            '#',
             'Cliente',
-            'Membresía',
-            'Fecha de Inicio',
-            'Fecha de Fin',
+            'Tipo de Producto',
             'Estado',
-            'Monto de Pago (Bs.)',
-            'Estado de Pago',
-            'Fecha de Registro'
+            'Fecha de Inscripción',
+            'Total Pagado'
         ];
     }
 
@@ -47,16 +62,17 @@ class InscripcionesExport implements FromCollection, WithHeadings, WithMapping, 
      */
     public function map($inscripcion): array
     {
+        // Validar que la membresía o sección existan antes de acceder a sus datos
+        $detalleProducto = isset($inscripcion->detalleInscripciones[0]) ? $inscripcion->detalleInscripciones[0]->tipoProducto : 'No definido';
+
         return [
             $inscripcion->id,
-            $inscripcion->cliente->nombre . ' ' . $inscripcion->cliente->primerApellido . ' ' . $inscripcion->cliente->segundoApellido,
-            $inscripcion->membresia->nombre,
-            Carbon::parse($inscripcion->fechaInicio)->format('d/m/Y'),
-            Carbon::parse($inscripcion->fechaFin)->format('d/m/Y'),
-            ucfirst($inscripcion->estado),
-            number_format($inscripcion->montoPago, 2, ',', '.') . ' Bs.',
-            ucfirst($inscripcion->estadoPago),
-            Carbon::parse($inscripcion->created_at)->format('d/m/Y H:i:s'),
+            $inscripcion->cliente->nombre . ' ' . $inscripcion->cliente->primerApellido . ' ' . ($inscripcion->cliente->segundoApellido ?? ''),
+            $detalleProducto, // Puede ser membresía o servicio
+            Carbon::parse($inscripcion->fechaInscripcion)->format('d/m/Y'),
+            ucfirst($inscripcion->estado), // Activa, vencida, cancelada
+            number_format($inscripcion->totalPago, 2, ',', '.') . ' Bs.', // Monto pagado
+            Carbon::parse($inscripcion->fechaCreacion)->format('d/m/Y H:i:s'), // Fecha de creación
         ];
     }
 
