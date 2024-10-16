@@ -415,7 +415,10 @@
                                         <a href="{{ route('admin.servicios.index') }}" class="nav-link"
                                             data-key="t-form-select"><i class="ri-service-line"></i>Lista de Servicios</a>
                                     </li>
-                                   
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.categorias.index') }}" class="nav-link"
+                                            data-key="t-form-select"><i class="ri-service-line"></i>Categorias Servicios</a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>

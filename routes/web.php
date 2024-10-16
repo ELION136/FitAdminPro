@@ -82,8 +82,11 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/admin/servicios/{id}', [App\Http\Controllers\ServiciosController::class, 'update'])->name('admin.servicios.update');
     Route::delete('/admin/servicios/{id}', [App\Http\Controllers\ServiciosController::class, 'destroy'])->name('admin.servicios.destroy');
 
-
-   // Route::get('/admin/secciones', [App\Http\Controllers\SeccionController::class, 'index'])->name('admin.secciones.index');
+    Route::get('/admin/categorias', [App\Http\Controllers\CategoriaServicioController::class, 'index'])->name('admin.categorias.index');
+    Route::post('/admin/categorias', [App\Http\Controllers\CategoriaServicioController::class, 'store'])->name('admin.categorias.store');
+    Route::put('/admin/categorias/{id}', [App\Http\Controllers\CategoriaServicioController::class, 'update'])->name('admin.categorias.update');
+    Route::delete('/admin/categorias/{id}', [App\Http\Controllers\CategoriaServicioController::class, 'destroy'])->name('admin.categorias.destroy');
+    // Route::get('/admin/secciones', [App\Http\Controllers\SeccionController::class, 'index'])->name('admin.secciones.index');
    // Route::post('/admin/secciones', [App\Http\Controllers\SeccionController::class, 'store'])->name('admin.secciones.store');
    // Route::put('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'update'])->name('admin.secciones.update');
    // Route::delete('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'destroy'])->name('admin.secciones.destroy');
