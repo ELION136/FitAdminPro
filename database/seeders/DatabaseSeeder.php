@@ -204,7 +204,7 @@ class DatabaseSeeder extends Seeder
                 'eliminado' => 1,
             ],
         ]);
-
+    /*
         DB::table('servicios')->insert([
             [
                 'nombre' => 'Clases de Spinning',
@@ -354,6 +354,6 @@ class DatabaseSeeder extends Seeder
         
 
 
-
+*/
     }
 }

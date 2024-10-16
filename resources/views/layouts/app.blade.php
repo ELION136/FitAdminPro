@@ -365,7 +365,7 @@
                             <div class="collapse menu-dropdown" id="sidebarForms">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
-                                        <a href="" class="nav-link"
+                                        <a href="{{route('admin.inscripciones.create')}}" class="nav-link"
                                             data-key="t-basic-elements"><i class="ri-file-add-line"></i>Crear nueva inscripcion</a>
                                     </li>
                                     <li class="nav-item">
@@ -415,10 +415,7 @@
                                         <a href="{{ route('admin.servicios.index') }}" class="nav-link"
                                             data-key="t-form-select"><i class="ri-service-line"></i>Lista de Servicios</a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.secciones.index') }}" class="nav-link"
-                                            data-key="t-list-js"><i class="ri-layout-grid-line"></i>Secciones</a>
-                                    </li>
+                                   
                                 </ul>
                             </div>
                         </li>

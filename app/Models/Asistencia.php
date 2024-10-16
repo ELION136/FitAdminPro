@@ -29,11 +29,11 @@ class Asistencia extends Model
 
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class, 'idCliente', 'idCliente');
+        return $this->belongsTo(Cliente::class, 'idCliente');
     }
 
     public function inscripcion()
     {
-        return $this->belongsTo(Inscripcion::class, 'idInscripcion', 'idInscripcion');
+        return $this->belongsTo(Inscripcion::class, 'idInscripcion');
     }
 }

@@ -20,8 +20,8 @@ class DiaSemana extends Model
     /**
      * Relación muchos a muchos con el modelo Seccion.
      */
-    public function secciones()
+    public function servicios()
     {
-        return $this->belongsToMany(Seccion::class, 'seccion_dias', 'idDia', 'idSeccion');
+        return $this->belongsToMany(Servicio::class, 'servicio_dias', 'idDia', 'idServicio');
     }
 }

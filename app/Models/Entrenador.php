@@ -38,9 +38,9 @@ class Entrenador extends Model
     
     protected $dates = ['fechaContratacion','fechaNacimiento' , 'fechaCreacion', 'fechaModificacion'];
 
-    public function secciones()
+    public function servicios()
     {
-        return $this->hasMany(Seccion::class, 'idEntrenador', 'idEntrenador');
+        return $this->hasMany(Servicio::class, 'idEntrenador');
     }
 
 }

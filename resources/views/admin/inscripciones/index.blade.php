@@ -22,54 +22,52 @@
         <div class="col-xl-3 col-md-6">
             <div class="card bg-primary text-white mb-4">
                 <div class="card-body">
-                    <i class="ri-bar-chart-fill me-2 align-bottom"></i> 
+                    <i class="ri-bar-chart-fill me-2 align-bottom"></i>
                     Total Membresías: {{ $totalMembresias }}
                 </div>
             </div>
         </div>
-    
+
         <!-- Tarjeta de Servicios -->
         <div class="col-xl-3 col-md-6">
             <div class="card bg-secondary text-white mb-4">
                 <div class="card-body">
-                    <i class="ri-service-fill me-2 align-bottom"></i> 
+                    <i class="ri-service-fill me-2 align-bottom"></i>
                     Total Servicios: {{ $totalServicios }}
                 </div>
             </div>
         </div>
-    
+
         <!-- Tarjeta de Activas -->
         <div class="col-xl-3 col-md-6">
             <div class="card bg-success text-white mb-4">
                 <div class="card-body">
-                    <i class="ri-check-line me-2 align-bottom"></i> 
+                    <i class="ri-check-line me-2 align-bottom"></i>
                     Activas: {{ $totalActivas }}
                 </div>
             </div>
         </div>
-    
+
         <!-- Tarjeta de Vencidas -->
         <div class="col-xl-3 col-md-6">
             <div class="card bg-danger text-white mb-4">
                 <div class="card-body">
-                    <i class="ri-close-line me-2 align-bottom"></i> 
+                    <i class="ri-close-line me-2 align-bottom"></i>
                     Vencidas: {{ $totalVencidas }}
                 </div>
             </div>
         </div>
-    
+
         <!-- Tarjeta de Canceladas -->
         <div class="col-xl-3 col-md-6">
             <div class="card bg-warning text-white mb-4">
                 <div class="card-body">
-                    <i class="ri-forbid-line me-2 align-bottom"></i> 
+                    <i class="ri-forbid-line me-2 align-bottom"></i>
                     Canceladas: {{ $totalCanceladas }}
                 </div>
             </div>
         </div>
     </div>
-    
-    
 
     <!-- Pestañas para membresías y servicios -->
     <div class="row">
@@ -82,8 +80,8 @@
                             <i class="ri-add-line me-1"></i> Nueva Inscripción
                         </a>
                     </div>
-
                 </div>
+
                 <div class="card-body border-bottom-dashed border-bottom">
                     <!-- Formulario de filtros -->
                     <form method="GET" action="{{ route('admin.inscripciones.index') }}" class="mb-4">
@@ -133,8 +131,8 @@
                                 role="tab" aria-controls="membresias" aria-selected="true">Membresías</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="servicios-tab" data-bs-toggle="tab" href="#servicios"
-                                role="tab" aria-controls="servicios" aria-selected="false">Servicios</a>
+                            <a class="nav-link" id="servicios-tab" data-bs-toggle="tab" href="#servicios" role="tab"
+                                aria-controls="servicios" aria-selected="false">Servicios</a>
                         </li>
                     </ul>
                     <div class="tab-content" id="inscripcionesTabContent">
@@ -179,7 +177,7 @@
                                                         <i class="ri-eye-line"></i>
                                                     </button>
 
-                                                    <!-- Botón para imprimir comprobante (no funcional) -->
+                                                    <!-- Botón para imprimir comprobante -->
                                                     <button class="btn btn-secondary btn-sm" title="Imprimir Comprobante">
                                                         <i class="ri-printer-line"></i>
                                                     </button>
@@ -198,35 +196,16 @@
                                                         </form>
                                                     @endif
 
-                                                    @php
-                                                        $esMembresia = $inscripcion->detalleInscripciones
-                                                            ->where('tipoProducto', 'membresia')
-                                                            ->isNotEmpty();
-                                                        $esServicio = $inscripcion->detalleInscripciones
-                                                            ->where('tipoProducto', 'servicio')
-                                                            ->isNotEmpty();
-                                                    @endphp
-
-                                                    @if ($esMembresia && $inscripcion->estado == 'activa')
-                                                        <!-- Botón para generar credencial -->
+                                                    <!-- Botón para generar credencial y enviar por WhatsApp -->
+                                                    @if ($inscripcion->estado == 'activa')
                                                         <a href="{{ route('admin.inscripciones.generarCredencial', $inscripcion->idInscripcion) }}"
                                                             class="btn btn-primary btn-sm" title="Generar Credencial">
                                                             <i class="ri-qr-code-line"></i>
                                                         </a>
 
-                                                        <!-- Botón para enviar QR por WhatsApp -->
                                                         <a href="{{ route('admin.inscripciones.enviarWhatsapp', $inscripcion->idInscripcion) }}"
                                                             class="btn btn-success btn-sm" title="Enviar QR por WhatsApp">
                                                             <i class="ri-whatsapp-line"></i>
-                                                        </a>
-                                                    @endif
-
-                                                    @if ($esServicio)
-                                                        <!-- Botón para generar pase de entrada -->
-                                                        <a href="{{ route('admin.inscripciones.generarPase', $inscripcion->idInscripcion) }}"
-                                                            class="btn btn-warning btn-sm"
-                                                            title="Generar Pase de Entrada">
-                                                            <i class="ri-ticket-line"></i>
                                                         </a>
                                                     @endif
                                                 </td>
@@ -255,85 +234,75 @@
                                     <tbody class="list form-check-all">
                                         @foreach ($inscripcionesServicios as $inscripcion)
                                             <tr>
-                                                <td>{{ $inscripcion->cliente->nombre }}
-                                                    {{ $inscripcion->cliente->primerApellido }}</td>
-
+                                                <td>{{ $inscripcion->cliente->nombre }} {{ $inscripcion->cliente->primerApellido }}</td>
+                                    
                                                 @php
-                                                    $detalleServicio = $inscripcion->detalleInscripciones->firstWhere(
-                                                        'tipoProducto',
-                                                        'servicio',
-                                                    );
+                                                    // Verificar si la relación detallesInscripciones está cargada y no es null
+                                                    $detalleServicio = $inscripcion->detallesInscripciones
+                                                        ? $inscripcion->detallesInscripciones->firstWhere('tipoProducto', 'servicio')
+                                                        : null;
                                                 @endphp
-
-                                                <td>{{ $detalleServicio->seccion->servicio->nombre ?? 'Servicio no disponible' }}
-                                                </td>
-
+                                    
+                                                <td>{{ $detalleServicio && $detalleServicio->servicio ? $detalleServicio->servicio->nombre : 'Servicio no disponible' }}</td>
+                                    
                                                 <td>
-                                                    @if ($detalleServicio && isset($detalleServicio->seccion->fechaInicio))
-                                                        {{ \Carbon\Carbon::parse($detalleServicio->seccion->fechaInicio)->format('d/m/Y') }}
+                                                    @if ($detalleServicio && $detalleServicio->servicio)
+                                                        {{ $detalleServicio->servicio->fechaInicio ? \Carbon\Carbon::parse($detalleServicio->servicio->fechaInicio)->format('d/m/Y') : 'N/A' }}
                                                     @else
                                                         N/A
                                                     @endif
                                                 </td>
+                                    
                                                 <td>
-                                                    @if ($detalleServicio && isset($detalleServicio->seccion->fechaFin))
-                                                        {{ \Carbon\Carbon::parse($detalleServicio->seccion->fechaFin)->format('d/m/Y') }}
+                                                    @if ($detalleServicio && $detalleServicio->servicio)
+                                                        {{ $detalleServicio->servicio->fechaFin ? \Carbon\Carbon::parse($detalleServicio->servicio->fechaFin)->format('d/m/Y') : 'N/A' }}
                                                     @else
                                                         N/A
                                                     @endif
                                                 </td>
-
+                                    
                                                 <td>
                                                     <span
                                                         class="badge text-{{ $inscripcion->estado == 'activa' ? 'info' : ($inscripcion->estado == 'vencida' ? 'danger' : 'warning') }} fw-bold">
                                                         {{ ucfirst($inscripcion->estado) }}
                                                     </span>
                                                 </td>
-
+                                    
                                                 <td>{{ number_format($inscripcion->totalPago, 2) }}</td>
-
+                                    
                                                 <td>
                                                     <!-- Botones de acciones -->
-                                                    <button class="btn btn-info btn-sm btn-detalle"
-                                                        data-id="{{ $inscripcion->idInscripcion }}" title="Ver Detalle">
+                                                    <button class="btn btn-info btn-sm btn-detalle" data-id="{{ $inscripcion->idInscripcion }}" title="Ver Detalle">
                                                         <i class="ri-eye-line"></i>
                                                     </button>
-
+                                    
                                                     <button class="btn btn-secondary btn-sm" title="Imprimir Comprobante">
                                                         <i class="ri-printer-line"></i>
                                                     </button>
-
+                                    
                                                     @if ($inscripcion->estado != 'cancelada')
-                                                        <form
-                                                            action="{{ route('admin.inscripciones.cancelar', $inscripcion->idInscripcion) }}"
-                                                            method="POST" style="display:inline;">
+                                                        <form action="{{ route('admin.inscripciones.cancelar', $inscripcion->idInscripcion) }}" method="POST" style="display:inline;">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                                title="Anular Venta"
+                                                            <button type="submit" class="btn btn-danger btn-sm" title="Anular Venta"
                                                                 onclick="return confirm('¿Está seguro de anular esta venta?')">
                                                                 <i class="ri-delete-bin-line"></i>
                                                             </button>
                                                         </form>
                                                     @endif
-
-                                                    <a href="{{ route('admin.inscripciones.generarPase', $inscripcion->idInscripcion) }}"
-                                                        class="btn btn-warning btn-sm" title="Generar Pase de Entrada">
+                                    
+                                                    <a href="{{ route('admin.inscripciones.generarPase', $inscripcion->idInscripcion) }}" class="btn btn-warning btn-sm" title="Generar Pase de Entrada">
                                                         <i class="ri-ticket-line"></i>
                                                     </a>
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
-
-
+                                    
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Modal para ver detalle (mantener igual) -->
-                <!-- ... -->
             </div>
         </div>
     </div>

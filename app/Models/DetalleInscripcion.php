@@ -11,6 +11,7 @@ class DetalleInscripcion extends Model
 
     protected $table = 'detalle_inscripciones';
     protected $primaryKey = 'idDetalle';
+    public $timestamps = false;
 
     protected $fillable = [
         'idInscripcion',
@@ -24,22 +25,16 @@ class DetalleInscripcion extends Model
 
     public function inscripcion()
     {
-        return $this->belongsTo(Inscripcion::class, 'idInscripcion', 'idInscripcion');
+        return $this->belongsTo(Inscripcion::class, 'idInscripcion');
     }
 
     public function membresia()
     {
-        return $this->belongsTo(Membresia::class, 'idMembresia', 'idMembresia');
+        return $this->belongsTo(Membresia::class, 'idMembresia');
     }
 
     public function servicio()
     {
-        return $this->belongsTo(Servicio::class, 'idServicio', 'idServicio');
-    }
-
-
-    public function seccion()
-    {
-        return $this->belongsTo(Seccion::class, 'idSeccion', 'idSeccion');
+        return $this->belongsTo(Servicio::class, 'idServicio');
     }
 }

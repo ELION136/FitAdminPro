@@ -30,27 +30,25 @@ class Inscripcion extends Model
         'fechaInscripcion' => 'datetime',
 
     ];
-
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class, 'idCliente', 'idCliente');
+        return $this->belongsTo(Cliente::class, 'idCliente');
     }
 
     public function usuario()
     {
-        return $this->belongsTo(User::class, 'idUsuario', 'idUsuario');
+        return $this->belongsTo(User::class, 'idUsuario');
     }
 
-    public function detalleInscripciones()
+    public function detallesInscripciones()
     {
-        return $this->hasMany(DetalleInscripcion::class, 'idInscripcion', 'idInscripcion');
+        return $this->hasMany(DetalleInscripcion::class, 'idInscripcion');
     }
 
-    public function pagos()
+    public function asistencias()
     {
-        return $this->hasMany(Pago::class, 'idInscripcion', 'idInscripcion');
+        return $this->hasMany(Asistencia::class, 'idInscripcion');
     }
-
     public function isActiva()
     {
         return $this->estado === 'activa' && Carbon::now()->between($this->fechaInicio, $this->fechaFin);

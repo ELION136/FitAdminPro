@@ -18,8 +18,10 @@ class Membresia extends Model
         'descripcion',
         'duracionDias',
         'precio',
+        'fechaInicio',
+        'fechaFin',
         'idAutor',
-        'eliminado'
+        'eliminado',
     ];
 
     protected $casts = [
@@ -27,8 +29,8 @@ class Membresia extends Model
         'fechaModificacion' => 'datetime',
     ];
 
-    public function inscripciones()
+    public function detallesInscripciones()
     {
-        return $this->hasMany(DetalleInscripcion::class, 'idMembresia', 'idMembresia');
+        return $this->hasMany(DetalleInscripcion::class, 'idMembresia');
     }
 }

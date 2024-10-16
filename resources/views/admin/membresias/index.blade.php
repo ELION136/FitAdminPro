@@ -2,23 +2,21 @@
 
 @section('content')
     <!-- Título de página y botón -->
-
-
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
-                <h4 class="mb-sm-0">Lista de Membresias</h4>
+                <h4 class="mb-sm-0">Lista de Membresías</h4>
 
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"><a href="javascript: void(0);">Paginas</a></li>
-                        <li class="breadcrumb-item active">Membresias</li>
+                        <li class="breadcrumb-item active">Membresías</li>
                     </ol>
                 </div>
-
             </div>
         </div>
     </div>
+
     <!-- Tabla de membresías -->
     <div class="row">
         <div class="col-12">
@@ -46,12 +44,10 @@
                                 @php $contador = 1; @endphp <!-- Inicializamos el contador -->
                                 @foreach ($membresias as $membresia)
                                     <tr>
-
-                                        <td>{{ $contador++ }}</td> 
+                                        <td>{{ $contador++ }}</td>
                                         <td>{{ $membresia->nombre }}</td>
-                                        <td>
-                                            {{ strlen($membresia->descripcion) > 50 ? substr($membresia->descripcion, 0, 50) . '...' : $membresia->descripcion }}
-                                        </td>                                        
+                                        <td>{{ strlen($membresia->descripcion) > 50 ? substr($membresia->descripcion, 0, 50) . '...' : $membresia->descripcion }}
+                                        </td>
                                         <td>{{ $membresia->duracionDias }}</td>
                                         <td>{{ number_format($membresia->precio, 2, '.', ',') }} BOB</td>
                                         <td>
@@ -62,6 +58,7 @@
                                             <button class="btn btn-danger btn-sm"
                                                 onclick="deleteMembresia({{ $membresia->idMembresia }})">
                                                 <i class="ri-delete-bin-fill align-bottom"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -71,7 +68,6 @@
                 </div>
             </div>
         </div>
-    </div>
     </div>
 
     <!-- Modal Crear/Editar Membresía -->
@@ -114,122 +110,114 @@
                             <input type="number" step="0.01" class="form-control" id="precio" name="precio"
                                 required>
                         </div>
+
+                        <!-- Fecha de Inicio -->
+                        <div class="mb-3">
+                            <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
+                            <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
                 </form>
+
             </div>
         </div>
-    @endsection
-
-    @push('scripts')
-        <script>
-            $(document).ready(function() {
-                $('#reservaTable').DataTable({
-                    lengthMenu: [5, 10, 25, 50, 100],
-                    pageLength: 5,
-                    language: {
-                        lengthMenu: "Mostrar _MENU_ registros por página",
-                        decimal: "",
-                        emptyTable: "No hay datos disponibles en la tabla",
-                        info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-                        infoEmpty: "Mostrando 0 a 0 de 0 entradas",
-                        infoFiltered: "(filtrado de _MAX_ entradas totales)",
-                        loadingRecords: "Cargando...",
-                        processing: "Procesando...",
-                        search: "Buscar:",
-                        zeroRecords: "No se encontraron registros coincidentes",
-                        paginate: {
-                            first: "Primero",
-                            last: "Último",
-                            next: "Siguiente",
-                            previous: "Anterior"
-                        },
-                        aria: {
-                            sortAscending: ": activar para ordenar la columna de manera ascendente",
-                            sortDescending: ": activar para ordenar la columna de manera descendente"
-                        }
-                    },
-                });
+    </div>
+@endsection
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            // Inicializar DataTable
+            $('#reservaTable').DataTable({
+                lengthMenu: [5, 10, 25, 50, 100],
+                pageLength: 5,
+                language: {
+                    lengthMenu: "Mostrar _MENU_ registros por página",
+                    emptyTable: "No hay datos disponibles en la tabla",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                    infoEmpty: "Mostrando 0 a 0 de 0 entradas",
+                    infoFiltered: "(filtrado de _MAX_ entradas totales)",
+                    loadingRecords: "Cargando...",
+                    processing: "Procesando...",
+                    search: "Buscar:",
+                    zeroRecords: "No se encontraron registros coincidentes",
+                    paginate: {
+                        first: "Primero",
+                        last: "Último",
+                        next: "Siguiente",
+                        previous: "Anterior"
+                    }
+                },
             });
 
-            let form = document.getElementById('formMembresia');
+            let $form = $('#formMembresia');
 
             // Función para abrir el modal de creación de una nueva membresía
-            function createMembresia() {
-                form.reset(); // Restablecer los campos del formulario
-                form.membresiaId.value = ''; // Limpiar el campo de ID
-                document.getElementById('modalMembresiaLabel').textContent = 'Añadir Membresía'; // Cambiar el título del modal
-                new bootstrap.Modal(document.getElementById('modalMembresia')).show(); // Mostrar el modal
-            }
+            window.createMembresia = function() {
+                $form[0].reset();
+                $('#membresiaId').val('');
+                $('#modalMembresiaLabel').text('Añadir Membresía');
+                $('#modalMembresia').modal('show');
+            };
 
             // Función para abrir el modal de edición de una membresía existente
-            function editMembresia(membresia) {
-                form.reset(); // Restablecer los campos del formulario
-                form.membresiaId.value = membresia.idMembresia; // Asignar el ID de la membresía
-                form.nombre.value = membresia.nombre;
-                form.descripcion.value = membresia.descripcion;
-                form.duracionDias.value = membresia.duracionDias;
-                form.precio.value = membresia.precio;
-                document.getElementById('modalMembresiaLabel').textContent = 'Editar Membresía'; // Cambiar el título del modal
-                new bootstrap.Modal(document.getElementById('modalMembresia')).show(); // Mostrar el modal
-            }
+            window.editMembresia = function(membresia) {
+                $form[0].reset();
+                $('#membresiaId').val(membresia.idMembresia);
+                $('#nombre').val(membresia.nombre);
+                $('#descripcion').val(membresia.descripcion);
+                $('#duracionDias').val(membresia.duracionDias);
+                $('#precio').val(membresia.precio);
+                $('#fechaInicio').val(membresia.fechaInicio);
+                $('#modalMembresiaLabel').text('Editar Membresía');
+                $('#modalMembresia').modal('show');
+            };
 
             // Crear o Editar Membresía
-            form.addEventListener('submit', function(e) {
+            $form.on('submit', function(e) {
                 e.preventDefault();
-                let membresiaId = form.membresiaId.value;
+                let membresiaId = $('#membresiaId').val();
                 let url = membresiaId ? `{{ route('admin.membresias.update', '') }}/${membresiaId}` :
                     `{{ route('admin.membresias.store') }}`;
-                let formData = new FormData(form);
+                let formData = $form.serialize(); // Serializar el formulario
 
                 if (membresiaId) {
-                    formData.append('_method', 'PUT');
+                    formData += '&_method=PUT';
                 }
 
-                fetch(url, {
-                        method: 'POST', // Usamos POST para enviar, aunque sea un PUT o DELETE con _method
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        },
-                        body: formData
+                $.post(url, formData)
+                    .done(function(data) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: 'Membresía guardada correctamente',
+                            confirmButtonText: 'Aceptar'
+                        }).then(() => {
+                            location.reload();
+                        });
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.errors) {
-                            let errors = Object.values(data.errors).map(err => err.join('<br>')).join('<br>');
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                html: errors,
-                                confirmButtonText: 'Aceptar'
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Éxito',
-                                text: 'Membresía guardada correctamente',
-                                confirmButtonText: 'Aceptar'
-                            }).then(() => {
-                                location.reload();
-                            });
+                    .fail(function(xhr) {
+                        let errorMessage = 'Ha ocurrido un error en el servidor';
+                        let errors = xhr.responseJSON?.errors;
+
+                        if (errors) {
+                            errorMessage = Object.values(errors).flat().join('<br>');
                         }
-                    })
-                    .catch(error => {
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Ha ocurrido un error en el servidor',
+                            html: errorMessage,
                             confirmButtonText: 'Aceptar'
                         });
-                        console.error('Error:', error);
                     });
             });
 
             // Función para eliminar una membresía
-            function deleteMembresia(id) {
+            window.deleteMembresia = function(id) {
                 Swal.fire({
                     title: '¿Estás seguro?',
                     text: "No podrás revertir esto",
@@ -241,40 +229,35 @@
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch(`{{ route('admin.membresias.destroy', '') }}/${id}`, {
-                                method: 'POST', // Usamos POST para enviar el _method: DELETE
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    _method: 'DELETE'
-                                })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Eliminado',
-                                        text: 'La membresía ha sido eliminada correctamente',
-                                        confirmButtonText: 'Aceptar'
-                                    }).then(() => {
-                                        location.reload();
-                                    });
-                                }
-                            })
-                            .catch(error => {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: 'Ha ocurrido un error en el servidor',
-                                    confirmButtonText: 'Aceptar'
-                                });
-                                console.error('Error:', error);
+                        $.ajax({
+                            url: `{{ route('admin.membresias.destroy', '') }}/${id}`,
+                            type: 'POST',
+                            data: {
+                                _method: 'DELETE',
+                                _token: $('meta[name="csrf-token"]').attr('content')
+                            }
+                        })
+                        .done(function(data) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Eliminado',
+                                text: 'La membresía ha sido eliminada correctamente',
+                                confirmButtonText: 'Aceptar'
+                            }).then(() => {
+                                location.reload();
                             });
+                        })
+                        .fail(function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Ha ocurrido un error en el servidor',
+                                confirmButtonText: 'Aceptar'
+                            });
+                        });
                     }
                 });
-            }
-        </script>
-    @endpush
+            };
+        });
+    </script>
+@endpush

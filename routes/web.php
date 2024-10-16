@@ -83,10 +83,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/admin/servicios/{id}', [App\Http\Controllers\ServiciosController::class, 'destroy'])->name('admin.servicios.destroy');
 
 
-    Route::get('/admin/secciones', [App\Http\Controllers\SeccionController::class, 'index'])->name('admin.secciones.index');
-    Route::post('/admin/secciones', [App\Http\Controllers\SeccionController::class, 'store'])->name('admin.secciones.store');
-    Route::put('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'update'])->name('admin.secciones.update');
-    Route::delete('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'destroy'])->name('admin.secciones.destroy');
+   // Route::get('/admin/secciones', [App\Http\Controllers\SeccionController::class, 'index'])->name('admin.secciones.index');
+   // Route::post('/admin/secciones', [App\Http\Controllers\SeccionController::class, 'store'])->name('admin.secciones.store');
+   // Route::put('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'update'])->name('admin.secciones.update');
+   // Route::delete('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'destroy'])->name('admin.secciones.destroy');
 
 
 
@@ -96,7 +96,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/inscripciones/{id}/generar-credencial', [App\Http\Controllers\InscripcionController::class, 'generarCredencial'])->name('admin.inscripciones.generarCredencial');
     Route::get('/admin/inscripciones/{id}/enviar-whatsapp', [App\Http\Controllers\InscripcionController::class, 'enviarWhatsapp'])->name('admin.inscripciones.enviarWhatsapp');
     Route::get('/admin/inscripciones/{id}/generar-pase', [App\Http\Controllers\InscripcionController::class, 'generarPase'])->name('admin.inscripciones.generarPase');
-
+    Route::get('/admin/inscripciones/crear', [App\Http\Controllers\InscripcionController::class, 'create'])->name('admin.inscripciones.create');
+    Route::post('/admin/inscripciones', [App\Http\Controllers\InscripcionController::class, 'store'])->name('admin.inscripciones.store');
 
 
 
