@@ -39,7 +39,8 @@
                                 @enderror
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="primerApellido" class="form-label">Primer Apellido<span style="color: red">*</span></label>
+                                <label for="primerApellido" class="form-label">Primer Apellido<span
+                                        style="color: red">*</span></label>
                                 <input type="text" class="form-control @error('primerApellido') is-invalid @enderror"
                                     id="primerApellido" name="primerApellido" value="{{ old('primerApellido') }}" required>
                                 @error('primerApellido')
@@ -59,7 +60,8 @@
                                 @enderror
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento<span style="color: red">*</span></label>
+                                <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento<span
+                                        style="color: red">*</span></label>
                                 <input type="date" class="form-control @error('fechaNacimiento') is-invalid @enderror"
                                     id="fechaNacimiento" name="fechaNacimiento" value="{{ old('fechaNacimiento') }}"
                                     max="{{ date('Y-m-d') }}" required>
@@ -71,10 +73,13 @@
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                                 <label for="genero" class="form-label">Género<span style="color: red">*</span></label>
-                                <select class="form-control @error('genero') is-invalid @enderror" id="genero" name="genero" required>
+                                <select class="form-control @error('genero') is-invalid @enderror" id="genero"
+                                    name="genero" required>
                                     <option value="" disabled selected>Seleccione</option>
-                                    <option value="Masculino" {{ old('genero') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
-                                    <option value="Femenino" {{ old('genero') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
+                                    <option value="Masculino" {{ old('genero') == 'Masculino' ? 'selected' : '' }}>
+                                        Masculino</option>
+                                    <option value="Femenino" {{ old('genero') == 'Femenino' ? 'selected' : '' }}>Femenino
+                                    </option>
                                     <option value="Otro" {{ old('genero') == 'Otro' ? 'selected' : '' }}>Otro</option>
                                 </select>
                                 @error('genero')
@@ -84,7 +89,8 @@
                                 @enderror
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="fechaContratacion" class="form-label">Fecha de Contratación<span style="color: red">*</span></label>
+                                <label for="fechaContratacion" class="form-label">Fecha de Contratación<span
+                                        style="color: red">*</span></label>
                                 <input type="date" class="form-control @error('fechaContratacion') is-invalid @enderror"
                                     id="fechaContratacion" name="fechaContratacion" value="{{ old('fechaContratacion') }}"
                                     max="{{ date('Y-m-d') }}" required>
@@ -115,16 +121,27 @@
                                 @enderror
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                <label for="especialidad" class="form-label">Especialidad<span style="color: red">*</span></label>
-                                <select class="form-control @error('especialidad') is-invalid @enderror"
-                                    id="especialidad" name="especialidad" required>
+                                <label for="especialidad" class="form-label">Especialidad<span
+                                        style="color: red">*</span></label>
+                                <select class="form-control @error('especialidad') is-invalid @enderror" id="especialidad"
+                                    name="especialidad" required>
                                     <option value="" disabled selected>Seleccione una especialidad</option>
-                                    <option value="Entrenamiento Personal" {{ old('especialidad') == 'Entrenamiento Personal' ? 'selected' : '' }}>Entrenamiento Personal</option>
-                                    <option value="Entrenamiento Cardiovascular" {{ old('especialidad') == 'Entrenamiento Cardiovascular' ? 'selected' : '' }}>Entrenamiento Cardiovascular</option>
-                                    <option value="Boxeo" {{ old('especialidad') == 'Boxeo' ? 'selected' : '' }}>Boxeo</option>
-                                    <option value="Entrenamiento de Resistencia" {{ old('especialidad') == 'Entrenamiento de Resistencia' ? 'selected' : '' }}>Entrenamiento de Resistencia</option>
-                                    <option value="Nutrición y Bienestar" {{ old('especialidad') == 'Nutrición y Bienestar' ? 'selected' : '' }}>Nutrición y Bienestar</option>
-                                    <option value="Otro" {{ old('especialidad') == 'Otro' ? 'selected' : '' }}>Otro</option>
+                                    <option value="Entrenamiento Personal"
+                                        {{ old('especialidad') == 'Entrenamiento Personal' ? 'selected' : '' }}>
+                                        Entrenamiento Personal</option>
+                                    <option value="Entrenamiento Cardiovascular"
+                                        {{ old('especialidad') == 'Entrenamiento Cardiovascular' ? 'selected' : '' }}>
+                                        Entrenamiento Cardiovascular</option>
+                                    <option value="Boxeo" {{ old('especialidad') == 'Boxeo' ? 'selected' : '' }}>Boxeo
+                                    </option>
+                                    <option value="Entrenamiento de Resistencia"
+                                        {{ old('especialidad') == 'Entrenamiento de Resistencia' ? 'selected' : '' }}>
+                                        Entrenamiento de Resistencia</option>
+                                    <option value="Nutrición y Bienestar"
+                                        {{ old('especialidad') == 'Nutrición y Bienestar' ? 'selected' : '' }}>Nutrición y
+                                        Bienestar</option>
+                                    <option value="Otro" {{ old('especialidad') == 'Otro' ? 'selected' : '' }}>Otro
+                                    </option>
                                 </select>
                                 @error('especialidad')
                                     <div class="invalid-feedback">
@@ -134,7 +151,8 @@
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                                 <label for="descripcion" class="form-label">Descripción</label>
-                                <textarea class="form-control @error('descripcion') is-invalid @enderror" id="descripcion" name="descripcion" rows="2">{{ old('descripcion') }}</textarea>
+                                <textarea class="form-control @error('descripcion') is-invalid @enderror" id="descripcion" name="descripcion"
+                                    rows="2">{{ old('descripcion') }}</textarea>
                                 @error('descripcion')
                                     <div class="invalid-feedback">
                                         {{ $message }}
@@ -153,7 +171,8 @@
                             </div>
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
                                 <div class="d-flex justify-content-end">
-                                    <a href="{{ route('admin.entrenadores.index') }}" class="btn btn-danger me-2">Volver</a>
+                                    <a href="{{ route('admin.entrenadores.index') }}"
+                                        class="btn btn-danger me-2">Volver</a>
                                     <button type="submit" class="btn btn-primary">Crear un nuevo registro</button>
                                 </div>
                             </div>

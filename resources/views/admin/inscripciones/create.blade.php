@@ -1,137 +1,424 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h2 class="mb-4">Nueva Inscripción</h2>
+    <div class="container">
+        <h1 class="mb-4">Nueva Inscripción</h1>
 
-    @if(session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <form action="{{ route('admin.inscripciones.store') }}" method="POST" id="inscripcionForm">
-        @csrf
-        <div class="mb-3">
-            <label for="idCliente" class="form-label">Cliente</label>
-            <select name="idCliente" id="idCliente" class="form-select" required>
-                <option value="">Seleccione un cliente</option>
-                @foreach($clientes as $cliente)
-                    <option value="{{ $cliente->idCliente }}">{{ $cliente->nombre }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label for="tipoProducto" class="form-label">Tipo de Producto</label>
-            <select name="tipoProducto" id="tipoProducto" class="form-select" required>
-                <option value="">Seleccione el tipo de producto</option>
-                <option value="membresia">Membresía</option>
-                <option value="servicio">Servicio</option>
-            </select>
-        </div>
-
-        <div id="membresiaOptions" style="display: none;">
-            <div class="mb-3">
-                <label for="idMembresia" class="form-label">Membresía</label>
-                <select name="idMembresia" id="idMembresia" class="form-select">
-                    <option value="">Seleccione una membresía</option>
-                    @foreach($membresias as $membresia)
-                        <option value="{{ $membresia->idMembresia }}" data-precio="{{ $membresia->precio }}">
-                            {{ $membresia->nombre }} - ${{ number_format($membresia->precio, 2) }}
-                        </option>
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->any() ? $errors->all() : [] as $error)
+                        <li>{{ $error }}</li>
                     @endforeach
-                </select>
+                </ul>
             </div>
-        </div>
+        @endif
 
-        <div id="servicioOptions" style="display: none;">
-            <div class="mb-3">
-                <label for="idSeccion" class="form-label">Sección</label>
-                <select name="idSeccion" id="idSeccion" class="form-select">
-                    <option value="">Seleccione una sección</option>
-                    @foreach($secciones as $seccion)
-                        <option value="{{ $seccion->idSeccion }}" data-precio="{{ $seccion->precioPorSeccion }}" data-capacidad="{{ $seccion->capacidad }}">
-                            {{ $seccion->nombre }} - ${{ number_format($seccion->precioPorSeccion, 2) }} por sección
-                        </option>
+        @if (session('success'))
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '{{ session('success') }}',
+                });
+            </script>
+        @endif
+
+        <form id="inscripcionForm" action="{{ route('admin.inscripciones.store') }}" method="POST">
+            @csrf
+
+            <!-- Card para selección de cliente y tipo de producto -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    Datos de la Inscripción
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="idCliente">Cliente</label>
+                        <select name="idCliente" class="form-control" id="idCliente" required></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de Producto</label>
+                        <div class="d-flex">
+                            <div class="custom-control custom-radio mr-3">
+                                <input type="radio" id="tipoMembresia" name="tipoProducto" value="membresia"
+                                    class="custom-control-input" required>
+                                <label class="custom-control-label" for="tipoMembresia">Membresía</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" id="tipoServicio" name="tipoProducto" value="servicio"
+                                    class="custom-control-input">
+                                <label class="custom-control-label" for="tipoServicio">Servicio</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card para Membresías -->
+            <div id="membresiasContainer" class="mb-4" style="display: none;">
+                <h3 class="mt-4">Selecciona una Membresía</h3>
+                <div class="card-deck">
+                    @foreach ($membresias as $membresia)
+                        <div class="card membresia-card" style="cursor: pointer;" data-id="{{ $membresia->idMembresia }}"
+                            data-precio="{{ $membresia->precio }}">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ $membresia->nombre }}</h5>
+                                <p class="card-text">{{ $membresia->descripcion }}</p>
+                                <p class="card-text"><strong>Precio:</strong> Bs{{ number_format($membresia->precio, 2) }}
+                                </p>
+                            </div>
+                        </div>
                     @endforeach
-                </select>
+                </div>
+                <input type="hidden" name="idMembresia" id="idMembresia">
             </div>
-            <div class="mb-3">
-                <label for="cantidadSecciones" class="form-label">Cantidad de Secciones</label>
-                <input type="number" name="cantidadSecciones" id="cantidadSecciones" class="form-control" min="1" value="1">
+
+            <!-- Card para Servicios -->
+            <div id="serviciosContainer" class="mb-4" style="display: none;">
+                <h3 class="mt-4">Selecciona Servicios</h3>
+                <div class="card">
+                    <div class="card-body">
+                        <button type="button" class="btn btn-primary mb-3" data-toggle="modal"
+                            data-target="#serviciosModal">Elegir Servicios</button>
+                        <!-- Mostrar servicios seleccionados -->
+                        <div id="serviciosSeleccionados" class="mt-3"></div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="mb-3">
-            <label for="totalPago" class="form-label">Total a Pagar</label>
-            <input type="number" name="totalPago" id="totalPago" class="form-control" readonly>
-        </div>
+            <!-- Modal para Selección de Servicios -->
+            <div class="modal fade" id="serviciosModal" tabindex="-1" role="dialog" aria-labelledby="serviciosModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="serviciosModalLabel">Selecciona los Servicios</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="tablaServicios">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Seleccionar</th>
+                                            <th>Nombre</th>
+                                            <th>Descripción</th>
+                                            <th>Precio (Bs)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($servicios as $servicio)
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" class="servicio-checkbox"
+                                                        data-id="{{ $servicio->idServicio }}"
+                                                        data-nombre="{{ $servicio->nombre }}"
+                                                        data-precio="{{ $servicio->precioTotal }}">
+                                                </td>
+                                                <td>{{ $servicio->nombre }}</td>
+                                                <td>{{ $servicio->descripcion }}</td>
+                                                <td>Bs{{ number_format($servicio->precioTotal, 2) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-primary" id="btnAgregarServicios">Agregar
+                                Servicios</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <button type="submit" class="btn btn-primary">Crear Inscripción</button>
-    </form>
-</div>
+            <!-- Card para Detalle de Venta -->
+            <div id="detalleVenta" class="mb-4" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        Detalle de la Venta
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Precio Unitario (Bs)</th>
+                                        <th>Descuento (%)</th>
+                                        <th>Precio Final (Bs)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detalleProductos">
+                                    <!-- Productos seleccionados se mostrarán aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Botón para aplicar descuentos -->
+                        <button type="button" class="btn btn-info" id="btnAplicarDescuentos">Aplicar Descuentos</button>
+                    </div>
+                </div>
+            </div>
 
-@endsection
+            <!-- Mostrar el total calculado -->
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h3>Total a Pagar: Bs<span id="totalPagar">0.00</span></h3>
+                </div>
+            </div>
 
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const tipoProductoSelect = document.getElementById('tipoProducto');
-    const membresiaOptions = document.getElementById('membresiaOptions');
-    const servicioOptions = document.getElementById('servicioOptions');
-    const idMembresiaSelect = document.getElementById('idMembresia');
-    const idSeccionSelect = document.getElementById('idSeccion');
-    const cantidadSeccionesInput = document.getElementById('cantidadSecciones');
-    const totalPagoInput = document.getElementById('totalPago');
+            <button type="submit" class="btn btn-success btn-block">Registrar Inscripción</button>
+        </form>
+    </div>
 
-    tipoProductoSelect.addEventListener('change', function() {
-        if (this.value === 'membresia') {
-            membresiaOptions.style.display = 'block';
-            servicioOptions.style.display = 'none';
-        } else if (this.value === 'servicio') {
-            membresiaOptions.style.display = 'none';
-            servicioOptions.style.display = 'block';
-        } else {
-            membresiaOptions.style.display = 'none';
-            servicioOptions.style.display = 'none';
-        }
-        calcularTotal();
-    });
+    <!-- Incluir jQuery y Select2 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
 
-    idMembresiaSelect.addEventListener('change', calcularTotal);
-    idSeccionSelect.addEventListener('change', calcularTotal);
-    cantidadSeccionesInput.addEventListener('input', calcularTotal);
+    <!-- Incluir Bootstrap JS si aún no lo tienes -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    function calcularTotal() {
-        let total = 0;
-        if (tipoProductoSelect.value === 'membresia' && idMembresiaSelect.value) {
-            const selectedOption = idMembresiaSelect.options[idMembresiaSelect.selectedIndex];
-            total = parseFloat(selectedOption.dataset.precio);
-        } else if (tipoProductoSelect.value === 'servicio' && idSeccionSelect.value) {
-            const selectedOption = idSeccionSelect.options[idSeccionSelect.selectedIndex];
-            const precioPorSeccion = parseFloat(selectedOption.dataset.precio);
-            const cantidadSecciones = parseInt(cantidadSeccionesInput.value) || 0;
-            total = precioPorSeccion * cantidadSecciones;
-        }
-        totalPagoInput.value = total.toFixed(2);
-    }
+    <!-- Incluir SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
-    document.getElementById('inscripcionForm').addEventListener('submit', function(e) {
-        const tipoProducto = tipoProductoSelect.value;
-        const idSeccion = idSeccionSelect.value;
-        const cantidadSecciones = parseInt(cantidadSeccionesInput.value) || 0;
+    <script>
+        $(document).ready(function() {
+            // Búsqueda de clientes en tiempo real
+            $('#idCliente').select2({
+                ajax: {
+                    url: '{{ route('admin.inscripciones.searchCliente') }}',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            term: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data
+                        };
+                    },
+                    cache: true
+                },
+                placeholder: 'Buscar cliente...',
+                minimumInputLength: 1,
+            });
 
-        if (tipoProducto === 'servicio' && idSeccion) {
-            const selectedOption = idSeccionSelect.options[idSeccionSelect.selectedIndex];
-            const capacidad = parseInt(selectedOption.dataset.capacidad);
+            // Mostrar contenedores según el tipo de producto
+            $('input[name="tipoProducto"]').change(function() {
+                if ($(this).val() == 'membresia') {
+                    $('#membresiasContainer').show();
+                    $('#serviciosContainer').hide();
+                    $('#detalleVenta').hide();
+                    $('#serviciosSeleccionados').empty();
+                    resetServicios();
+                    calcularTotal();
+                } else if ($(this).val() == 'servicio') {
+                    $('#serviciosContainer').show();
+                    $('#membresiasContainer').hide();
+                    $('#detalleVenta').hide();
+                    $('#idMembresia').val('');
+                    $('.membresia-card').removeClass('border-primary');
+                    calcularTotal();
+                }
+            });
 
-            if (cantidadSecciones > capacidad) {
-                e.preventDefault();
-                alert(`La sección seleccionada solo tiene capacidad para ${capacidad} secciones.`);
+            // Selección de membresía
+            var productosSeleccionados = [];
+            $('.membresia-card').click(function() {
+                $('.membresia-card').removeClass('border-primary');
+                $(this).addClass('border-primary');
+                let idMembresia = $(this).data('id');
+                let nombre = $(this).find('.card-title').text();
+                let precio = parseFloat($(this).data('precio'));
+                $('#idMembresia').val(idMembresia);
+                productosSeleccionados = [];
+                productosSeleccionados.push({
+                    tipoProducto: 'membresia',
+                    idProducto: idMembresia,
+                    nombre: nombre,
+                    precio: precio,
+                    descuento: 0,
+                    tipoDescuento: 'ninguno'
+                });
+                mostrarDetalleVenta();
+                calcularTotal();
+            });
+
+            // Manejo de servicios en el modal
+            var serviciosSeleccionadosData = {};
+
+            $('#btnAgregarServicios').click(function() {
+                productosSeleccionados = [];
+                $('.servicio-checkbox:checked').each(function() {
+                    let id = $(this).data('id');
+                    let nombre = $(this).data('nombre');
+                    let precio = parseFloat($(this).data('precio'));
+                    productosSeleccionados.push({
+                        tipoProducto: 'servicio',
+                        idProducto: id,
+                        nombre: nombre,
+                        precio: precio,
+                        descuento: 0,
+                        tipoDescuento: 'ninguno',
+                        extras: null,
+                        precioExtras: 0
+                    });
+                });
+                $('#serviciosModal').modal('hide');
+                mostrarDetalleVenta();
+                calcularTotal();
+            });
+
+            // Función para resetear servicios seleccionados
+            function resetServicios() {
+                $('.servicio-checkbox').prop('checked', false);
+                serviciosSeleccionadosData = {};
+                productosSeleccionados = [];
             }
-        }
-    });
-});
-</script>
-@endpush
+
+            // Mostrar detalle de la venta
+            function mostrarDetalleVenta() {
+                if (productosSeleccionados.length > 0) {
+                    $('#detalleVenta').show();
+                    let tbody = $('#detalleProductos');
+                    tbody.empty();
+                    productosSeleccionados.forEach(function(producto, index) {
+                        let precioFinal = producto.precio - (producto.precio * (producto.descuento || 0) /
+                            100);
+                        let row = '<tr>' +
+                            '<td>' + producto.nombre + '</td>' +
+                            '<td>Bs' + producto.precio.toFixed(2) + '</td>' +
+                            '<td>' + (producto.descuento || 0) + '%</td>' +
+                            '<td>Bs' + precioFinal.toFixed(2) + '</td>' +
+                            '</tr>';
+                        tbody.append(row);
+                    });
+                } else {
+                    $('#detalleVenta').hide();
+                }
+            }
+
+            // Calcular el total a pagar
+            function calcularTotal() {
+                let total = 0;
+                productosSeleccionados.forEach(function(producto) {
+                    let precioFinal = producto.precio - (producto.precio * (producto.descuento || 0) / 100);
+                    total += precioFinal;
+                });
+                $('#totalPagar').text(total.toFixed(2));
+            }
+
+            // Botón para aplicar descuentos
+            $('#btnAplicarDescuentos').click(function() {
+                let index = 0;
+
+                function solicitarDescuento() {
+                    if (index < productosSeleccionados.length) {
+                        let producto = productosSeleccionados[index];
+                        Swal.fire({
+                            title: 'Aplicar Descuento a ' + producto.nombre,
+                            html: '<select id="descuentoSelect" class="swal2-input">' +
+                                '<option value="0">0%</option>' +
+                                '<option value="5">5%</option>' +
+                                '<option value="10">10%</option>' +
+                                '<option value="20">20%</option>' +
+                                '</select>',
+                            showCancelButton: true,
+                            confirmButtonText: 'Guardar',
+                            preConfirm: () => {
+                                return {
+                                    descuento: parseFloat(document.getElementById(
+                                        'descuentoSelect').value) || 0,
+                                    tipoDescuento: 'promocion' // Puedes ajustar esto si necesitas tipos diferentes
+                                }
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                producto.descuento = result.value.descuento;
+                                producto.tipoDescuento = result.value.tipoDescuento;
+                                index++;
+                                solicitarDescuento();
+                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                index++;
+                                solicitarDescuento();
+                            } else {
+                                // Do nothing
+                            }
+                        });
+                    } else {
+                        mostrarDetalleVenta();
+                        calcularTotal();
+                    }
+                }
+                solicitarDescuento();
+            });
+
+            // Al enviar el formulario, recopilar los datos necesarios
+            $('#inscripcionForm').submit(function(event) {
+                if (productosSeleccionados.length == 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Debe seleccionar al menos un producto.'
+                    });
+                    event.preventDefault();
+                    return false;
+                }
+
+                let productosInput = $('<input>').attr({
+                    type: 'hidden',
+                    name: 'productos',
+                    value: JSON.stringify(productosSeleccionados)
+                });
+                $(this).append(productosInput);
+                setTimeout(function() {
+                    // Aquí puedes validar la respuesta del servidor o el resultado
+                    generarComprobantePDF(); // Llamar la función para generar el comprobante
+                }, 500);
+            });
+
+            function generarComprobantePDF() {
+                const {
+                    jsPDF
+                } = window.jspdf;
+                const doc = new jsPDF();
+
+                // Datos de ejemplo, puedes obtenerlos dinámicamente
+                var cliente = $('#idCliente option:selected').text();
+                var productos = productosSeleccionados;
+                var totalPagar = $('#totalPagar').text();
+
+                // Crear el PDF
+                doc.setFontSize(18);
+                doc.text('Comprobante de Inscripción', 10, 10);
+
+                doc.setFontSize(12);
+                doc.text('Cliente: ' + cliente, 10, 20);
+
+                let yPosition = 30;
+                productos.forEach(function(producto) {
+                    doc.text(`Producto: ${producto.nombre}`, 10, yPosition);
+                    doc.text(`Precio: Bs${producto.precio}`, 10, yPosition + 10);
+                    doc.text(`Descuento: ${producto.descuento}%`, 10, yPosition + 20);
+                    let precioFinal = producto.precio - (producto.precio * (producto.descuento || 0) / 100);
+                    doc.text(`Precio Final: Bs${precioFinal.toFixed(2)}`, 10, yPosition + 30);
+                    yPosition += 40;
+                });
+
+                // Total
+                doc.text(`Total Pagado: Bs${totalPagar}`, 10, yPosition + 10);
+
+                // Descargar automáticamente el PDF o abrir en una nueva ventana
+                doc.save('comprobante_inscripcion.pdf');
+            }
+        });
+    </script>
+@endsection

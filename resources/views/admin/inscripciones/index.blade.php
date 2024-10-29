@@ -76,7 +76,7 @@
                 <div class="card-header border-bottom-dashed">
                     <h5 class="card-title mb-0">Lista de Inscripciones</h5>
                     <div class="mb-3">
-                        <a href="#" class="btn btn-success">
+                        <a href="{{ route('admin.inscripciones.create') }}" class="btn btn-success">
                             <i class="ri-add-line me-1"></i> Nueva Inscripción
                         </a>
                     </div>
@@ -149,6 +149,7 @@
                                             <th>Fecha Inicio</th>
                                             <th>Fecha Fin</th>
                                             <th>Estado</th>
+                                            <th>Código QR</th>
                                             <th>Monto Pagado</th>
                                             <th>Acciones</th>
                                         </tr>
@@ -169,44 +170,46 @@
                                                         {{ ucfirst($inscripcion->estado) }}
                                                     </span>
                                                 </td>
+                                                <td>
+                                                    @if ($inscripcion->cliente->qrCode)
+                                                        <img src="{{ asset('storage/' . $inscripcion->cliente->qrCode) }}"
+                                                            alt="Código QR de cliente" width="100">
+                                                    @else
+                                                        <p>Sin QR generado</p>
+                                                    @endif
+                                                </td>
                                                 <td>{{ number_format($inscripcion->montoPago, 2) }}</td>
                                                 <td>
                                                     <!-- Botón para ver detalle (modal) -->
-                                                    <button class="btn btn-info btn-sm btn-detalle"
-                                                        data-id="{{ $inscripcion->idInscripcion }}" title="Ver Detalle">
-                                                        <i class="ri-eye-line"></i>
-                                                    </button>
+
 
                                                     <!-- Botón para imprimir comprobante -->
-                                                    <button class="btn btn-secondary btn-sm" title="Imprimir Comprobante">
+                                                    <a href="javascript:void(0);"
+                                                        onclick="abrirVentanaPDF({{ $inscripcion->idInscripcion }})"
+                                                        class="btn btn-info btn-sm" title="Imprimir Comprobante">
                                                         <i class="ri-printer-line"></i>
-                                                    </button>
+                                                    </a>
 
                                                     <!-- Botón para anular venta -->
                                                     @if ($inscripcion->estado != 'cancelada')
-                                                        <form
-                                                            action="{{ route('admin.inscripciones.cancelar', $inscripcion->idInscripcion) }}"
-                                                            method="POST" style="display:inline;">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                                title="Anular Venta"
-                                                                onclick="return confirm('¿Está seguro de anular esta venta?')">
-                                                                <i class="ri-delete-bin-line"></i>
-                                                            </button>
-                                                        </form>
+                                                    <form action="{{ route('admin.inscripciones.cancelar', $inscripcion->idInscripcion) }}" method="POST" style="display:inline;">
+                                                        @csrf
+                                                        @method('PUT') <!-- Esto simula el método PUT en el formulario -->
+                                                        <button type="submit" class="btn btn-danger btn-sm" title="Anular Venta" onclick="return confirm('¿Está seguro de anular esta venta?')">
+                                                            <i class="ri-delete-bin-line"></i>
+                                                        </button>
+                                                    </form>
+                                                    
                                                     @endif
 
                                                     <!-- Botón para generar credencial y enviar por WhatsApp -->
                                                     @if ($inscripcion->estado == 'activa')
-                                                        <a href="{{ route('admin.inscripciones.generarCredencial', $inscripcion->idInscripcion) }}"
-                                                            class="btn btn-primary btn-sm" title="Generar Credencial">
+                                                        <a href="{{ route('admin.inscripciones.generarQr', $inscripcion->idInscripcion) }}"
+                                                            class="btn btn-primary btn-sm" title="Generar QR">
                                                             <i class="ri-qr-code-line"></i>
                                                         </a>
 
-                                                        <a href="{{ route('admin.inscripciones.enviarWhatsapp', $inscripcion->idInscripcion) }}"
-                                                            class="btn btn-success btn-sm" title="Enviar QR por WhatsApp">
-                                                            <i class="ri-whatsapp-line"></i>
-                                                        </a>
+                                                        
                                                     @endif
                                                 </td>
                                             </tr>
@@ -234,17 +237,22 @@
                                     <tbody class="list form-check-all">
                                         @foreach ($inscripcionesServicios as $inscripcion)
                                             <tr>
-                                                <td>{{ $inscripcion->cliente->nombre }} {{ $inscripcion->cliente->primerApellido }}</td>
-                                    
+                                                <td>{{ $inscripcion->cliente->nombre }}
+                                                    {{ $inscripcion->cliente->primerApellido }}</td>
+
                                                 @php
                                                     // Verificar si la relación detallesInscripciones está cargada y no es null
                                                     $detalleServicio = $inscripcion->detallesInscripciones
-                                                        ? $inscripcion->detallesInscripciones->firstWhere('tipoProducto', 'servicio')
+                                                        ? $inscripcion->detallesInscripciones->firstWhere(
+                                                            'tipoProducto',
+                                                            'servicio',
+                                                        )
                                                         : null;
                                                 @endphp
-                                    
-                                                <td>{{ $detalleServicio && $detalleServicio->servicio ? $detalleServicio->servicio->nombre : 'Servicio no disponible' }}</td>
-                                    
+
+                                                <td>{{ $detalleServicio && $detalleServicio->servicio ? $detalleServicio->servicio->nombre : 'Servicio no disponible' }}
+                                                </td>
+
                                                 <td>
                                                     @if ($detalleServicio && $detalleServicio->servicio)
                                                         {{ $detalleServicio->servicio->fechaInicio ? \Carbon\Carbon::parse($detalleServicio->servicio->fechaInicio)->format('d/m/Y') : 'N/A' }}
@@ -252,7 +260,7 @@
                                                         N/A
                                                     @endif
                                                 </td>
-                                    
+
                                                 <td>
                                                     @if ($detalleServicio && $detalleServicio->servicio)
                                                         {{ $detalleServicio->servicio->fechaFin ? \Carbon\Carbon::parse($detalleServicio->servicio->fechaFin)->format('d/m/Y') : 'N/A' }}
@@ -260,44 +268,47 @@
                                                         N/A
                                                     @endif
                                                 </td>
-                                    
+
                                                 <td>
                                                     <span
                                                         class="badge text-{{ $inscripcion->estado == 'activa' ? 'info' : ($inscripcion->estado == 'vencida' ? 'danger' : 'warning') }} fw-bold">
                                                         {{ ucfirst($inscripcion->estado) }}
                                                     </span>
                                                 </td>
-                                    
+
                                                 <td>{{ number_format($inscripcion->totalPago, 2) }}</td>
-                                    
+
                                                 <td>
                                                     <!-- Botones de acciones -->
-                                                    <button class="btn btn-info btn-sm btn-detalle" data-id="{{ $inscripcion->idInscripcion }}" title="Ver Detalle">
-                                                        <i class="ri-eye-line"></i>
-                                                    </button>
-                                    
-                                                    <button class="btn btn-secondary btn-sm" title="Imprimir Comprobante">
+
+                                                    <!-- Botón para imprimir comprobante, con el color cambiado -->
+                                                    <a href="javascript:void(0);"
+                                                        onclick="abrirVentanaPDF({{ $inscripcion->idInscripcion }})"
+                                                        class="btn btn-info btn-sm" title="Imprimir Comprobante">
                                                         <i class="ri-printer-line"></i>
-                                                    </button>
-                                    
-                                                    @if ($inscripcion->estado != 'cancelada')
-                                                        <form action="{{ route('admin.inscripciones.cancelar', $inscripcion->idInscripcion) }}" method="POST" style="display:inline;">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-danger btn-sm" title="Anular Venta"
-                                                                onclick="return confirm('¿Está seguro de anular esta venta?')">
-                                                                <i class="ri-delete-bin-line"></i>
-                                                            </button>
-                                                        </form>
-                                                    @endif
-                                    
-                                                    <a href="{{ route('admin.inscripciones.generarPase', $inscripcion->idInscripcion) }}" class="btn btn-warning btn-sm" title="Generar Pase de Entrada">
-                                                        <i class="ri-ticket-line"></i>
                                                     </a>
+
+
+                                                    <!-- Botón para anular venta -->
+                                                    @if ($inscripcion->estado != 'cancelada')
+                                                    <form action="{{ route('admin.inscripciones.cancelar', $inscripcion->idInscripcion) }}" method="POST" style="display:inline;">
+                                                        @csrf
+                                                        @method('PUT') <!-- Esto simula una solicitud PUT -->
+                                                        <button type="submit" class="btn btn-danger btn-sm" title="Anular Venta" onclick="return confirm('¿Está seguro de anular esta venta?')">
+                                                            <i class="ri-delete-bin-line"></i>
+                                                        </button>
+                                                    </form>
+                                                    
+                                                    @endif
+
+                                                    
+                                                    
+
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
-                                    
+
                                 </table>
                             </div>
                         </div>
@@ -368,49 +379,17 @@
                 },
             });
 
-            // Evento para abrir el modal y cargar el detalle
-            $('.btn-detalle').on('click', function() {
-                var idInscripcion = $(this).data('id');
-                $('#detalleContenido').html('<p>Cargando...</p>');
-                $('#detalleModal').modal('show');
 
-                $.ajax({
-                    url: '/admin/inscripciones/' + idInscripcion + '/detalle',
-                    method: 'GET',
-                    success: function(data) {
-                        var contenido = '<p><strong>Cliente:</strong> ' + data.cliente.nombre +
-                            ' ' + data.cliente.primerApellido + '</p>';
-                        contenido += '<p><strong>Fecha de Inscripción:</strong> ' + data
-                            .fechaInscripcion + '</p>';
-                        contenido += '<p><strong>Estado:</strong> ' + data.estado.charAt(0)
-                            .toUpperCase() + data.estado.slice(1) + '</p>';
-                        contenido += '<p><strong>Total Pago:</strong> ' + parseFloat(data
-                            .totalPago).toFixed(2) + '</p>';
-                        contenido += '<h5>Productos:</h5>';
-                        contenido += '<ul>';
-                        data.detalle_inscripciones.forEach(function(detalle) {
-                            var producto = detalle.tipoProducto.charAt(0)
-                                .toUpperCase() + detalle.tipoProducto.slice(1);
-                            if (detalle.tipoProducto === 'membresia' && detalle
-                                .membresia) {
-                                producto += ' - ' + detalle.membresia.nombre;
-                            } else if (detalle.tipoProducto === 'servicio' && detalle
-                                .servicio) {
-                                producto += ' - ' + detalle.servicio.nombre;
-                            }
-                            contenido += '<li>' + producto + ' - Precio: ' + parseFloat(
-                                detalle.precio).toFixed(2) + '</li>';
-                        });
-                        contenido += '</ul>';
 
-                        $('#detalleContenido').html(contenido);
-                    },
-                    error: function() {
-                        $('#detalleContenido').html(
-                            '<p>Ocurrió un error al cargar el detalle.</p>');
-                    }
-                });
-            });
         });
+
+        function abrirVentanaPDF(idInscripcion) {
+            // Generar la URL de la ruta usando el ID de la inscripción
+            const url = new URL('{{ route('admin.inscripciones.comprobante', ':id') }}'.replace(':id', idInscripcion),
+                window.location.origin);
+
+            // Abrir la URL en una nueva ventana con el tamaño especificado
+            window.open(url, '_blank', 'width=800,height=600');
+        }
     </script>
 @endpush

@@ -42,6 +42,7 @@ class User extends Authenticatable
         'estado',
         'idAutor',
         'eliminado',
+        
     ];
 
     /**
@@ -59,6 +60,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'password_reset_token', // Campo para el token de restablecimiento
+        'password_reset_token_expires',
     ];
 
     /**
@@ -85,5 +88,5 @@ class User extends Authenticatable
         return $this->hasMany(Inscripcion::class, 'idUsuario', 'idUsuario');
     }
 
-
+    
 }

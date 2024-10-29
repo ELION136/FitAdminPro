@@ -53,6 +53,18 @@
 
 <body>
 
+    @if (($message = Session::get('mensaje')) && ($icono = Session::get('icono')))
+    <script>
+        Swal.fire({
+            //position: "top-end",
+            icon: "{{ $icono }}",
+            title: "{{ $message }}",
+            showConfirmButton: false,
+            timer: 4500
+        });
+    </script>
+@endif
+
     <div class="auth-one-bg-position">
         @yield('content')
     </div>

@@ -137,3 +137,5 @@ class QRCheckController extends Controller
         }
     }
 }
+
+

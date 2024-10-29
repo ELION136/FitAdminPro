@@ -25,6 +25,13 @@ Route::get('/', function () {
 
 Auth::routes();
 
+
+Route::post('/custom-password-reset', [App\Http\Controllers\CustomPasswordResetController::class, 'sendResetLink'])->name('password.custom_reset');
+Route::get('/custom-reset-password', function () {
+    return view('custom_reset_password');
+})->name('password.custom_reset_form');
+Route::post('/custom-reset-password', [App\Http\Controllers\CustomPasswordResetController::class, 'resetPassword'])->name('password.custom_update');
+
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 //primero creamos un controlador php artisa make:controller AdminController modificar esta ruta para ruta
 //rutas para el administrador
@@ -61,6 +68,8 @@ Route::middleware(['auth'])->group(function () {
     //Route::get('/admin/entrenadores/eliminados', [App\Http\Controllers\EntrenadorController::class, 'eliminados'])->name('admin.entrenadores.eliminados');
     //Route::get('admin/entrenadores/pdf', [App\Http\Controllers\EntrenadorController::class, 'exportPDF'])->name('admin.entrenadores.pdf');
     //Route::get('admin/entrenadores/export/excel', [App\Http\Controllers\EntrenadorController::class, 'exportExcel'])->name('admin.entrenadores.export.excel');
+    Route::post('/admin/entrenadores/validateField', [App\Http\Controllers\EntrenadorController::class, 'validateField'])
+        ->name('admin.entrenadores.validateField');
 
 
     Route::get('/admin/usuarios', [App\Http\Controllers\UsuarioController::class, 'index'])->name('admin.usuarios.index');
@@ -87,9 +96,13 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/admin/categorias/{id}', [App\Http\Controllers\CategoriaServicioController::class, 'update'])->name('admin.categorias.update');
     Route::delete('/admin/categorias/{id}', [App\Http\Controllers\CategoriaServicioController::class, 'destroy'])->name('admin.categorias.destroy');
     // Route::get('/admin/secciones', [App\Http\Controllers\SeccionController::class, 'index'])->name('admin.secciones.index');
-   // Route::post('/admin/secciones', [App\Http\Controllers\SeccionController::class, 'store'])->name('admin.secciones.store');
-   // Route::put('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'update'])->name('admin.secciones.update');
-   // Route::delete('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'destroy'])->name('admin.secciones.destroy');
+    // Route::post('/admin/secciones', [App\Http\Controllers\SeccionController::class, 'store'])->name('admin.secciones.store');
+    // Route::put('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'update'])->name('admin.secciones.update');
+    // Route::delete('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'destroy'])->name('admin.secciones.destroy');
+    Route::get('admin/servicios/{id}/horarios', [App\Http\Controllers\ServicioHorarioController::class, 'edit'])->name('servicio.horarios.edit');
+    Route::put('admin/servicios/{id}/horarios', [App\Http\Controllers\ServicioHorarioController::class, 'update'])->name('servicio.horarios.update');
+   // Route::delete('admin/servicios/{id}/horarios/{idDia}/{horaInicio}', [App\Http\Controllers\ServicioHorarioController::class, 'destroy'])->name('servicio.horarios.destroy');
+    Route::delete('/admin/servicios/{servicio}/horarios/{dia}/{hora}', [App\Http\Controllers\ServicioHorarioController::class, 'destroy'])->name('servicio.horario.destroy');
 
 
 
@@ -102,6 +115,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/inscripciones/crear', [App\Http\Controllers\InscripcionController::class, 'create'])->name('admin.inscripciones.create');
     Route::post('/admin/inscripciones', [App\Http\Controllers\InscripcionController::class, 'store'])->name('admin.inscripciones.store');
 
+    Route::get('/admin/inscripciones/searchCliente', [App\Http\Controllers\InscripcionController::class, 'searchCliente'])->name('admin.inscripciones.searchCliente');
+    Route::get('/admin/inscripciones/{id}', [App\Http\Controllers\InscripcionController::class, 'show'])->name('admin.inscripciones.show');
 
 
     Route::get('/admin/clientes', [App\Http\Controllers\ClienteController::class, 'index'])->name('admin.clientes.index');
@@ -123,7 +138,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/asistencias/buscar', [App\Http\Controllers\AsistenciaController::class, 'buscarCliente'])->name('admin.asistencias.buscar');
     Route::get('/admin/asistencias/lista', [App\Http\Controllers\AsistenciaController::class, 'verAsistencias'])->name('admin.asistencias.ver');
     //Route::put('/admin/asistencias/{id}', [App\Http\Controllers\AsistenciaController::class, 'update'])->name('admin.asistencias.update');
-    Route::post('/admin/asistencias/anular/{idAsistencia}', [App\Http\Controllers\AsistenciaController::class, 'verDetalles'])->name('admin.asistencias.anular');
+    Route::post('/admin/asistencias/anular/{idAsistencia}', [App\Http\Controllers\AsistenciaController::class, 'anularAsistencia'])->name('admin.asistencias.anular');
     Route::get('/admin/asistencias/{idAsistencia}/detalles', [App\Http\Controllers\AsistenciaController::class, 'anularAsistencia'])->name('admin.asistencias.detalles');
 
 
@@ -131,6 +146,76 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/reportes/inscripciones', [App\Http\Controllers\ReportesController::class, 'inscripciones'])->name('admin.reportes.inscripciones');
     Route::get('/reportes/inscripciones/pdf', [App\Http\Controllers\ReportesController::class, 'generarPDFInscripciones'])->name('admin.reportes.inscripcionesPDF');
     Route::get('/reportes/inscripciones/excel', [App\Http\Controllers\ReportesController::class, 'generarExcelInscripciones'])->name('admin.reportes.inscripcionesExcel');
+    Route::get('/admin/informes/inscripciones', [App\Http\Controllers\ReportesController::class, 'index'])->name('admin.reportes.informes');
+
+
+    //reportes
+
+
+
+
+    Route::get('/admin/reporte/clientes', [App\Http\Controllers\ReportesController::class, 'index'])->name('admin.reportes.cliente');
+    Route::get('/admin/reporte/clientes/export/pdf', [App\Http\Controllers\ReportesController::class, 'exportarPDF'])->name('admin.reportes.clientes-pdf');
+    Route::get('/admin/reporte/clientes/export/excel', [App\Http\Controllers\ReportesController::class, 'exportarExcel'])->name('admin.reporte.clientes-excel');
+
+    Route::get('/admin/reportes/entrenadores', [App\Http\Controllers\ReportesEntrenadoresController::class, 'index'])->name('admin.reportes.entrenadores');
+    Route::get('/admin/reportes/entrenadores-pdf', [App\Http\Controllers\ReportesEntrenadoresController::class, 'exportarPDF'])->name('admin.reportes.entrenadores-pdf');
+    Route::get('/admin/reportes/entrenadores-excel', [App\Http\Controllers\ReportesEntrenadoresController::class, 'exportarExcel'])->name('admin.reporte.entrenadores-excel');
+
+    Route::get('/admin/reportes/ingresos', [App\Http\Controllers\ReportesIngresosController::class, 'index'])->name('admin.reportes.ingresos');
+
+    // Ruta para exportar el reporte de ingresos a PDF
+    Route::get('/admin/reportes/ingresos-pdf', [App\Http\Controllers\ReportesIngresosController::class, 'exportarPDF'])->name('admin.reportes.ingresos-pdf');
+
+    // Ruta para exportar el reporte de ingresos a Excel
+    Route::get('/admin/reportes/ingresos-excel', [App\Http\Controllers\ReportesIngresosController::class, 'exportarExcel'])->name('admin.reportes.ingresos-excel');
+
+
+    Route::get('/admin/reportes/asistencias', [App\Http\Controllers\ReportesAsistenciasController::class, 'index'])->name('admin.reportes.asistencias');
+    Route::get('/admin/reportes/asistencias-pdf', [App\Http\Controllers\ReportesAsistenciasController::class, 'exportarPDF'])->name('admin.reportes.asistencias-pdf');
+    Route::get('/admin/reportes/asistencias-excel', [App\Http\Controllers\ReportesAsistenciasController::class, 'exportarExcel'])->name('admin.reportes.asistencias-excel');
+
+
+
+    Route::get('/admin/reportes/inscripciones-mes-anio', [App\Http\Controllers\ReportesInscripcionesController::class, 'index'])
+        ->name('admin.reportes.inscripciones-mes-anio');
+
+    // Ruta para exportar el reporte a PDF
+    Route::get('/admin/reportes/inscripciones-mes-anio/pdf', [App\Http\Controllers\ReportesInscripcionesController::class, 'exportarPDF'])
+        ->name('admin.reportes.inscripciones-pdf');
+
+    // Ruta para exportar el reporte a Excel
+    Route::get('/admin/reportes/inscripciones-excel', [App\Http\Controllers\ReportesInscripcionesController::class, 'exportarExcel'])->name('admin.reporte.inscripciones-excel');
+
+
+    Route::get('/admin/ingresos-vendedor', [App\Http\Controllers\ReportesIngresosVendedorController::class, 'index'])->name('admin.reportes.ingresos-vendedor');
+    Route::get('/admin/ingresos-vendedor-pdf', [App\Http\Controllers\ReportesIngresosVendedorController::class, 'exportarPDF'])->name('admin.reportes.ingresos-vendedor-pdf');
+
+
+    Route::get('/admin/reportes/ingresos-membresias', [App\Http\Controllers\ReportesIngresosMembresiasController::class, 'index'])->name('admin.reportes.ingresos-membresias');
+    Route::get('/admin/reportes/ingresos-membresias/pdf', [App\Http\Controllers\ReportesIngresosMembresiasController::class, 'exportarPDF'])->name('admin.reportes.ingresos-membresias-pdf');
+    Route::get('/admin/reportes/ingresos-membresias/excel', [App\Http\Controllers\ReportesIngresosMembresiasController::class, 'exportarExcel'])->name('admin.reporte.ingresos-membresias-excel');
+
+
+    Route::get('/admin/reportes/ingresos-servicios', [App\Http\Controllers\ReportesIngresosServiciosController::class, 'index'])->name('admin.reportes.ingresos-servicios');
+    Route::get('/admin/reportes/ingresos-servicios/pdf', [App\Http\Controllers\ReportesIngresosServiciosController::class, 'exportarPDF'])->name('admin.reportes.ingresos-servicios-pdf');
+    Route::get('/admin/reportes/ingresos-servicios/excel', [App\Http\Controllers\ReportesIngresosServiciosController::class, 'exportarExcel'])->name('admin.reportes.ingresos-servicios-excel');
+
+
+
+    // qr asistencia
+
+    Route::get('/admin/inscripciones/{id}/generar-qr', [App\Http\Controllers\InscripcionController::class, 'generarQr'])->name('admin.inscripciones.generarQr');
+
+    Route::get('/admin/inscripciones/{id}/generar-qr2', [App\Http\Controllers\InscripcionController::class, 'generarQr2'])->name('admin.inscripciones.generarQr2');
+
+    Route::get('/admin/inscripciones/{id}/comprobante', [App\Http\Controllers\InscripcionController::class, 'generarComprobante'])->name('admin.inscripciones.comprobante');
+
+    //Route::get('/admin/inscripciones/{id}/comprobante', [App\Http\Controllers\InscripcionController::class, 'generarComprobanteTCPDF'])->name('admin.inscripciones.comprobante');
+
+
+    Route::get('/admin/asistencias/qr-register', [App\Http\Controllers\AsistenciaController::class, 'qrRegister'])->name('admin.asistencias.qrRegister');
+    Route::post('/admin/asistencias/registrarQR', [App\Http\Controllers\AsistenciaController::class, 'registrarQR'])->name('admin.asistencias.registrarQR');
 
 });
 
@@ -165,9 +250,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/admin/planes/{id}', [App\Http\Controllers\MembresiaController::class, 'destroy'])->name('admin.planes.destroy');
     //modulo de inscripciones 
 
-});
 
-Route::middleware(['auth'])->group(function () {
     //Route::get('/admin/inscripciones/crear', [App\Http\Controllers\InscripcionController::class, 'create'])->name('admin.inscripciones.create');
     //Route::post('/admin/inscripciones', [App\Http\Controllers\InscripcionController::class, 'store'])->name('admin.inscripciones.store');
     //Route::get('/admin/inscripciones/resgistro', [App\Http\Controllers\InscripcionController::class, 'index'])->name('admin.inscripciones.index');
@@ -255,18 +338,18 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-    Route::get('/admin/reportes/reservas', [App\Http\Controllers\ReporteReservasController::class, 'index'])->name('admin.reportes.reservas');
+    // Route::get('/admin/reportes/reservas', [App\Http\Controllers\ReporteReservasController::class, 'index'])->name('admin.reportes.reservas');
 
-    Route::get('admin/reportes/reservas/exportar-pdf', [App\Http\Controllers\ReporteReservasController::class, 'exportarPDF'])->name('admin.reportes.reservas.exportarPDF');
-    Route::get('admin/reportes/reservas/exportar-excel', [App\Http\Controllers\ReporteReservasController::class, 'exportarExcel'])->name('admin.reportes.reservas.exportarExcel');
+    //Route::get('admin/reportes/reservas/exportar-pdf', [App\Http\Controllers\ReporteReservasController::class, 'exportarPDF'])->name('admin.reportes.reservas.exportarPDF');
+    //Route::get('admin/reportes/reservas/exportar-excel', [App\Http\Controllers\ReporteReservasController::class, 'exportarExcel'])->name('admin.reportes.reservas.exportarExcel');
 
 
     //reportes de pagos
 
-    Route::get('/reporte-pagos', [App\Http\Controllers\ReportePagosController::class, 'index'])->name('admin.reportes.pagos');
-    Route::get('/reporte-pagos/data', [App\Http\Controllers\ReportePagosController::class, 'getPagos'])->name('pagos.get');
-    Route::get('/reporte-pagos/export-pdf', [App\Http\Controllers\ReportePagosController::class, 'exportPDF'])->name('pagos.exportPDF');
-    Route::get('/reporte-pagos/export-excel', [App\Http\Controllers\ReportePagosController::class, 'exportExcel'])->name('pagos.exportExcel');
+    ///Route::get('/reporte-pagos', [App\Http\Controllers\ReportePagosController::class, 'index'])->name('admin.reportes.pagos');
+    //Route::get('/reporte-pagos/data', [App\Http\Controllers\ReportePagosController::class, 'getPagos'])->name('pagos.get');
+    //Route::get('/reporte-pagos/export-pdf', [App\Http\Controllers\ReportePagosController::class, 'exportPDF'])->name('pagos.exportPDF');
+    //Route::get('/reporte-pagos/export-excel', [App\Http\Controllers\ReportePagosController::class, 'exportExcel'])->name('pagos.exportExcel');
 
 
 
@@ -276,38 +359,12 @@ Route::middleware(['auth'])->group(function () {
     // Route::get('clientes/search', [App\Http\Controllers\ReporteAsistenciasController::class, 'searchClientes'])->name('clientes.search');
 
 
-    Route::get('reservas/{id}/comprobante', [App\Http\Controllers\ReservaController::class, 'generarComprobante'])->name('admin.reservas.comprobante');
+    // Route::get('reservas/{id}/comprobante', [App\Http\Controllers\ReservaController::class, 'generarComprobante'])->name('admin.reservas.comprobante');
 
 
 });
 
-Route::middleware(['auth'])->group(function () {
 
-    // Rutas para el módulo de reservas
-    Route::get('/admin/reservas/create', [App\Http\Controllers\ReservaController::class, 'create'])->name('admin.reservas.create');
-    Route::post('/admin/reservas', [App\Http\Controllers\ReservaController::class, 'store'])->name('admin.reservas.store');
-    Route::get('/admin/reservas', [App\Http\Controllers\ReservaController::class, 'index'])->name('admin.reservas.index');
-
-    // Ruta para actualizar el estado de una reserva
-    Route::post('/reservas/{id}/actualizar-estado', [App\Http\Controllers\ReservaController::class, 'actualizarEstado'])->name('admin.reservas.actualizarEstado');
-
-    // Ruta para cancelar una reserva
-    Route::post('/reservas/{id}/cancelar', [App\Http\Controllers\ReservaController::class, 'cancelar'])->name('admin.reservas.cancelar');
-
-    // Ruta para registrar el pago de una reserva
-    Route::post('/reservas/{id}/registrar-pago', [App\Http\Controllers\ReservaController::class, 'registrarPago'])->name('reservas.registrarPago');
-
-    // Ruta para generar un ticket de la reserva
-    Route::get('/reservas/{id}/generar-ticket', [App\Http\Controllers\ReservaController::class, 'generarTicket'])->name('reservas.generarTicket');
-
-    // Rutas para el módulo de pagos
-    Route::get('/admin/pagos', [App\Http\Controllers\PagoController::class, 'index'])->name('admin.pagos.index');
-    Route::post('/pagos/reporte', [App\Http\Controllers\PagoController::class, 'generarReporte'])->name('pagos.reporte');
-
-    // Ruta para la búsqueda de clientes (Ajax o buscador)
-    Route::get('/clientes/buscar', [App\Http\Controllers\ReservaController::class, 'buscarClientes'])->name('clientes.buscar');
-
-});
 
 //configuracion del envio de email
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {

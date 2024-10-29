@@ -11,7 +11,9 @@
                             <div class="card mt-4 card-bg-fill">
                                 <div class="card-body p-4">
                                     <div class="text-center mt-2">
-                                        <h5 class="text-primary">Bienvenido de nuevo!</h5>
+                                        <h2 class="fw-bold">
+                                            <i class="la la-dumbbell me-2 text-warning"></i><span class="text-warning">G</span>imnasio<span class="text-warning">U</span>rbano
+                                        </h2>
                                         <p class="text-muted">Inicia sesión para continuar.</p>
                                     </div>
                                     <div class="p-2 mt-4">

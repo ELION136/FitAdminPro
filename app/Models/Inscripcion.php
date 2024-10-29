@@ -18,6 +18,7 @@ class Inscripcion extends Model
         'idCliente',
         'idUsuario',
         'estado',
+        'montoPagado',
         'totalPago',
         'diasRestantes',
         'idAutor',
@@ -42,9 +43,8 @@ class Inscripcion extends Model
 
     public function detallesInscripciones()
     {
-        return $this->hasMany(DetalleInscripcion::class, 'idInscripcion');
+        return $this->hasMany(DetalleInscripcion::class, 'idInscripcion', 'idInscripcion');
     }
-
     public function asistencias()
     {
         return $this->hasMany(Asistencia::class, 'idInscripcion');

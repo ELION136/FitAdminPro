@@ -1,6 +1,5 @@
 @extends('layouts.app')
 @section('content')
-    <!-- start page title -->
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
@@ -9,266 +8,443 @@
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboards</a></li>
-                        <li class="breadcrumb-item active">Incio</li>
+                        <li class="breadcrumb-item active">Inicio</li>
                     </ol>
                 </div>
 
             </div>
         </div>
     </div>
-    <!-- end page title -->
-
-    <div class="row project-wrapper">
-        <div class="col-xxl-8">
-            <div class="row">
-                <div class="col-xl-4">
-                    <div class="card card-animate">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-primary-subtle text-primary rounded-2 fs-2">
-                                        <i data-feather="user" class="text-primary"></i>
-                                    </span>
-                                </div>
-                                <div class="flex-grow-1 overflow-hidden ms-3">
-                                    <p class="text-uppercase fw-medium text-muted text-truncate mb-3">Usuarios</p>
-                                    <div class="d-flex align-items-center mb-3">
-                                        <h4 class="fs-4 flex-grow-1 mb-0"><span class="counter-value"
-                                                data-target="{{ $totalUsuarios }}">0</span></h4>
-                                        <span class="badge bg-danger-subtle text-danger fs-12"><i
-                                                class="ri-arrow-down-s-line fs-13 align-middle me-1"></i>5.02 %</span>
-                                    </div>
-                                    <p class="text-muted text-truncate mb-0">Usuarios en el mes</p>
-                                </div>
-                            </div>
-                        </div><!-- end card body -->
-                    </div>
-                </div><!-- end col -->
-
-                <div class="col-xl-4">
-                    <div class="card card-animate">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-warning-subtle text-warning rounded-2 fs-2">
-                                        <i data-feather="award" class="text-warning"></i>
-                                    </span>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-3">Asistencias</p>
-                                    <div class="d-flex align-items-center mb-3">
-                                        <h4 class="fs-4 flex-grow-1 mb-0"><span class="counter-value"
-                                                data-target="">0</span></h4>
-                                        <span class="badge bg-success-subtle text-success fs-12"><i
-                                                class="ri-arrow-up-s-line fs-13 align-middle me-1"></i>3.58 %</span>
-                                    </div>
-                                    <p class="text-muted mb-0">Asistencias en el mes</p>
-                                </div>
-                            </div>
-                        </div><!-- end card body -->
-                    </div>
-                </div><!-- end col -->
-
-
-                <div class="col-xl-4">
-                    <div class="card card-animate">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-info-subtle text-info rounded-2 fs-2">
-                                        <i data-feather="clock" class="text-info"></i>
-                                    </span>
-                                </div>
-                                <div class="flex-grow-1 overflow-hidden ms-3">
-                                    <p class="text-uppercase fw-medium text-muted text-truncate mb-3">Miembros</p>
-                                    <div class="d-flex align-items-center mb-3">
-                                        <h4 class="fs-4 flex-grow-1 mb-0"><span class="counter-value"
-                                                data-target="0">{{ $totalMembresiasActivas }}</span></h4>
-                                        <span class="badge bg-danger-subtle text-danger fs-12"><i
-                                                class="ri-arrow-down-s-line fs-13 align-middle me-1"></i>10.35 %</span>
-                                    </div>
-                                    <p class="text-muted text-truncate mb-0">en el mes month</p>
-                                </div>
-                            </div>
-                        </div><!-- end card body -->
-                    </div>
-                </div><!-- end col -->
-            </div><!-- end row -->
-
-            <div class="row">
-                <!-- Tarjeta de Entrenadores Registrados -->
-                <div class="col-xl-4">
-                    <div class="card card-animate">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-primary-subtle text-primary rounded-2 fs-2">
-                                        <i data-feather="user-check" class="text-primary"></i>
-                                    </span>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-3">Entrenadores Activos</p>
-                                    <h4 class="fs-4 mb-0"><span class="counter-value"
-                                            data-target="{{ $totalEntrenadores }}">0</span></h4>
-                                    <p class="text-muted mb-0">Entrenadores en el sistema</p>
-                                </div>
+    <div class="row">
+        @php
+            $summaryCards = [
+                [
+                    'title' => 'Ingresos Hoy',
+                    'icon' => 'ri-wallet-line',
+                    'value' => number_format($incomeToday, 2),
+                    'color' => 'bg-success',
+                    'subtitle' => 'Total diario',
+                    'isIncome' => true,
+                ],
+                [
+                    'title' => 'Ingresos Esta Semana',
+                    'icon' => 'ri-calendar-line',
+                    'value' => number_format($incomeThisWeek, 2),
+                    'color' => 'bg-primary',
+                    'subtitle' => 'Total semanal',
+                    'isIncome' => true,
+                ],
+                [
+                    'title' => 'Ingresos Este Mes',
+                    'icon' => 'ri-bar-chart-line',
+                    'value' => number_format($incomeThisMonth, 2),
+                    'color' => 'bg-warning',
+                    'subtitle' => 'Total mensual',
+                    'isIncome' => true,
+                ],
+                [
+                    'title' => 'Ingresos Totales',
+                    'icon' => 'ri-bank-line',
+                    'value' => number_format($totalIncome, 2),
+                    'color' => 'bg-danger',
+                    'subtitle' => 'Acumulado',
+                    'isIncome' => true,
+                ],
+                [
+                    'title' => 'Membresías Activas',
+                    'icon' => 'ri-group-line',
+                    'value' => $totalMembresiasActivas,
+                    'color' => 'bg-info',
+                    'subtitle' => 'Clientes activos',
+                    'isIncome' => false,
+                ],
+                [
+                    'title' => 'Clientes Nuevos Este Mes',
+                    'icon' => 'ri-user-add-line',
+                    'value' => $newClientsThisMonth,
+                    'color' => 'bg-secondary',
+                    'subtitle' => 'Nuevas membresías',
+                    'isIncome' => false,
+                ],
+                [
+                    'title' => 'Check-ins Hoy',
+                    'icon' => 'ri-check-line',
+                    'value' => $checkInsToday,
+                    'color' => 'bg-dark',
+                    'subtitle' => 'Entradas registradas',
+                    'isIncome' => false,
+                ],
+                [
+                    'title' => 'Total de Clientes',
+                    'icon' => 'ri-group-line',
+                    'value' => $totalClientes,
+                    'color' => 'bg-primary',
+                    'subtitle' => 'Clientes registrados',
+                    'isIncome' => false,
+                ],
+            ];
+        @endphp
+        @foreach ($summaryCards as $card)
+            <div class="col-xl-3 col-md-6">
+                <!-- card -->
+                <div class="card card-animate {{ $card['color'] }}">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <p class="text-uppercase fw-medium text-white mb-0">{{ $card['title'] }}</p>
                             </div>
                         </div>
-                    </div>
+                        <div class="d-flex align-items-end justify-content-between mt-4">
+                            <div>
+                                <h4 class="fs-22 fw-semibold ff-secondary mb-4 text-white">
+                                    @if ($card['isIncome'])
+                                        Bs. {{ $card['value'] }}
+                                    @else
+                                        {{ $card['value'] }}
+                                    @endif
+                                </h4>
+                                <span class="text-decoration-underline text-white-50">{{ $card['subtitle'] }}</span>
+                            </div>
+                            <div class="avatar-sm flex-shrink-0">
+                                <span class="avatar-title bg-white bg-opacity-25 rounded fs-3 material-shadow">
+                                    <i class="{{ $card['icon'] }} text-white"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div><!-- end card body -->
+                </div><!-- end card -->
+            </div><!-- end col -->
+        @endforeach
+    </div>
+    <div class="row mt-4">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Ingresos en los Últimos 30 Días</h6>
                 </div>
-
-                <!-- Tarjeta de Clientes Registrados -->
-                <div class="col-xl-4">
-                    <div class="card card-animate">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-success-subtle text-success rounded-2 fs-2">
-                                        <i data-feather="user" class="text-success"></i>
-                                    </span>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-3">Clientes Activos</p>
-                                    <h4 class="fs-4 mb-0"><span class="counter-value"
-                                            data-target="{{ $totalClientes }}">0</span></h4>
-                                    <p class="text-muted mb-0">Clientes en el sistema</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tarjeta de Ingresos del Mes -->
-                <div class="col-xl-4">
-                    <div class="card card-animate">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-warning-subtle text-warning rounded-2 fs-2">
-                                        <i data-feather="dollar-sign" class="text-warning"></i>
-                                    </span>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-3">Ingresos del Mes</p>
-                                    <h4 class="fs-4 mb-0">Bs.- <span class="counter-value"
-                                            data-target="">0</span></h4>
-                                    <p class="text-muted mb-0">Monto total recibido</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tarjeta de Reservas Pendientes -->
-                <div class="col-xl-4">
-                    <div class="card card-animate">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-danger-subtle text-danger rounded-2 fs-2">
-                                        <i data-feather="calendar" class="text-danger"></i>
-                                    </span>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-3">Reservas Pendientes</p>
-                                    <h4 class="fs-4 mb-0"><span class="counter-value"
-                                            data-target="">0</span></h4>
-                                    <p class="text-muted mb-0">Reservas aún no procesadas</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tarjeta de Servicios Activos -->
-                <div class="col-xl-4">
-                    <div class="card card-animate">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-sm flex-shrink-0">
-                                    <span class="avatar-title bg-info-subtle text-info rounded-2 fs-2">
-                                        <i data-feather="briefcase" class="text-info"></i>
-                                    </span>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <p class="text-uppercase fw-medium text-muted mb-3">Servicios Activos</p>
-                                    <h4 class="fs-4 mb-0"><span class="counter-value"
-                                            data-target="">0</span></h4>
-                                    <p class="text-muted mb-0">Servicios ofrecidos actualmente</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="card-body">
+                    <div id="incomeChart" style="height: 400px;"></div>
                 </div>
             </div>
-
-
-
-
-            <div class="row">
-                <!-- Gráfico de barras: Usuarios por Rol -->
-                <div class="col-xl-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title mb-0">Usuarios por Rol</h4>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="usuariosPorRol"></canvas>
-                        </div>
-                    </div>
+        </div>
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Servicios Más Solicitados</h6>
                 </div>
-            
-                <!-- Gráfico de líneas: Asistencias por Mes -->
-                <div class="col-xl-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title mb-0">Asistencias por Mes</h4>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="asistenciasPorMes"></canvas>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Gráfico de pasteles: Estado de las Membresías Activas -->
-                <div class="col-xl-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title mb-0">Estado de las Membresías</h4>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="estadoMembresias"></canvas>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Gráficos con ApexCharts -->
-                <div class="col-xl-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title mb-0">Asistencias por Semana (ApexCharts)</h4>
-                        </div>
-                        <div class="card-body">
-                            <div id="line_chart_basic" class="apex-charts"></div>
-                        </div>
-                    </div>
-                </div>
-            
-                <div class="col-xl-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title mb-0">Membresías Activas por Mes (ApexCharts)</h4>
-                        </div>
-                        <div class="card-body">
-                            <div id="line_chart_zoomable" class="apex-charts"></div>
-                        </div>
-                    </div>
+                <div class="card-body">
+                    <div id="servicesChart" style="height: 400px;"></div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Asistencias de Esta Semana</h6>
+                </div>
+                <div class="card-body">
+                    <div id="attendanceChart" style="height: 350px;"></div>
+                </div>
+            </div>
+        </div>
 
+        <div class="col-xl-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Membresías Más Adquiridas</h6>
+                </div>
+                <div class="card-body">
+                    <div id="membershipsChart" style="height: 350px;"></div>
+                </div>
+            </div>
+        </div>
 
-
-        </div><!-- end row -->
+    </div>
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">ingresos</h6>
+                </div>
+                <div class="card-body">
+                    <div id="incomeInteractiveChart" style="height: 500px;"></div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
-<!-- end row -->
+@push('scripts')
+    <script>
+        var incomeChart = echarts.init(document.getElementById('incomeChart'));
+        var incomeOption = {
+            tooltip: {
+                trigger: 'axis',
+                formatter: function(params) {
+                    return params[0].name + '<br/>' +
+                        params[0].seriesName + ': Bs. ' + params[0].value.toFixed(2);
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: {!! json_encode($incomeDates) !!},
+                axisLabel: {
+                    rotate: 45,
+                    interval: 'auto'
+                }
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: {
+                    formatter: function(value) {
+                        return 'Bs. ' + value.toFixed(2);
+                    }
+                }
+            },
+            series: [{
+                name: 'Ingresos',
+                data: {!! json_encode($incomeValues) !!},
+                type: 'line',
+                smooth: true,
+                lineStyle: {
+                    color: '#5470C6',
+                    width: 4
+                },
+                itemStyle: {
+                    color: '#5470C6'
+                },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0,
+                        color: 'rgba(84,112,198,0.5)'
+                    }, {
+                        offset: 1,
+                        color: 'rgba(84,112,198,0.1)'
+                    }])
+                }
+            }]
+        };
+        incomeChart.setOption(incomeOption);
+        var servicesChart = echarts.init(document.getElementById('servicesChart'));
+        var servicesOption = {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b}: {c} ({d}%)'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 10,
+                data: {!! json_encode($popularServices->pluck('nombre')) !!}
+            },
+            series: [{
+                name: 'Servicios',
+                type: 'pie',
+                radius: ['50%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: '18',
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: {!! json_encode(
+                    $popularServices->map(function ($service) {
+                        return ['value' => $service->total, 'name' => $service->nombre];
+                    }),
+                ) !!}
+            }]
+        };
+        servicesChart.setOption(servicesOption);
+        var attendanceChart = echarts.init(document.getElementById('attendanceChart'));
+        var attendanceOption = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: {!! json_encode($attendanceThisWeek->pluck('date')) !!},
+                axisLabel: {
+                    rotate: 45,
+                    interval: 0
+                }
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                name: 'Asistencias',
+                data: {!! json_encode($attendanceThisWeek->pluck('total')) !!},
+                type: 'bar',
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0,
+                        color: '#83bff6'
+                    }, {
+                        offset: 0.5,
+                        color: '#188df0'
+                    }, {
+                        offset: 1,
+                        color: '#188df0'
+                    }])
+                },
+                emphasis: {
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                            offset: 0,
+                            color: '#2378f7'
+                        }, {
+                            offset: 0.7,
+                            color: '#2378f7'
+                        }, {
+                            offset: 1,
+                            color: '#83bff6'
+                        }])
+                    }
+                }
+            }]
+        };
+        attendanceChart.setOption(attendanceOption);
+        var membershipsChart = echarts.init(document.getElementById('membershipsChart'));
+        var membershipsOption = {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b}: {c} ({d}%)'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 10,
+                data: {!! json_encode($popularMemberships->pluck('nombre')) !!}
+            },
+            series: [{
+                name: 'Membresías',
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '60%'],
+                data: {!! json_encode(
+                    $popularMemberships->map(function ($membership) {
+                        return ['value' => $membership->total, 'name' => $membership->nombre];
+                    }),
+                ) !!},
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }]
+        };
+        membershipsChart.setOption(membershipsOption);
+        window.addEventListener('resize', function() {
+            incomeChart.resize();
+            servicesChart.resize();
+            attendanceChart.resize();
+            membershipsChart.resize();
+        });
+
+
+        let incomeData = {
+            today: {
+                services: {{ $incomeTodayServices }},
+                memberships: {{ $incomeTodayMemberships }}
+            },
+            week: {
+                services: {{ $incomeThisWeekServices }},
+                memberships: {{ $incomeThisWeekMemberships }}
+            },
+            month: {
+                services: {{ $incomeThisMonthServices }},
+                memberships: {{ $incomeThisMonthMemberships }}
+            },
+            year: {
+                services: {{ $incomeThisYearServices }},
+                memberships: {{ $incomeThisYearMemberships }}
+            }
+        };
+
+        var incomeInteractiveChart = echarts.init(document.getElementById('incomeInteractiveChart'));
+
+        // Configuración inicial del gráfico de barras
+        let currentFilter = 'today';
+
+        function getChartOption(filter) {
+            return {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['Servicios', 'Membresías'],
+                    top: 10
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Ingresos']
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: function(value) {
+                            return 'Bs. ' + value.toFixed(2);
+                        }
+                    }
+                },
+                series: [{
+                        name: 'Servicios',
+                        type: 'bar',
+                        data: [incomeData[filter].services],
+                        itemStyle: {
+                            color: '#5470C6'
+                        }
+                    },
+                    {
+                        name: 'Membresías',
+                        type: 'bar',
+                        data: [incomeData[filter].memberships],
+                        itemStyle: {
+                            color: '#91CC75'
+                        }
+                    }
+                ]
+            };
+        }
+
+        // Inicializa el gráfico con el filtro "Hoy"
+        incomeInteractiveChart.setOption(getChartOption(currentFilter));
+
+        // Función para cambiar de filtro dinámicamente
+        function updateChart(filter) {
+            currentFilter = filter;
+            incomeInteractiveChart.setOption(getChartOption(filter));
+        }
+
+        // Generar los botones de filtro en HTML
+        document.getElementById('incomeInteractiveChart').insertAdjacentHTML('beforebegin', `
+        <div class="mb-4">
+            <button onclick="updateChart('today')" class="btn btn-sm btn-primary">Hoy</button>
+            <button onclick="updateChart('week')" class="btn btn-sm btn-secondary">Esta Semana</button>
+            <button onclick="updateChart('month')" class="btn btn-sm btn-warning">Este Mes</button>
+            <button onclick="updateChart('year')" class="btn btn-sm btn-success">Este Año</button>
+        </div>
+    `);
+
+        // Ajuste de tamaño al redimensionar la ventana
+        window.addEventListener('resize', function() {
+            incomeInteractiveChart.resize();
+        });
+    </script>
+@endpush

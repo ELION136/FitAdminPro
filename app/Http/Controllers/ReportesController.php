@@ -4,122 +4,115 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Inscripcion;
+use App\Models\DetalleInscripcion;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Membresia;
 use App\Models\Servicio;
 use App\Models\Cliente;
+use App\Exports\ClientesExport;
 use TCPDF;
 use App\Exports\InscripcionesExport;
-use Maatwebsite\Excel\Facades\Excel;
+
 
 class ReportesController extends Controller
 {
     // Mostrar la vista de reportes de inscripciones
     // Mostrar la vista de reportes de inscripciones
-    public function inscripciones(Request $request)
+    // Mostrar el formulario con los filtros y listado de clientes
+    public function index(Request $request)
     {
-        // Cargar clientes para los filtros
-        $clientes = Cliente::select('idCliente', 'nombre', 'primerApellido')->get();
-    
-        // Filtros recibidos
-        $fechaInicio = $request->input('fecha_inicio');
-        $fechaFin = $request->input('fecha_fin');
-        $estado = $request->input('estado');
-        $estadoPago = $request->input('estadoPago');
-        $clienteNombre = $request->input('cliente_nombre');
-    
-        // Construcción de la consulta dinámica
-        $query = Inscripcion::query();
-    
-        if ($fechaInicio && $fechaFin) {
-            $query->whereBetween('fechaInscripcion', [$fechaInicio, $fechaFin]);
+        $clientes = Cliente::query();
+
+        // Cálculo de totales para las cards
+        $totalClientes = Cliente::count();
+        $totalHombres = Cliente::where('genero', 'Masculino')->count();
+        $totalMujeres = Cliente::where('genero', 'Femenino')->count();
+
+        // Aplicar filtros solo si se han enviado
+        if ($request->filled('nombre') || $request->filled('primerApellido') || $request->filled('genero') || $request->filled('fechaCreacionInicio') || $request->filled('fechaCreacionFin')) {
+
+            if ($request->filled('nombre')) {
+                $clientes->where('nombre', 'like', '%' . $request->nombre . '%');
+            }
+
+            if ($request->filled('primerApellido')) {
+                $clientes->where('primerApellido', 'like', '%' . $request->primerApellido . '%');
+            }
+
+            // Aquí modificamos la lógica para el género
+            if ($request->filled('genero') && $request->genero != '') {
+                $clientes->where('genero', $request->genero);
+            }
+
+            if ($request->filled('fechaCreacionInicio') && $request->filled('fechaCreacionFin')) {
+                $clientes->whereBetween('fechaCreacion', [$request->fechaCreacionInicio, $request->fechaCreacionFin]);
+            }
+
+            $clientes = $clientes->get(); // Solo obtener clientes si hay filtros
+        } else {
+            $clientes = collect(); // Retornar una colección vacía si no hay filtros
         }
-    
-        if ($estado) {
-            $query->where('estado', $estado);
-        }
-    
-        if ($clienteNombre) {
-            $query->whereHas('cliente', function ($q) use ($clienteNombre) {
-                $q->where('nombre', 'like', '%' . $clienteNombre . '%');
-            });
-        }
-    
-        // Obtener los resultados
-        $inscripciones = $query->with(['cliente', 'detalleInscripciones.membresia'])->get();
-    
-        // Cálculos adicionales
-        $totalInscripciones = $inscripciones->count();
-        $totalIngresos = $inscripciones->sum('totalPago');
-    
-        return view('admin.reportes.inscripciones', compact('clientes', 'inscripciones', 'totalInscripciones', 'totalIngresos'));
+
+        return view('admin.reportes.cliente', compact('clientes', 'totalClientes', 'totalHombres', 'totalMujeres'));
     }
-    
-    // Exportar PDF
-    public function generarPDFInscripciones(Request $request)
+    //error no muestra todos los filtros al darle click en todos los generos 
+
+    // Exportar a PDF usando DomPDF
+    public function exportarPDF(Request $request)
     {
-        // Procesar filtros (igual que en inscripciones)
-        // ...
+        $clientes = $this->filtrarClientes($request);
 
-        // Generar PDF con los datos filtrados
-        // ...
-    }
+        // Capturar las fechas para el reporte
+        $fechaCreacionInicio = $request->fechaCreacionInicio;
+        $fechaCreacionFin = $request->fechaCreacionFin;
 
-    // Exportar Excel
-    public function generarExcelInscripciones(Request $request)
-    {
-        // Procesar filtros (igual que en inscripciones)
-        // ...
+        // Generar el PDF en orientación vertical (portrait)
+        $pdf = Pdf::loadView('admin.reportes.clientes-pdf', compact('clientes', 'fechaCreacionInicio', 'fechaCreacionFin'))
+            ->setPaper('a4', 'portrait'); // Cambiado a 'portrait' para formato vertical
+        // Configurar DomPDF para permitir archivos externos
+        $pdf->getDomPDF()->set_option("enable_remote", true);
+        $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
 
-        // Generar Excel con los datos filtrados
-        // ...
-    }
+        // Establecer la ruta base para las imágenes
+        $pdf->getDomPDF()->set_option("chroot", public_path());
 
-    // Generar reporte basado en los filtros aplicados
-    public function generarReporteInscripciones(Request $request)
-    {
-        // Filtros recibidos
-        $fechaInicio = $request->input('fecha_inicio');
-        $fechaFin = $request->input('fecha_fin');
-        $tipoProducto = $request->input('tipo_producto');
-        $estado = $request->input('estado');
-        $idCliente = $request->input('cliente');
-
-        // Construcción de la consulta dinámica
-        $query = Inscripcion::query();
-
-        if ($fechaInicio && $fechaFin) {
-            $query->whereBetween('fechaInscripcion', [$fechaInicio, $fechaFin]);
-        }
-
-        if ($tipoProducto) {
-            $query->whereHas('detalleInscripciones', function ($q) use ($tipoProducto) {
-                $q->where('tipoProducto', $tipoProducto);
-            });
-        }
-
-        if ($estado) {
-            $query->where('estado', $estado);
-        }
-
-        if ($idCliente) {
-            $query->where('idCliente', $idCliente);
-        }
-
-        // Obtener los resultados
-        $inscripciones = $query->with(['cliente', 'detalleInscripciones'])->get();
-
-        // Cálculos adicionales
-        $totalInscripciones = $inscripciones->count();
-        $totalIngresos = $inscripciones->sum('totalPago');
-
-        // Devolver la respuesta en JSON
-        return response()->json([
-            'inscripciones' => $inscripciones,
-            'totalInscripciones' => $totalInscripciones,
-            'totalIngresos' => $totalIngresos
-        ]);
+        // Devolver el PDF para verlo en una nueva pestaña
+        return $pdf->stream('reporte_clientes.pdf');
     }
 
+    // Exportar a Excel usando Maatwebsite Excel
+    public function exportarExcel(Request $request)
+    {
+        $clientes = $this->filtrarClientes($request);
+        return Excel::download(new ClientesExport($clientes), 'reporte_clientes.xlsx');
+    }
+
+    // Función para aplicar los filtros a los clientes
+    private function filtrarClientes(Request $request)
+    {
+        $clientes = Cliente::query();
+
+        if ($request->filled('nombre')) {
+            $clientes->where('nombre', 'like', '%' . $request->nombre . '%');
+        }
+
+        if ($request->filled('primerApellido')) {
+            $clientes->where('primerApellido', 'like', '%' . $request->primerApellido . '%');
+        }
+
+        if ($request->filled('genero') && $request->genero != '') {
+            $clientes->where('genero', $request->genero);
+        }
+
+        if ($request->filled('fechaCreacionInicio') && $request->filled('fechaCreacionFin')) {
+            $clientes->whereBetween('fechaCreacion', [$request->fechaCreacionInicio, $request->fechaCreacionFin]);
+        }
+
+        return $clientes->get();
+    }
 
 
 }

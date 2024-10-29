@@ -17,17 +17,17 @@ class DetalleInscripcion extends Model
         'idInscripcion',
         'tipoProducto',
         'idMembresia',
-        'idSeccion',
+        'idServicio',
         'precio',
-        'cantidadSecciones',
-        'descuento'
+        'descuento',
+        'tipoDescuento',
+        'sesionesRestantes'
     ];
 
     public function inscripcion()
     {
         return $this->belongsTo(Inscripcion::class, 'idInscripcion');
     }
-
     public function membresia()
     {
         return $this->belongsTo(Membresia::class, 'idMembresia');

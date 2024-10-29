@@ -13,108 +13,181 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Http\Requests\StoreInscripcionRequest;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Storage;
+
 class InscripcionController extends Controller
 {
 
 
+
     public function create()
     {
-        $clientes = Cliente::all();
-        $membresias = Membresia::all();
-        $secciones = Seccion::all();
-        $servicios = Servicio::all();
-        return view('admin.inscripciones.create', compact('clientes', 'membresias', 'secciones', 'servicios'));
+        // Obtener las membresías no eliminadas y vigentes
+        $membresias = Membresia::where('eliminado', 1)
+            ->where('fechaFin', '>=', now())
+            ->get();
+    
+        // Obtener los servicios no eliminados y activos, con sus días y horarios
+        $servicios = Servicio::where('eliminado', 1)
+            ->where('estado', 1) // 1 = Activo
+            ->with(['diasHorarios.diaSemana'])
+            ->get();
+    
+        return view('admin.inscripciones.create', compact('membresias', 'servicios'));
     }
 
+    // Método para almacenar la inscripción
     public function store(Request $request)
     {
-        \Log::info($request->all());
-
-        // Validaciones
         $request->validate([
             'idCliente' => 'required|exists:clientes,idCliente',
-            'tipoProducto' => 'required|in:membresia,servicio',
-            'idMembresia' => 'nullable|required_if:tipoProducto,membresia|exists:membresias,idMembresia',
-            'idSeccion' => 'nullable|required_if:tipoProducto,servicio|exists:secciones,idSeccion',
-            'cantidadSecciones' => 'nullable|required_if:tipoProducto,servicio|integer|min:1',
-            'totalPago' => 'required|numeric|min:0',
-            'accion' => 'nullable|in:nueva,renovar,actualizar' // Nueva acción: renovar o actualizar membresía
+            'productos' => 'required|json',
         ]);
-
-        // Iniciar una transacción para asegurar que todos los datos se registren correctamente
-        DB::beginTransaction();
-
-        try {
-            // Verificar si el cliente ya tiene una membresía activa
-            $membresiaActiva = Inscripcion::where('idCliente', $request->idCliente)
-                ->where('estado', 'activa')
-                ->whereHas('detalleInscripciones', function ($query) {
-                    $query->where('tipoProducto', 'membresia');
-                })
-                ->first();
-
-            // Inicializar total de pago
-            $totalPago = 0;
-
-            // Procesar la lógica de membresía
-            if ($request->tipoProducto == 'membresia') {
-                $membresia = Membresia::find($request->idMembresia);
-                $totalPago = $membresia->precio;
-            }
-
-            // Procesar la lógica de servicios
-            if ($request->tipoProducto == 'servicio') {
-                $seccion = Seccion::find($request->idSeccion);
-
-                // Validar la capacidad disponible de la sección
-                if ($seccion->capacidad < $request->cantidadSecciones) {
-                    return redirect()->back()->with('error', 'No hay suficiente capacidad en esta sección.');
-                }
-
-                // Calcular el precio del servicio
-                $totalPago = $seccion->precioPorSeccion * $request->cantidadSecciones;
-
-                // Si el servicio incluye el precio de entrada y el cliente NO tiene una membresía activa, sumar el costo de entrada
-                if ($seccion->servicio->incluyeCostoEntrada && !$membresiaActiva) {
-                    $precioEntrada = 10.00; // Suponiendo un precio fijo para la entrada
-                    $totalPago += $precioEntrada;
-                }
-            }
-
-            // Crear la inscripción
-            $inscripcion = Inscripcion::create([
-                'idCliente' => $request->idCliente,
-                'idUsuario' => auth()->id(),
-                'totalPago' => $totalPago,
-                'diasRestantes' => $request->tipoProducto == 'membresia' ? $membresia->duracionDias : null,
-            ]);
-
-            // Crear el detalle de la inscripción
-            DetalleInscripcion::create([
-                'idInscripcion' => $inscripcion->idInscripcion,
-                'tipoProducto' => $request->tipoProducto,
-                'idMembresia' => $request->tipoProducto == 'membresia' ? $request->idMembresia : null,
-                'idSeccion' => $request->tipoProducto == 'servicio' ? $request->idSeccion : null,
-                'precio' => $totalPago,
-                'cantidadSecciones' => $request->tipoProducto == 'servicio' ? $request->cantidadSecciones : 1, // Para servicios, de lo contrario se establece en 1
-            ]);
-
-            // Si es un servicio, reducir la capacidad de la sección seleccionada
-            if ($request->tipoProducto == 'servicio') {
-                $seccion->capacidad -= $request->cantidadSecciones;
-                $seccion->save();
-            }
-
-            DB::commit();
-
-            return redirect()->route('admin.inscripciones.index')
-                ->with('success', 'Inscripción creada correctamente.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Ocurrió un error al crear la inscripción: ' . $e->getMessage());
+    
+        $productos = json_decode($request->productos, true);
+    
+        if (empty($productos)) {
+            return redirect()->back()->withErrors(['Debe seleccionar al menos un producto.']);
         }
+    
+        DB::beginTransaction();
+    
+        try {
+            $tieneMembresiaActiva = false;
+            foreach ($productos as $productoData) {
+                if ($productoData['tipoProducto'] == 'membresia') {
+                    // Verificar si el cliente ya tiene una membresía activa
+                    $membresiaActiva = DetalleInscripcion::where('tipoProducto', 'membresia')
+                        ->whereHas('inscripcion', function ($query) use ($request) {
+                            $query->where('idCliente', $request->idCliente)
+                                  ->where('estado', 'activa');
+                        })
+                        ->first();
+    
+                    if ($membresiaActiva) {
+                        return redirect()->back()->withErrors(['El cliente ya tiene una membresía activa.']);
+                    }
+    
+                    $tieneMembresiaActiva = true;
+                    break;
+                }
+            }
+    
+            // Crear la inscripción
+            $inscripcion = new Inscripcion();
+            $inscripcion->idCliente = $request->idCliente;
+            $inscripcion->idUsuario = auth()->user()->idUsuario;
+            $inscripcion->totalPago = 0; // Se calculará más adelante
+            $inscripcion->estado = 'activa';
+            $inscripcion->diasRestantes = null; // Inicialmente null
+            $inscripcion->save();
+    
+            $totalPago = 0;
+    
+            foreach ($productos as $productoData) {
+                $detalle = new DetalleInscripcion();
+                $detalle->idInscripcion = $inscripcion->idInscripcion;
+                $detalle->tipoProducto = $productoData['tipoProducto'];
+    
+                if ($productoData['tipoProducto'] == 'membresia') {
+                    $membresia = Membresia::find($productoData['idProducto']);
+                    $detalle->idMembresia = $productoData['idProducto'];
+                    $detalle->precio = $membresia->precio;
+    
+                    // Aplicar descuento si existe
+                    $detalle->descuento = $productoData['descuento'] ?? 0;
+    
+                    $precioFinal = $detalle->precio - $detalle->descuento;
+                    $totalPago += $precioFinal;
+    
+                    // Actualizar días restantes en la inscripción
+                    $inscripcion->diasRestantes = $membresia->duracionDias;
+    
+                } else if ($productoData['tipoProducto'] == 'servicio') {
+                    // Validación de servicio ya inscrito
+                    $servicioExistente = DetalleInscripcion::where('tipoProducto', 'servicio')
+                        ->where('idServicio', $productoData['idProducto'])
+                        ->whereHas('inscripcion', function ($query) use ($request) {
+                            $query->where('idCliente', $request->idCliente)
+                                  ->where('estado', 'activa');
+                        })
+                        ->first();
+    
+                    if ($servicioExistente) {
+                        return redirect()->back()->withErrors(['El cliente ya está inscrito en uno de los servicios seleccionados.']);
+                    }
+    
+                    $servicio = Servicio::find($productoData['idProducto']);
+    
+                    // Verificar si hay capacidad disponible
+                    if ($servicio->capacidad <= 0) {
+                        return redirect()->back()->withErrors(['El servicio "' . $servicio->nombre . '" no tiene cupos disponibles.']);
+                    }
+    
+                    $detalle->idServicio = $productoData['idProducto'];
+                    $detalle->precio = $servicio->precioTotal;
+    
+                    // Aplicar descuento si existe
+                    $detalle->descuento = $productoData['descuento'] ?? 0;
+    
+                    $precioFinal = $detalle->precio - $detalle->descuento;
+                    $totalPago += $precioFinal;
+    
+                    // Establecer sesiones restantes si aplica
+                    if ($servicio->cantidadSesiones) {
+                        $detalle->sesionesRestantes = $servicio->cantidadSesiones;
+                    }
+    
+                    $detalle->save();
+    
+                    // Reducir la capacidad del servicio en 1
+                    $servicio->capacidad -= 1;
+                    $servicio->save();
+                }
+    
+                // Guardar el detalle si no es un servicio (membresía)
+                if ($detalle->tipoProducto != 'servicio') {
+                    $detalle->save();
+                }
+            }
+    
+            // Actualizar montos en la inscripción
+            $inscripcion->totalPago = $totalPago;
+            $inscripcion->save();
+    
+            DB::commit();
+    
+            return redirect()->route('admin.inscripciones.create')->with('success', 'Inscripción realizada correctamente.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->withErrors(['Ocurrió un error al realizar la inscripción: ' . $e->getMessage()]);
+        }
+    }
+    
+
+
+    // Método para búsqueda de clientes en tiempo real
+    public function searchCliente(Request $request)
+    {
+        $search = $request->get('term');
+        $clientes = Cliente::where('nombre', 'LIKE', '%' . $search . '%')
+            ->orWhere('primerApellido', 'LIKE', '%' . $search . '%')
+            ->get();
+
+        $result = [];
+        foreach ($clientes as $cliente) {
+            $result[] = [
+                'id' => $cliente->idCliente,
+                'text' => $cliente->nombre . ' ' . $cliente->primerApellido
+            ];
+        }
+
+        return response()->json($result);
     }
 
 
@@ -138,6 +211,39 @@ class InscripcionController extends Controller
     }  */
 
 
+
+    public function generarComprobante($id)
+    {
+        // Obtener la inscripción con todas las relaciones necesarias
+        $inscripcion = Inscripcion::with(['cliente', 'detallesInscripciones.membresia', 'detallesInscripciones.servicio'])
+            ->findOrFail($id);
+
+        // Verificar si el cliente ya tiene un código QR
+        $cliente = $inscripcion->cliente;
+        if (!$cliente->qrCode) {
+            return redirect()->back()->with('error', 'El cliente no tiene un código QR generado.');
+        }
+
+        // Obtener la ruta del código QR almacenado
+        $qrCodePath = 'storage/' . $cliente->qrCode; // Ruta donde se almacenó el QR en el disco público
+
+        // Obtener el logo del gimnasio
+        $logo = public_path('dist/assets/images/logo3.png');  // Ruta del logo
+
+        // Cargar la vista del comprobante y generar el PDF
+        $pdf = Pdf::loadView('admin.inscripciones.comprobante', compact('inscripcion', 'qrCodePath', 'logo'))
+            ->setPaper('a4', 'portrait'); // Ajusta el tamaño y la orientación del papel si es necesario
+
+        // Habilitar la carga remota de imágenes
+        $pdf->getDomPDF()->set_option("enable_remote", true);
+        $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
+
+        // Establecer la ruta base para las imágenes
+        $pdf->getDomPDF()->set_option("chroot", public_path());
+
+        // Devolver el PDF para que se abra en una nueva ventana
+        return $pdf->stream('comprobante_inscripcion_' . $inscripcion->idInscripcion . '.pdf');
+    }
 
 
 
@@ -175,39 +281,39 @@ class InscripcionController extends Controller
         $fecha_inicio = $request->input('fecha_inicio');
         $fecha_fin = $request->input('fecha_fin');
         $estado = $request->input('estado');
-    
+
         // Consulta base para membresías
         $queryMembresias = Inscripcion::whereHas('detallesInscripciones', function ($q) {
             $q->where('tipoProducto', 'membresia');
         });
-    
+
         // Consulta base para servicios
         $queryServicios = Inscripcion::whereHas('detallesInscripciones', function ($q) {
             $q->where('tipoProducto', 'servicio');
         });
-    
+
         // Aplicar filtros a ambas consultas
         if ($fecha_inicio) {
             $queryMembresias->where('fechaInscripcion', '>=', $fecha_inicio);
             $queryServicios->where('fechaInscripcion', '>=', $fecha_inicio);
         }
-    
+
         if ($fecha_fin) {
             $queryMembresias->where('fechaInscripcion', '<=', $fecha_fin);
             $queryServicios->where('fechaInscripcion', '<=', $fecha_fin);
         }
-    
+
         if ($estado) {
             $queryMembresias->where('estado', $estado);
             $queryServicios->where('estado', $estado);
         }
-    
+
         // Obtener inscripciones con relaciones necesarias para membresías
         $inscripcionesMembresias = $queryMembresias->with(['cliente', 'detallesInscripciones.membresia'])->get();
-    
+
         // Obtener inscripciones con relaciones necesarias para servicios
         $inscripcionesServicios = $queryServicios->with(['cliente', 'detallesInscripciones.servicio'])->get();
-    
+
         // Procesar inscripciones de membresías
         foreach ($inscripcionesMembresias as $inscripcion) {
             $detalle = $inscripcion->detallesInscripciones->where('tipoProducto', 'membresia')->first();
@@ -222,7 +328,7 @@ class InscripcionController extends Controller
             }
             $inscripcion->montoPago = $inscripcion->detallesInscripciones->sum('precio');
         }
-    
+
         // Procesar inscripciones de servicios
         foreach ($inscripcionesServicios as $inscripcion) {
             $detalle = $inscripcion->detallesInscripciones->where('tipoProducto', 'servicio')->first();
@@ -237,15 +343,15 @@ class InscripcionController extends Controller
             }
             $inscripcion->montoPago = $inscripcion->detallesInscripciones->sum('precio');
         }
-    
+
         // Contadores para las tarjetas (opcional, puedes ajustarlos según tus necesidades)
         $totalMembresias = $inscripcionesMembresias->count();
         $totalServicios = $inscripcionesServicios->count();
-    
+
         $totalActivas = Inscripcion::where('estado', 'activa')->count();
         $totalVencidas = Inscripcion::where('estado', 'vencida')->count();
         $totalCanceladas = Inscripcion::where('estado', 'cancelada')->count();
-    
+
         return view('admin.inscripciones.index', compact(
             'inscripcionesMembresias',
             'inscripcionesServicios',
@@ -259,16 +365,120 @@ class InscripcionController extends Controller
             'totalCanceladas'
         ));
     }
-    
+
+    // generar qr 
 
 
-    public function detalle($id)
+
+
+
+    public function generarQr($idInscripcion)
     {
-        $inscripcion = Inscripcion::with(['cliente', 'detalleInscripciones.membresia', 'detalleInscripciones.servicio'])->findOrFail($id);
+        // Obtener la inscripción y el cliente asociado
+        $inscripcion = Inscripcion::findOrFail($idInscripcion);
+        $cliente = $inscripcion->cliente;
 
-        // Devolver los datos en formato JSON para el modal
-        return response()->json($inscripcion);
+        // Obtener el detalle de la inscripción para obtener el tipo de producto (membresía o servicio)
+        $detalleInscripcion = DetalleInscripcion::where('idInscripcion', $idInscripcion)->first();
+
+        if ($detalleInscripcion) {
+            // Inicializamos la variable de la fecha de fin
+            $fechaFin = '';
+
+            // Verificar si es una membresía
+            if ($detalleInscripcion->tipoProducto === 'membresia') {
+                // Obtener la membresía asociada y su fecha de fin
+                $membresia = Membresia::find($detalleInscripcion->idMembresia);
+                if ($membresia) {
+                    $fechaFin = $membresia->fechaFin;
+                }
+            } elseif ($detalleInscripcion->tipoProducto === 'servicio') {
+                // Si es un servicio, podrías tomar la fecha de fin del servicio o dejarlo vacío
+                $servicio = Servicio::find($detalleInscripcion->idServicio);
+                if ($servicio) {
+                    $fechaFin = $servicio->fechaFin;
+                }
+            }
+
+            // Verificar si el cliente ya tiene un código QR generado
+            if (!$cliente->qrCode) {
+                // Generar los datos para el código QR
+                $qrData = "Cliente: {$cliente->nombre} {$cliente->primerApellido} {$cliente->segundoApellido} | 
+            Inscripción ID: {$inscripcion->idInscripcion} | 
+            Fecha de Fin: {$fechaFin} | 
+            Tipo: {$detalleInscripcion->tipoProducto}";
+
+                // Generar el código QR en formato PNG utilizando GD
+                $qrCode = QrCode::size(200)->generate($qrData);
+
+                // Generar un nombre de archivo único
+                $filePath = 'qrcodes/cliente_' . $cliente->idCliente . '_' . time() . '.svg';
+
+                // Guardar el archivo QR en el almacenamiento público
+                Storage::disk('public')->put($filePath, $qrCode);
+
+                // Guardar la ruta del QR en el campo qrCode del cliente
+                $cliente->qrCode = $filePath;
+                $cliente->save();
+            }
+
+            return redirect()->back()->with('success', 'Código QR generado correctamente.');
+        } else {
+            return redirect()->back()->with('error', 'No se pudo generar el QR, no se encontró el detalle de la inscripción.');
+        }
     }
+
+
+    public function generarQr2($idInscripcion)
+    {
+        // Obtener la inscripción y el cliente asociado
+        $inscripcion = Inscripcion::findOrFail($idInscripcion);
+        $cliente = $inscripcion->cliente;
+
+        // Obtener el detalle de la membresía
+        $detalleInscripcion = $inscripcion->detalles()->where('tipoProducto', 'membresia')->first();
+
+        if ($detalleInscripcion) {
+            // Obtener la membresía asociada y su fecha de fin
+            $membresia = Membresia::find($detalleInscripcion->idMembresia);
+            if ($membresia) {
+                // Asumiendo que tienes un campo 'duracion' en días en la membresía
+                $fechaFin = $inscripcion->created_at->addDays($membresia->duracion)->format('d/m/Y');
+            } else {
+                $fechaFin = '';
+            }
+
+            // Generar los datos para el código QR
+            $qrData = "Cliente: {$cliente->nombre} {$cliente->primerApellido} {$cliente->segundoApellido} | 
+Inscripción ID: {$inscripcion->idInscripcion} | 
+Fecha de Fin: {$fechaFin} | 
+Tipo: Membresía";
+
+            // Generar el código QR en formato SVG
+            $qrCode = QrCode::format('svg')->size(200)->generate($qrData);
+
+            // Generar un nombre de archivo único
+            $filePath = 'qrcodes/cliente_' . $cliente->idCliente . '_' . time() . '.svg';
+
+            // Guardar el archivo QR en el almacenamiento público
+            Storage::disk('public')->put($filePath, $qrCode);
+
+            // Guardar la ruta del QR en el campo qrCode del cliente
+            $cliente->qrCode = $filePath;
+            $cliente->save();
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+
+
+
+
+
 
     public function cancelar(Request $request, $id)
     {

@@ -18,7 +18,6 @@
         </div>
     </div>
     <!-- Page Header Close -->
-
  <!-- Start::row-1 -->
 <div class="row">
     <div class="col-lg-12">
@@ -69,6 +68,7 @@
                                         @endif
                                     </td>
                                     <td>
+                                        @if(auth()->user()->rol == 'Administrador')
                                         <a href="{{ route('admin.entrenadores.edit', $entrenador->idEntrenador) }}" class="btn btn-sm btn-info btn-b" data-bs-toggle="tooltip" title="Editar">
                                             <i class="ri-sip-fill"></i>
                                         </a>
@@ -82,6 +82,7 @@
                                                 <i class="ri-delete-bin-6-line"></i>
                                             </button>
                                         </form>
+                                        @endif
                                         <!-- Botón para ver detalles en un modal -->
                                         <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#modalVerEntrenador{{ $entrenador->idEntrenador }}">
                                             <i class="las la-eye"></i>

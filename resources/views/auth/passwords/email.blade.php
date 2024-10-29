@@ -9,12 +9,17 @@
 
                 <div class="card-body">
                     @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
+                        <script>
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Enlace Enviado',
+                                text: '{{ session("status") }}',
+                                confirmButtonText: 'Aceptar'
+                            });
+                        </script>
                     @endif
 
-                    <form method="POST" action="{{ route('password.email') }}">
+                    <form method="POST" action="{{ route('password.custom_reset') }}">
                         @csrf
 
                         <div class="row mb-3">

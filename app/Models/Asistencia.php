@@ -18,11 +18,13 @@ class Asistencia extends Model
         'idCliente',
         'idInscripcion',
         'metodoRegistro',
+        'estado',
         'idAutor',
         'eliminado'
     ];
 
     protected $casts = [
+        'fechaAsistencia' => 'datetime',
         'fechaCreacion' => 'datetime',
         'fechaModificacion' => 'datetime',
     ];

@@ -21,7 +21,7 @@
             <div class="card">
                 <div class="card-header">
 
-                    
+
                     <h5 class="card-title mb-0">Lista de Usuarios</h5><br>
                     <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
                         <i class="las la-plus"></i> Añadir Usuario
@@ -48,11 +48,13 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>
                                             @if ($usuario->image)
-                                                <img src="{{ asset('storage/' . $usuario->image) }}" alt="Foto de perfil" width="50" height="50">
+                                                <img src="{{ asset('storage/' . $usuario->image) }}" alt="Foto de perfil"
+                                                    width="50" height="50">
                                             @else
-                                                <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil" width="50" height="50">
+                                                <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
+                                                    width="50" height="50">
                                             @endif
-                                        </td>                                        
+                                        </td>
                                         <td>{{ $usuario->nombreUsuario }}</td>
                                         <td>{{ $usuario->email }}</td>
                                         <td>{{ $usuario->rol }}</td>
@@ -63,29 +65,35 @@
                                                 <span class="badge bg-danger">Inhabilitado</span>
                                             @endif
                                         </td>
-
                                         <td>
-                                            <button class="btn btn-sm btn-info edit-button"
-                                                data-usuario="{{ json_encode($usuario) }}">
-                                                <i class="ri-sip-fill"></i>
-                                            </button>
-                                            <!-- Botón de inhabilitar/habilitar -->
-                                            <button
-                                                class="btn btn-sm {{ $usuario->eliminado == 1 ? 'btn-danger' : 'btn-success' }}"
-                                                onclick="toggleUserStatus({{ $usuario->idUsuario }})"
-                                                {{ $usuario->idUsuario == auth()->id() ? 'disabled' : '' }}>
-                                                @if ($usuario->eliminado == 1)
-                                                    <i class="ri-delete-bin-line"></i>
-                                                @else
-                                                    <i class="ri-check-line"></i> Habilitar
-                                                @endif
-                                            </button>
+                                            @if ($usuario->rol !== 'Administrador' || auth()->id() !== $usuario->idUsuario)
+                                                <!-- Botón de edición (solo para usuarios que no sean el propio administrador) -->
+                                                <button class="btn btn-sm btn-info edit-button"
+                                                    data-usuario="{{ json_encode($usuario) }}"
+                                                    {{ $usuario->rol === 'Administrador' ? 'disabled' : '' }}>
+                                                    <i class="ri-sip-fill"></i>
+                                                </button>
 
-
+                                                <!-- Botón de habilitar/inhabilitar (solo para usuarios que no sean el propio administrador) -->
+                                                <button
+                                                    class="btn btn-sm {{ $usuario->eliminado == 1 ? 'btn-danger' : 'btn-success' }}"
+                                                    onclick="toggleUserStatus({{ $usuario->idUsuario }})"
+                                                    {{ $usuario->rol === 'Administrador' || $usuario->idUsuario == auth()->id() ? 'disabled' : '' }}>
+                                                    @if ($usuario->eliminado == 1)
+                                                        <i class="ri-delete-bin-line"></i>
+                                                    @else
+                                                        <i class="ri-check-line"></i> Habilitar
+                                                    @endif
+                                                </button>
+                                            @else
+                                                <!-- Texto indicando que el administrador actual no puede editarse a sí mismo -->
+                                                <span class="text-muted">No disponible</span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
+
                         </table>
                     </div>
                 </div>
@@ -93,99 +101,101 @@
         </div>
     </div>
 
-   <!-- Modal para editar usuario (reutilizable) -->
-   <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Editar Usuario</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="edit-user-form" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" id="editUserId" name="idUsuario">
-                    <div class="mb-3">
-                        <label for="editNombreUsuario" class="form-label">Nombre de Usuario <span
-                                style="color: red">*</span></label>
-                        <input type="text" class="form-control" id="editNombreUsuario" name="nombreUsuario" required>
-                        <div class="invalid-feedback" id="editNombreUsuarioError"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editEmail" class="form-label">Correo Electrónico <span
-                                style="color: red">*</span></label>
-                        <input type="email" class="form-control" id="editEmail" name="email" required>
-                        <div class="invalid-feedback" id="editEmailError"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editRol" class="form-label">Rol <span style="color: red">*</span></label>
-                        <select class="form-control" id="editRol" name="rol" required>
-                            <option value="" disabled>Seleccione un rol</option>
-                            <option value="Administrador">Administrador</option>
-                            <option value="Vendedor">Vendedor</option>
-                        </select>
-                        <div class="invalid-feedback" id="editRolError"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editImage" class="form-label">Foto (Opcional)</label>
-                        <input type="file" class="form-control" id="editImage" name="image" accept="image/*">
-                        <img id="previewEditImage" src="#" alt="Previsualización" style="display: none; width: 100px; height: 100px;">
-                        <div class="invalid-feedback" id="editImageError"></div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Actualizar</button>
-                </form>
+    <!-- Modal para editar usuario (reutilizable) -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-user-form" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" id="editUserId" name="idUsuario">
+                        <div class="mb-3">
+                            <label for="editNombreUsuario" class="form-label">Nombre de Usuario <span
+                                    style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="editNombreUsuario" name="nombreUsuario" required>
+                            <div class="invalid-feedback" id="editNombreUsuarioError"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEmail" class="form-label">Correo Electrónico <span
+                                    style="color: red">*</span></label>
+                            <input type="email" class="form-control" id="editEmail" name="email" required>
+                            <div class="invalid-feedback" id="editEmailError"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editRol" class="form-label">Rol <span style="color: red">*</span></label>
+                            <select class="form-control" id="editRol" name="rol" required>
+                                <option value="" disabled>Seleccione un rol</option>
+                                <option value="Administrador">Administrador</option>
+                                <option value="Vendedor">Vendedor</option>
+                            </select>
+                            <div class="invalid-feedback" id="editRolError"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editImage" class="form-label">Foto (Opcional)</label>
+                            <input type="file" class="form-control" id="editImage" name="image" accept="image/*">
+                            <img id="previewEditImage" src="#" alt="Previsualización"
+                                style="display: none; width: 100px; height: 100px;">
+                            <div class="invalid-feedback" id="editImageError"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal para crear usuario -->
-<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Añadir Usuario</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="create-user-form" enctype="multipart/form-data">
-                    @csrf
-                    <!-- Campos del formulario para crear usuario -->
-                    <div class="mb-3">
-                        <label for="nombreUsuario" class="form-label">Nombre de Usuario <span
-                                style="color: red">*</span></label>
-                        <input type="text" class="form-control" id="nombreUsuario" name="nombreUsuario" required>
-                        <div class="invalid-feedback" id="nombreUsuarioError"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Correo Electrónico <span
-                                style="color: red">*</span></label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                        <div class="invalid-feedback" id="emailError"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="rol" class="form-label">Rol <span style="color: red">*</span></label>
-                        <select class="form-control" id="rol" name="rol" required>
-                            <option value="" disabled selected>Seleccione un rol</option>
-                            <option value="Administrador">Administrador</option>
-                            <option value="Vendedor">Vendedor</option>
-                        </select>
-                        <div class="invalid-feedback" id="rolError"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="image" class="form-label">Foto (Opcional)</label>
-                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
-                        <img id="previewImage" src="#" alt="Previsualización" style="display: none; width: 100px; height: 100px;">
-                        <div class="invalid-feedback" id="imageError"></div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Crear</button>
-                </form>
+    <!-- Modal para crear usuario -->
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Añadir Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-user-form" enctype="multipart/form-data">
+                        @csrf
+                        <!-- Campos del formulario para crear usuario -->
+                        <div class="mb-3">
+                            <label for="nombreUsuario" class="form-label">Nombre de Usuario <span
+                                    style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="nombreUsuario" name="nombreUsuario" required>
+                            <div class="invalid-feedback" id="nombreUsuarioError"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Correo Electrónico <span
+                                    style="color: red">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                            <div class="invalid-feedback" id="emailError"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="rol" class="form-label">Rol <span style="color: red">*</span></label>
+                            <select class="form-control" id="rol" name="rol" required>
+                                <option value="" disabled selected>Seleccione un rol</option>
+                                <option value="Administrador">Administrador</option>
+                                <option value="Vendedor">Vendedor</option>
+                            </select>
+                            <div class="invalid-feedback" id="rolError"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Foto (Opcional)</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                            <img id="previewImage" src="#" alt="Previsualización"
+                                style="display: none; width: 100px; height: 100px;">
+                            <div class="invalid-feedback" id="imageError"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Crear</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
 @push('scripts')
     <script>
@@ -216,10 +226,10 @@
             $('#editNombreUsuario').val(usuario.nombreUsuario);
             $('#editEmail').val(usuario.email);
             $('#editRol').val(usuario.rol);
-            
+
             // Mostrar la imagen si existe, o ocultar la previsualización
             if (usuario.image) {
-                $('#previewEditImage').attr('src', '{{ asset("storage/") }}/' + usuario.image).show();
+                $('#previewEditImage').attr('src', '{{ asset('storage/') }}/' + usuario.image).show();
             } else {
                 $('#previewEditImage').hide();
             }
@@ -276,7 +286,8 @@
         $('#create-user-form').on('submit', function(event) {
             event.preventDefault();
             let formData = new FormData(this);
-            sendAjaxRequest("{{ route('admin.usuarios.store') }}", 'POST', formData, 'Usuario creado exitosamente!');
+            sendAjaxRequest("{{ route('admin.usuarios.store') }}", 'POST', formData,
+                'Usuario creado exitosamente!');
         });
 
         // Enviar formulario de edición
@@ -284,7 +295,8 @@
             event.preventDefault();
             let formData = new FormData(this);
             let userId = $('#editUserId').val();
-            sendAjaxRequest("{{ route('admin.usuarios.update', '') }}/" + userId, 'POST', formData, 'Usuario actualizado exitosamente!');
+            sendAjaxRequest("{{ route('admin.usuarios.update', '') }}/" + userId, 'POST', formData,
+                'Usuario actualizado exitosamente!');
         });
 
         // Función para cambiar el estado del usuario
@@ -320,13 +332,15 @@
                         },
                         success: function(response) {
                             Swal.close();
-                            Swal.fire('Éxito!', 'El estado del usuario ha sido cambiado.', 'success').then(() => {
-                                location.reload();
-                            });
+                            Swal.fire('Éxito!', 'El estado del usuario ha sido cambiado.', 'success')
+                                .then(() => {
+                                    location.reload();
+                                });
                         },
                         error: function(response) {
                             Swal.close();
-                            Swal.fire('Error!', 'Hubo un problema al cambiar el estado del usuario.', 'error');
+                            Swal.fire('Error!', 'Hubo un problema al cambiar el estado del usuario.',
+                                'error');
                         }
                     });
                 }

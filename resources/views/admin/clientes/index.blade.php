@@ -77,7 +77,7 @@
                                             @endif
                                         </td>
                                         <td>
-
+                                            @if(auth()->user()->rol == 'Administrador')
                                             <a href="{{ route('admin.clientes.edit', $cliente->idCliente) }}"
                                                 class="btn btn-sm btn-warning btn-b" data-bs-toggle="tooltip" title=""
                                                 data-bs-original-title="Editar">
@@ -95,6 +95,7 @@
                                                     <i class="ri-delete-bin-6-line"></i>
                                                 </button>
                                             </form>
+                                            @endif
 
                                             <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal"
                                                 data-bs-target="#modalCliente{{ $cliente->idCliente }}">

@@ -105,6 +105,15 @@
     <!-- Tarjeta para escaneo de asistencia -->
    
 </div>
+
+
+
+<li class="nav-item">
+    <a href="{{ route('admin.asistencias.registrarQR') }}"class="nav-link"><span
+        data-key="t-boxicons"><i class="ri-eye-line"></i> dos
+        Asistencias</span> </a>
+</li>
+
 @endsection
 
 @push('scripts')

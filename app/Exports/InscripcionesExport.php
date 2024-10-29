@@ -5,26 +5,19 @@ namespace App\Exports;
 use App\Models\Inscripcion;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use PhpOffice\PhpSpreadsheet\Style\Color;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use Maatwebsite\Excel\Events\AfterSheet;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
-class InscripcionesExport implements FromCollection, WithHeadings, WithMapping, WithStyles
+class InscripcionesExport implements FromCollection, WithHeadings, WithCustomStartCell, WithStyles, WithEvents
 {
-    /**
-     * Retorna la colección de inscripciones.
-     */
-
-
-
     protected $inscripciones;
 
-    public function __construct($inscripciones)
+    public function __construct(Collection $inscripciones)
     {
         $this->inscripciones = $inscripciones;
     }
@@ -32,92 +25,92 @@ class InscripcionesExport implements FromCollection, WithHeadings, WithMapping, 
     public function collection()
     {
         return $this->inscripciones->map(function ($inscripcion) {
-            $detalleProducto = (isset($inscripcion->detalleInscripciones[0]))
-                ? $inscripcion->detalleInscripciones[0]->tipoProducto
-                : 'No definido';
-
             return [
-                $inscripcion->cliente->nombre . ' ' . $inscripcion->cliente->primerApellido,
-                $detalleProducto,
-                $inscripcion->estado,
-                $inscripcion->fechaInscripcion,
-                $inscripcion->totalPago
+                $inscripcion->fechaInscripcion->format('d/m/Y'),
+                $inscripcion->clienteNombre,
+                $inscripcion->tipoProducto,
+                number_format($inscripcion->precio, 2),
+                number_format($inscripcion->descuento, 2),
+                number_format($inscripcion->subtotal, 2),
+                $inscripcion->vendedor,
             ];
         });
+    }
+
+    public function startCell(): string
+    {
+        return 'A6';
     }
 
     public function headings(): array
     {
         return [
-            'Cliente',
-            'Tipo de Producto',
-            'Estado',
             'Fecha de Inscripción',
-            'Total Pagado'
+            'Nombre del Cliente',
+            'Producto',
+            'Precio',
+            'Descuento',
+            'Subtotal',
+            'Vendedor',
         ];
     }
 
-    /**
-     * Mapea los datos de cada inscripción para mostrarlos en cada fila de Excel.
-     */
-    public function map($inscripcion): array
-    {
-        // Validar que la membresía o sección existan antes de acceder a sus datos
-        $detalleProducto = isset($inscripcion->detalleInscripciones[0]) ? $inscripcion->detalleInscripciones[0]->tipoProducto : 'No definido';
-
-        return [
-            $inscripcion->id,
-            $inscripcion->cliente->nombre . ' ' . $inscripcion->cliente->primerApellido . ' ' . ($inscripcion->cliente->segundoApellido ?? ''),
-            $detalleProducto, // Puede ser membresía o servicio
-            Carbon::parse($inscripcion->fechaInscripcion)->format('d/m/Y'),
-            ucfirst($inscripcion->estado), // Activa, vencida, cancelada
-            number_format($inscripcion->totalPago, 2, ',', '.') . ' Bs.', // Monto pagado
-            Carbon::parse($inscripcion->fechaCreacion)->format('d/m/Y H:i:s'), // Fecha de creación
-        ];
-    }
-
-    /**
-     * Aplica estilos personalizados a la hoja de cálculo.
-     */
     public function styles(Worksheet $sheet)
     {
-        // Estilo para las cabeceras
-        $sheet->getStyle('A1:I1')->applyFromArray([
-            'font' => [
-                'bold' => true,
-                'color' => ['argb' => Color::COLOR_WHITE],
-            ],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['argb' => '007bff'],
-            ],
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-                'vertical' => Alignment::VERTICAL_CENTER,
-            ],
-            'borders' => [
-                'allBorders' => [
-                    'borderStyle' => Border::BORDER_THIN,
-                    'color' => ['argb' => '000000'],
-                ],
-            ],
-        ]);
+        return [
+            6 => ['font' => ['bold' => true]],
+        ];
+    }
 
-        // Ajustar el ancho de las columnas automáticamente
-        foreach (range('A', 'I') as $column) {
-            $sheet->getColumnDimension($column)->setAutoSize(true);
-        }
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
 
-        // Alternar color de fondo en filas
-        for ($row = 2; $row <= $sheet->getHighestRow(); $row++) {
-            if ($row % 2 == 0) {
-                $sheet->getStyle('A' . $row . ':I' . $row)->applyFromArray([
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['argb' => 'f2f2f2'],
+                // Encabezado del reporte
+                $sheet->mergeCells('A1:G1');
+                $sheet->setCellValue('A1', 'Reporte de Inscripciones');
+                $sheet->getStyle('A1')->applyFromArray([
+                    'font' => [
+                        'bold' => true,
+                        'size' => 16,
+                    ],
+                    'alignment' => [
+                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
                     ],
                 ]);
-            }
-        }
+
+                // Fecha de generación del reporte
+                $sheet->mergeCells('A2:G2');
+                $sheet->setCellValue('A2', 'Generado el: ' . Carbon::now()->format('d/m/Y H:i:s'));
+                $sheet->getStyle('A2')->applyFromArray([
+                    'alignment' => [
+                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    ],
+                ]);
+
+                // Aplicar bordes a los encabezados de la tabla
+                $sheet->getStyle('A6:G6')->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        ],
+                    ],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'startColor' => ['argb' => 'FFDDDDDD'],
+                    ],
+                    'font' => [
+                        'bold' => true,
+                    ],
+                ]);
+
+                // Ajustar el tamaño de las columnas
+                foreach (range('A', 'G') as $col) {
+                    $sheet->getColumnDimension($col)->setAutoSize(true);
+                }
+            },
+        ];
     }
 }

@@ -55,10 +55,12 @@
                                                 onclick="editMembresia({{ $membresia }})">
                                                 <i class="ri-pencil-fill align-bottom"></i>
                                             </button>
+                                            @if(auth()->user()->rol == 'Administrador')
                                             <button class="btn btn-danger btn-sm"
                                                 onclick="deleteMembresia({{ $membresia->idMembresia }})">
                                                 <i class="ri-delete-bin-fill align-bottom"></i>
                                             </button>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach

@@ -210,11 +210,9 @@ class UsuarioController extends Controller
     {
         $user = Auth::user();
 
-        // Validar los datos del request de forma básica
         $request->validate([
             'nombreUsuario' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:usuarios,email,' . $user->idUsuario . ',idUsuario',
-            //'telefono' => 'nullable|string|max:10',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
@@ -224,7 +222,6 @@ class UsuarioController extends Controller
         try {
             $user->nombreUsuario = $request->nombreUsuario;
             $user->email = $request->email;
-            // $user->telefono = $request->telefono;
             $user->idAutor = Auth::id();
 
             if ($request->hasFile('image')) {
@@ -241,13 +238,12 @@ class UsuarioController extends Controller
 
             $user->save();
 
-
             DB::commit();
 
-            return redirect()->route('profile.index')->with('success', 'Perfil actualizado con éxito.')->with('icono', 'success');
+            return response()->json(['success' => 'Perfil actualizado con éxito.']);
         } catch (Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Hubo un error al actualizar el perfil. Por favor, inténtalo nuevamente.');
+            return response()->json(['error' => 'Hubo un error al actualizar el perfil. Por favor, inténtalo nuevamente.'], 500);
         }
     }
 

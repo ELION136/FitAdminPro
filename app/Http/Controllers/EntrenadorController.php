@@ -99,7 +99,6 @@ class EntrenadorController extends Controller
             ->with('mensaje', 'El entrenador fue registrado correctamente.')
             ->with('icono', 'success');
     }
-
     /**
      * Muestra el formulario para editar un entrenador.
      */
@@ -253,10 +252,10 @@ class EntrenadorController extends Controller
         //return $pdf->download('entrenadores.pdf');
         return $pdf->download('entrenadores.pdf');
     }
-    public function exportExcel()
-    {
-        return Excel::download(new EntrenadoresExport, 'entrenadores.xlsx');
-    }
+    //public function exportExcel()
+    //{
+    //   return Excel::download(new EntrenadoresExport, 'entrenadores.xlsx');
+    // }
 
     // UserController.php
 

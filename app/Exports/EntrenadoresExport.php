@@ -19,102 +19,62 @@ class EntrenadoresExport implements FromCollection, WithHeadings, WithStyles, Wi
     /**
     * @return \Illuminate\Support\Collection
     */
+    protected $entrenadores;
+
+    public function __construct($entrenadores)
+    {
+        $this->entrenadores = $entrenadores;
+    }
+
     public function collection()
     {
-        //return Entrenador::all();
-        return Entrenador::with('usuario')->select('nombre', 'primerApellido', 'segundoApellido', 'genero', 'fechaNacimiento', 'eliminado', 'fechaCreacion')->get();
+        // Usar los entrenadores pasados a través del constructor
+        return $this->entrenadores;
     }
 
-     /**
-     * Definir la celda donde comienzan los datos.
-     */
-    public function startCell(): string
-    {
-        return 'A6';  // Empieza en A6 para dejar espacio al encabezado personalizado
-    }
-
-    /**
-     * Definir los encabezados de las columnas.
-     */
     public function headings(): array
     {
         return [
-            'Nombre',
-            'Primer Apellido',
-            'Segundo Apellido',
-            'Género',
-            'Edad',
-            'Estado',
-            'Fecha de Registro'
+            'Nombre', 'Primer Apellido', 'Segundo Apellido', 'Especialidad', 'Género', 'Teléfono', 'Fecha de Nacimiento', 'Fecha de Contratación'
         ];
     }
 
-    /**
-     * Estilos para las celdas, como negrita para los encabezados.
-     */
+    public function startCell(): string
+    {
+        return 'A6'; // Empieza en A6 para dejar espacio para el encabezado personalizado
+    }
+
     public function styles(Worksheet $sheet)
     {
         return [
-            // Negrita en la primera fila de encabezados de la tabla
-            6    => ['font' => ['bold' => true]],
+            6    => ['font' => ['bold' => true]], // Encabezado en negrita
         ];
     }
 
-    /**
-     * Registrar eventos para personalizar aún más la hoja
-     */
     public function registerEvents(): array
     {
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                // Encabezado de la aplicación
-                $sheet->mergeCells('A1:G1'); // Unir celdas para el nombre de la aplicación
-                $sheet->setCellValue('A1', 'Nombre de la Aplicación - Sistema de Gym');
+                // Encabezado
+                $sheet->mergeCells('A1:H1'); // Unir celdas para el nombre del sistema
+                $sheet->setCellValue('A1', 'Sistema de Gym - Reporte de Entrenadores');
                 $sheet->getStyle('A1')->applyFromArray([
-                    'font' => [
-                        'bold' => true,
-                        'size' => 16,
-                    ],
-                    'alignment' => [
-                        'horizontal' => Alignment::HORIZONTAL_CENTER,
-                    ],
+                    'font' => ['bold' => true, 'size' => 16],
+                    'alignment' => ['horizontal' => 'center'],
                 ]);
 
                 // Fecha de generación
-                $sheet->mergeCells('A2:G2'); // Unir celdas para la fecha de generación
-                $sheet->setCellValue('A2', 'Generado el: ' . Carbon::now()->format('d/m/Y H:i:s'));
-                $sheet->getStyle('A2')->applyFromArray([
-                    'alignment' => [
-                        'horizontal' => Alignment::HORIZONTAL_CENTER,
-                    ],
-                ]);
+                $sheet->mergeCells('A2:H2');
+                $sheet->setCellValue('A2', 'Generado el: ' . now()->format('d/m/Y H:i:s'));
+                $sheet->getStyle('A2')->applyFromArray(['alignment' => ['horizontal' => 'center']]);
 
-                // Aplicar bordes a los encabezados de la tabla
-                $sheet->getStyle('A6:G6')->applyFromArray([
-                    'borders' => [
-                        'allBorders' => [
-                            'borderStyle' => Border::BORDER_THIN,
-                        ],
-                    ],
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['argb' => 'FFDDDDDD'], // Color de fondo gris claro
-                    ],
-                    'font' => [
-                        'bold' => true,
-                    ],
+                // Estilos de los encabezados
+                $sheet->getStyle('A6:H6')->applyFromArray([
+                    'borders' => ['allBorders' => ['borderStyle' => 'thin']],
+                    'font' => ['bold' => true],
                 ]);
-
-                // Ajustar el tamaño de las columnas
-                $sheet->getColumnDimension('A')->setAutoSize(true);
-                $sheet->getColumnDimension('B')->setAutoSize(true);
-                $sheet->getColumnDimension('C')->setAutoSize(true);
-                $sheet->getColumnDimension('D')->setAutoSize(true);
-                $sheet->getColumnDimension('E')->setAutoSize(true);
-                $sheet->getColumnDimension('F')->setAutoSize(true);
-                $sheet->getColumnDimension('G')->setAutoSize(true);
             },
         ];
     }

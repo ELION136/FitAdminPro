@@ -36,6 +36,7 @@
                                                 {{ $categoria->estado ? 'Activo' : 'Inactivo' }}
                                             </span>
                                         </td>
+                                        @if(auth()->user()->rol == 'Administrador')
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
                                                 <button class="btn btn-sm btn-outline-primary"
@@ -48,6 +49,7 @@
                                                 </button>
                                             </div>
                                         </td>
+                                        @endif
                                     </tr>
                                 @endforeach
                             </tbody>

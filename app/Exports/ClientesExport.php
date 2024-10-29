@@ -13,17 +13,36 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Carbon\Carbon;
-
 class ClientesExport implements FromCollection, WithHeadings, WithStyles, WithCustomStartCell, WithEvents
 {
     /**
     * @return \Illuminate\Support\Collection
     */
+
+    public function __construct($clientes)
+    {
+        $this->clientes = $clientes;
+    }
     public function collection()
     {
-        return Cliente::with('usuario')
-        ->select('nombre', 'primerApellido', 'segundoApellido', 'genero', 'fechaNacimiento', 'eliminado', 'fechaCreacion')
-        ->get();
+
+        
+        // Obtener los datos de los clientes, calculando la edad y el estado
+        return Cliente::select('nombre', 'primerApellido', 'segundoApellido', 'genero', 'fechaNacimiento', 'eliminado', 'fechaCreacion')
+            ->get()
+            ->map(function ($cliente) {
+                $estado = $cliente->eliminado ? 'Inactivo' : 'Activo';
+                $edad = Carbon::parse($cliente->fechaNacimiento)->age;
+                return [
+                    $cliente->nombre,
+                    $cliente->primerApellido,
+                    $cliente->segundoApellido,
+                    $cliente->genero,
+                    $edad,  // Calcular edad a partir de la fecha de nacimiento
+                    $estado,  // Estado basado en el campo 'eliminado'
+                    Carbon::parse($cliente->fechaCreacion)->format('d/m/Y'),  // Formatear la fecha de registro
+                ];
+            });
     }
 
 
@@ -32,11 +51,13 @@ class ClientesExport implements FromCollection, WithHeadings, WithStyles, WithCu
      */
     public function startCell(): string
     {
-        return 'A6';  // Empieza en A6 para dejar espacio al encabezado personalizado
+        return 'A6';  // Los datos comienzan desde la celda A6
     }
 
     /**
      * Definir los encabezados de las columnas.
+     *
+     * @return array
      */
     public function headings(): array
     {
@@ -52,18 +73,22 @@ class ClientesExport implements FromCollection, WithHeadings, WithStyles, WithCu
     }
 
     /**
-     * Estilos para las celdas, como negrita para los encabezados.
+     * Aplicar estilos básicos a las celdas.
+     *
+     * @param Worksheet $sheet
+     * @return array
      */
     public function styles(Worksheet $sheet)
     {
         return [
-            // Negrita en la primera fila de encabezados de la tabla
-            6    => ['font' => ['bold' => true]],
+            6 => ['font' => ['bold' => true]],  // Negrita en la fila de encabezados (fila 6)
         ];
     }
 
     /**
-     * Registrar eventos para personalizar aún más la hoja
+     * Registrar eventos para personalizar la hoja de Excel.
+     *
+     * @return array
      */
     public function registerEvents(): array
     {
@@ -72,7 +97,7 @@ class ClientesExport implements FromCollection, WithHeadings, WithStyles, WithCu
                 $sheet = $event->sheet->getDelegate();
 
                 // Encabezado de la aplicación
-                $sheet->mergeCells('A1:G1'); // Unir celdas para el nombre de la aplicación
+                $sheet->mergeCells('A1:G1');  // Unir celdas de A1 a G1
                 $sheet->setCellValue('A1', 'Nombre de la Aplicación - Sistema de Gym');
                 $sheet->getStyle('A1')->applyFromArray([
                     'font' => [
@@ -84,8 +109,8 @@ class ClientesExport implements FromCollection, WithHeadings, WithStyles, WithCu
                     ],
                 ]);
 
-                // Fecha de generación
-                $sheet->mergeCells('A2:G2'); // Unir celdas para la fecha de generación
+                // Fecha de generación del reporte
+                $sheet->mergeCells('A2:G2');  // Unir celdas de A2 a G2
                 $sheet->setCellValue('A2', 'Generado el: ' . Carbon::now()->format('d/m/Y H:i:s'));
                 $sheet->getStyle('A2')->applyFromArray([
                     'alignment' => [
@@ -102,21 +127,17 @@ class ClientesExport implements FromCollection, WithHeadings, WithStyles, WithCu
                     ],
                     'fill' => [
                         'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['argb' => 'FFDDDDDD'], // Color de fondo gris claro
+                        'startColor' => ['argb' => 'FFDDDDDD'],  // Fondo gris claro para los encabezados
                     ],
                     'font' => [
                         'bold' => true,
                     ],
                 ]);
 
-                // Ajustar el tamaño de las columnas
-                $sheet->getColumnDimension('A')->setAutoSize(true);
-                $sheet->getColumnDimension('B')->setAutoSize(true);
-                $sheet->getColumnDimension('C')->setAutoSize(true);
-                $sheet->getColumnDimension('D')->setAutoSize(true);
-                $sheet->getColumnDimension('E')->setAutoSize(true);
-                $sheet->getColumnDimension('F')->setAutoSize(true);
-                $sheet->getColumnDimension('G')->setAutoSize(true);
+                // Ajustar el tamaño de las columnas automáticamente
+                foreach (range('A', 'G') as $col) {
+                    $sheet->getColumnDimension($col)->setAutoSize(true);
+                }
             },
         ];
     }
