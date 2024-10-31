@@ -17,57 +17,58 @@
         </div>
     </div>
 
-    <div class="row mb-4">
+    <div class="row mb-2">
         <!-- Tarjeta de Membresías -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-primary text-white mb-4">
-                <div class="card-body">
-                    <i class="ri-bar-chart-fill me-2 align-bottom"></i>
-                    Total Membresías: {{ $totalMembresias }}
+        <div class="col-xl-2 col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body p-2">
+                    <i class="ri-bar-chart-fill align-bottom"></i>
+                    <small>Total Membresías:</small> {{ $totalMembresias }}
                 </div>
             </div>
         </div>
-
+    
         <!-- Tarjeta de Servicios -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-secondary text-white mb-4">
-                <div class="card-body">
-                    <i class="ri-service-fill me-2 align-bottom"></i>
-                    Total Servicios: {{ $totalServicios }}
+        <div class="col-xl-2 col-md-4">
+            <div class="card bg-secondary text-white">
+                <div class="card-body p-2">
+                    <i class="ri-service-fill align-bottom"></i>
+                    <small>Total Servicios:</small> {{ $totalServicios }}
                 </div>
             </div>
         </div>
-
+    
         <!-- Tarjeta de Activas -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-success text-white mb-4">
-                <div class="card-body">
-                    <i class="ri-check-line me-2 align-bottom"></i>
-                    Activas: {{ $totalActivas }}
+        <div class="col-xl-2 col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body p-2">
+                    <i class="ri-check-line align-bottom"></i>
+                    <small>Activas:</small> {{ $totalActivas }}
                 </div>
             </div>
         </div>
-
+    
         <!-- Tarjeta de Vencidas -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-danger text-white mb-4">
-                <div class="card-body">
-                    <i class="ri-close-line me-2 align-bottom"></i>
-                    Vencidas: {{ $totalVencidas }}
+        <div class="col-xl-2 col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body p-2">
+                    <i class="ri-close-line align-bottom"></i>
+                    <small>Vencidas:</small> {{ $totalVencidas }}
                 </div>
             </div>
         </div>
-
+    
         <!-- Tarjeta de Canceladas -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-warning text-white mb-4">
-                <div class="card-body">
-                    <i class="ri-forbid-line me-2 align-bottom"></i>
-                    Canceladas: {{ $totalCanceladas }}
+        <div class="col-xl-2 col-md-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body p-2">
+                    <i class="ri-forbid-line align-bottom"></i>
+                    <small>Canceladas:</small> {{ $totalCanceladas }}
                 </div>
             </div>
         </div>
     </div>
+    
 
     <!-- Pestañas para membresías y servicios -->
     <div class="row">

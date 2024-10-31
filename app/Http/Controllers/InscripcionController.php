@@ -31,13 +31,13 @@ class InscripcionController extends Controller
         $membresias = Membresia::where('eliminado', 1)
             ->where('fechaFin', '>=', now())
             ->get();
-    
+
         // Obtener los servicios no eliminados y activos, con sus días y horarios
         $servicios = Servicio::where('eliminado', 1)
             ->where('estado', 1) // 1 = Activo
             ->with(['diasHorarios.diaSemana'])
             ->get();
-    
+
         return view('admin.inscripciones.create', compact('membresias', 'servicios'));
     }
 
@@ -48,36 +48,43 @@ class InscripcionController extends Controller
             'idCliente' => 'required|exists:clientes,idCliente',
             'productos' => 'required|json',
         ]);
-    
+
         $productos = json_decode($request->productos, true);
-    
+
         if (empty($productos)) {
             return redirect()->back()->withErrors(['Debe seleccionar al menos un producto.']);
         }
-    
+
         DB::beginTransaction();
-    
+
         try {
             $tieneMembresiaActiva = false;
+            $cantidadMembresias = 0;
+
             foreach ($productos as $productoData) {
                 if ($productoData['tipoProducto'] == 'membresia') {
+                    $cantidadMembresias++;
+
+                    if ($cantidadMembresias > 1) {
+                        return redirect()->back()->withErrors(['Solo puede adquirir una membresía a la vez.']);
+                    }
+
                     // Verificar si el cliente ya tiene una membresía activa
                     $membresiaActiva = DetalleInscripcion::where('tipoProducto', 'membresia')
                         ->whereHas('inscripcion', function ($query) use ($request) {
                             $query->where('idCliente', $request->idCliente)
-                                  ->where('estado', 'activa');
+                                ->where('estado', 'activa');
                         })
                         ->first();
-    
+
                     if ($membresiaActiva) {
                         return redirect()->back()->withErrors(['El cliente ya tiene una membresía activa.']);
                     }
-    
+
                     $tieneMembresiaActiva = true;
-                    break;
                 }
             }
-    
+
             // Crear la inscripción
             $inscripcion = new Inscripcion();
             $inscripcion->idCliente = $request->idCliente;
@@ -86,89 +93,136 @@ class InscripcionController extends Controller
             $inscripcion->estado = 'activa';
             $inscripcion->diasRestantes = null; // Inicialmente null
             $inscripcion->save();
-    
+
             $totalPago = 0;
-    
+
             foreach ($productos as $productoData) {
                 $detalle = new DetalleInscripcion();
                 $detalle->idInscripcion = $inscripcion->idInscripcion;
                 $detalle->tipoProducto = $productoData['tipoProducto'];
-    
+
                 if ($productoData['tipoProducto'] == 'membresia') {
                     $membresia = Membresia::find($productoData['idProducto']);
                     $detalle->idMembresia = $productoData['idProducto'];
                     $detalle->precio = $membresia->precio;
-    
+
                     // Aplicar descuento si existe
                     $detalle->descuento = $productoData['descuento'] ?? 0;
-    
+
+                    // Validar descuento
+                    if ($detalle->descuento < 0 || $detalle->descuento > $detalle->precio) {
+                        throw new \Exception('El descuento es inválido para el producto: ' . $productoData['idProducto']);
+                    }
+
                     $precioFinal = $detalle->precio - $detalle->descuento;
                     $totalPago += $precioFinal;
-    
+
                     // Actualizar días restantes en la inscripción
                     $inscripcion->diasRestantes = $membresia->duracionDias;
-    
+
+                    // Guardar el detalle
+                    $detalle->save();
+
                 } else if ($productoData['tipoProducto'] == 'servicio') {
                     // Validación de servicio ya inscrito
                     $servicioExistente = DetalleInscripcion::where('tipoProducto', 'servicio')
                         ->where('idServicio', $productoData['idProducto'])
                         ->whereHas('inscripcion', function ($query) use ($request) {
                             $query->where('idCliente', $request->idCliente)
-                                  ->where('estado', 'activa');
+                                ->where('estado', 'activa');
                         })
                         ->first();
-    
+
                     if ($servicioExistente) {
                         return redirect()->back()->withErrors(['El cliente ya está inscrito en uno de los servicios seleccionados.']);
                     }
-    
+
                     $servicio = Servicio::find($productoData['idProducto']);
-    
+
                     // Verificar si hay capacidad disponible
                     if ($servicio->capacidad <= 0) {
                         return redirect()->back()->withErrors(['El servicio "' . $servicio->nombre . '" no tiene cupos disponibles.']);
                     }
-    
+
                     $detalle->idServicio = $productoData['idProducto'];
                     $detalle->precio = $servicio->precioTotal;
-    
+
                     // Aplicar descuento si existe
                     $detalle->descuento = $productoData['descuento'] ?? 0;
-    
+
+                    // Validar descuento
+                    if ($detalle->descuento < 0 || $detalle->descuento > $detalle->precio) {
+                        throw new \Exception('El descuento es inválido para el producto: ' . $productoData['idProducto']);
+                    }
+
                     $precioFinal = $detalle->precio - $detalle->descuento;
                     $totalPago += $precioFinal;
-    
+
                     // Establecer sesiones restantes si aplica
                     if ($servicio->cantidadSesiones) {
                         $detalle->sesionesRestantes = $servicio->cantidadSesiones;
                     }
-    
+
+                    // Guardar el detalle
                     $detalle->save();
-    
+
                     // Reducir la capacidad del servicio en 1
                     $servicio->capacidad -= 1;
+
+                    // Verificar que la capacidad no sea negativa
+                    if ($servicio->capacidad < 0) {
+                        throw new \Exception('La capacidad del servicio "' . $servicio->nombre . '" es insuficiente.');
+                    }
+
                     $servicio->save();
                 }
-    
-                // Guardar el detalle si no es un servicio (membresía)
-                if ($detalle->tipoProducto != 'servicio') {
-                    $detalle->save();
-                }
             }
-    
+
             // Actualizar montos en la inscripción
             $inscripcion->totalPago = $totalPago;
             $inscripcion->save();
-    
+
             DB::commit();
-    
+
             return redirect()->route('admin.inscripciones.create')->with('success', 'Inscripción realizada correctamente.');
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->withErrors(['Ocurrió un error al realizar la inscripción: ' . $e->getMessage()]);
         }
     }
-    
+
+
+    public function storeCliente(Request $request)
+    {
+        // Validar los datos del formulario
+        $validatedData = $request->validate([
+            'nombre' => 'required|string|max:50',
+            'primerApellido' => 'required|string|max:50',
+            'fechaNacimiento' => 'required|date',
+            'genero' => 'required|in:Masculino,Femenino,Otro',
+            // No se incluyen campos opcionales
+        ]);
+
+        // Crear un nuevo cliente
+        $cliente = new Cliente();
+        $cliente->nombre = $validatedData['nombre'];
+        $cliente->primerApellido = $validatedData['primerApellido'];
+        $cliente->fechaNacimiento = $validatedData['fechaNacimiento'];
+        $cliente->genero = $validatedData['genero'];
+        $cliente->idAutor = auth()->user()->idUsuario ?? null; // Ajusta según tu modelo de usuario
+        $cliente->eliminado = 1; // O el valor que corresponda
+
+        // Guardar el cliente
+        $cliente->save();
+
+        // Devolver una respuesta JSON para actualizar el select2
+        return response()->json([
+            'id' => $cliente->idCliente,
+            'text' => $cliente->nombre . ' ' . $cliente->primerApellido,
+        ]);
+    }
+
+
 
 
     // Método para búsqueda de clientes en tiempo real

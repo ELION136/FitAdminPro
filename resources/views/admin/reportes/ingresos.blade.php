@@ -15,7 +15,7 @@
                     <div class="row g-3">
                         <div class="col-lg-4 col-md-6">
                             <label for="fechaInicio" class="form-label">Fecha desde</label>
-                            <input type="date" name="fechaInicio" class="form-control" value="{{ request('fechaInicio') }}">
+                            <input type="date" name="fechaInicio" class="form-control"  value="{{ request('fechaInicio', now()->format('Y-m-d')) }}">
                         </div>
                         <div class="col-lg-4 col-md-6">
                             <label for="fechaFin" class="form-label">Fecha hasta</label>
@@ -44,7 +44,7 @@
                 </div>
             @else
                 <table class="table table-hover table-striped table-bordered align-middle">
-                    <thead class="table-dark text-center">
+                    <thead class="table text-center">
                         <tr>
                             <th><i class="ri-calendar-line me-1"></i> Fecha de Inscripción</th>
                             <th><i class="ri-user-line me-1"></i> Cliente</th>

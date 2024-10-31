@@ -32,15 +32,15 @@ class AdminController extends Controller
         // Métricas de Ingresos
         $incomeToday = DB::table('inscripciones')
             ->whereDate('fechaInscripcion', today())
-            ->sum('montoPagado');
+            ->sum('totalPago');
 
         $incomeThisWeek = DB::table('inscripciones')
             ->whereBetween('fechaInscripcion', [now()->startOfWeek(), now()->endOfWeek()])
-            ->sum('montoPagado');
+            ->sum('totalPago');
 
         $incomeThisMonth = DB::table('inscripciones')
             ->whereMonth('fechaInscripcion', date('m'))
-            ->sum('montoPagado');
+            ->sum('totalPago');
 
         $totalIncome = DB::table('inscripciones')->sum('totalPago');
         // Ingresos por Servicios y Membresías para Hoy

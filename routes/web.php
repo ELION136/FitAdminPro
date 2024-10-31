@@ -118,6 +118,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/inscripciones/searchCliente', [App\Http\Controllers\InscripcionController::class, 'searchCliente'])->name('admin.inscripciones.searchCliente');
     Route::get('/admin/inscripciones/{id}', [App\Http\Controllers\InscripcionController::class, 'show'])->name('admin.inscripciones.show');
 
+    Route::post('/admin/inscripciones/storeCliente', [App\Http\Controllers\InscripcionController::class, 'storeCliente'])->name('admin.inscripciones.storeCliente');
 
     Route::get('/admin/clientes', [App\Http\Controllers\ClienteController::class, 'index'])->name('admin.clientes.index');
     Route::get('/admin/clientes/create', [App\Http\Controllers\ClienteController::class, 'create'])->name('admin.clientes.create');
