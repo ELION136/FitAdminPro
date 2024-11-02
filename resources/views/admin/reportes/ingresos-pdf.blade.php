@@ -5,40 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte de Ingresos</title>
     <style>
+        @page {
+            margin: 90px 25px;
+        }
+
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
-            font-size: 12px;
+            font-size: 16px;
             margin: 0;
             padding: 0;
             background-color: #fff;
             position: relative;
         }
 
-        .container {
-            width: 90%;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
+        /* Estilos para elementos que se repiten en cada página */
         .header {
+            position: fixed;
+            top: -60px;
+            left: 0;
+            right: 0;
+            height: 50px;
             text-align: left;
-            padding: 20px 0;
-            position: relative;
-            z-index: 2;
+            padding: 20px;
         }
 
         .header img {
-            width: 50px; /* Ajuste de tamaño del logo */
+            width: 50px;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: -60px;
+            left: 0;
+            right: 0;
+            height: 30px;
+            text-align: center;
+            font-size: 12px;
+            border-top: 1px solid #ddd;
+            padding-top: 5px;
+        }
+
+        /* Marca de agua en cada página */
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1000;
+        }
+
+        .watermark img {
+            opacity: 0.1;
+            width: 300px;
+        }
+
+        .watermark p {
+            text-align: center;
+            font-size: 100px;
+            color: rgba(0, 0, 0, 0.05);
+            margin: 0;
+        }
+
+        /* Contenido principal */
+        .container {
+            margin-top: 40px;
+            padding: 20px;
         }
 
         .report-info {
             text-align: right;
             margin-top: -80px;
+            margin-bottom: 30px;
         }
 
         .report-info h1 {
-            font-size: 20px;
+            font-size: 24px;
             color: #333;
             font-weight: 600;
             margin-bottom: 5px;
@@ -55,8 +96,6 @@
             border-collapse: collapse;
             margin-top: 20px;
             font-size: 12px;
-            z-index: 2;
-            position: relative;
         }
 
         table, th, td {
@@ -80,51 +119,49 @@
             background-color: #f9f9f9;
         }
 
-        footer {
-            text-align: center;
-            font-size: 10px;
-            padding: 10px;
-            margin-top: 20px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            z-index: 2;
-        }
-
-        /* Para compatibilidad con DomPDF */
+        /* Numeración de páginas */
         .pagenum:before {
             content: counter(page);
         }
 
-        /* Marca de agua */
-        .watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 100px;
-            color: rgba(0, 0, 0, 0.05); /* Texto semitransparente */
-            z-index: 0;
-            text-align: center;
-            white-space: nowrap;
+        .pagecount:before {
+            content: counter(pages);
         }
 
+        /* Secciones finales */
+        .total-count, .notes, .signature {
+            margin-top: 20px;
+            page-break-inside: avoid;
+        }
+
+        .signature {
+            margin-top: 40px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header con el logo -->
-        <div class="header">
-            <img src="{{ public_path('dist/assets/images/logo1.png') }}" alt="Logo">
-        </div>
+    <!-- Header fijo para todas las páginas -->
+    <div class="header">
+        <img src="{{ public_path('dist/assets/images/logo1.png') }}" alt="Logo">
+    </div>
 
+    
+
+    <!-- Marca de agua fija para todas las páginas -->
+    <div class="watermark">
+        <img src="{{ public_path('dist/assets/images/logo1.png') }}" alt="Logo" />
+        <p>Gimnasio Urbano</p>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="container">
         <!-- Información del reporte -->
         <div class="report-info">
             <h1>Reporte de Ingresos</h1>
-            <h2 class="fw-bold text-warning">Gimnasio Urbano</h2>
-            <p>Sucursal: Sacaba, Abra</p>
             <p>Generado el {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}</p>
+            <p>Sucursal: Gimnasio Urbano - Sacaba, Abra</p>
             <p>Usuario: {{ $usuarioNombre }}</p>
+
             @if($fechaInicio && $fechaFin)
                 <p>Desde: {{ \Carbon\Carbon::parse($fechaInicio)->format('d/m/Y') }} hasta {{ \Carbon\Carbon::parse($fechaFin)->format('d/m/Y') }}</p>
             @else
@@ -136,6 +173,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Fecha de Inscripción</th>
                     <th>Cliente</th>
                     <th>Tipo de Producto</th>
@@ -146,32 +184,36 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($ingresos as $ingreso)
+                @foreach ($ingresos as $index => $ingreso)
                     <tr>
+                        <td>{{ $index + 1 }}</td>
                         <td>{{ \Carbon\Carbon::parse($ingreso->fechaInscripcion)->format('d/m/Y') }}</td>
                         <td>{{ $ingreso->clienteNombre }}</td>
                         <td>{{ $ingreso->tipoProducto }}</td>
-                        <td>{{ number_format($ingreso->precio, 2) }}</td>
-                        <td>{{ number_format($ingreso->descuento, 2) }}</td>
-                        <td>{{ number_format($ingreso->subtotal, 2) }}</td>
+                        <td>{{ number_format($ingreso->precio, 2) }} BOB</td>
+                        <td>{{ number_format($ingreso->descuento, 2) }} BOB</td>
+                        <td>{{ number_format($ingreso->subtotal, 2) }} BOB</td>
                         <td>{{ $ingreso->vendedor }}</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
 
-        <h3>Total de Ingresos: {{ number_format($totalIngresos, 2) }} BOB</h3>
-    </div>
+        <!-- Secciones finales -->
+        <div class="total-count">
+            <p><strong>Total de Ingresos:</strong> {{ number_format($totalIngresos, 2) }} BOB</p>
+        </div>
 
-    <!-- Footer con número de página -->
-    <footer>
-        <p>&copy; {{ date('Y') }} Nombre de la Empresa - Sucursal | Página <span class="pagenum"></span></p>
-    </footer>
+        <div class="notes">
+            <p><strong>Notas:</strong> Aquí puedes incluir comentarios adicionales o información relevante al reporte.</p>
+        </div>
 
-    <!-- Marca de agua -->
-    <div class="watermark">
-        <img src="{{ public_path('dist/assets/images/logo1.png') }}" alt="Logo" style="opacity: 0.1; width: 300px; display: block; margin: 0 auto;" />
-        <p>FitAdminPro</p>
+        <div class="signature">
+            <p>__________________________</p>
+            <p>Firma del Responsable</p>
+            <p>Nombre del Responsable</p>
+            <p>Fecha: {{ \Carbon\Carbon::now()->format('d/m/Y') }}</p>
+        </div>
     </div>
 </body>
 </html>

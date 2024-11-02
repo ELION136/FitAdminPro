@@ -48,26 +48,26 @@ class AdminController extends Controller
             ->join('detalle_inscripciones', 'inscripciones.idInscripcion', '=', 'detalle_inscripciones.idInscripcion')
             ->whereNotNull('detalle_inscripciones.idServicio')
             ->whereDate('inscripciones.fechaInscripcion', today())
-            ->sum('inscripciones.montoPagado');
+            ->sum('inscripciones.totalPago');
 
         $incomeTodayMemberships = DB::table('inscripciones')
             ->join('detalle_inscripciones', 'inscripciones.idInscripcion', '=', 'detalle_inscripciones.idInscripcion')
             ->whereNotNull('detalle_inscripciones.idMembresia')
             ->whereDate('inscripciones.fechaInscripcion', today())
-            ->sum('inscripciones.montoPagado');
+            ->sum('inscripciones.totalPago');
 
         // Ingresos por Servicios y Membresías para Esta Semana
         $incomeThisWeekServices = DB::table('inscripciones')
             ->join('detalle_inscripciones', 'inscripciones.idInscripcion', '=', 'detalle_inscripciones.idInscripcion')
             ->whereNotNull('detalle_inscripciones.idServicio')
             ->whereBetween('inscripciones.fechaInscripcion', [now()->startOfWeek(), now()->endOfWeek()])
-            ->sum('inscripciones.montoPagado');
+            ->sum('inscripciones.totalPago');
 
         $incomeThisWeekMemberships = DB::table('inscripciones')
             ->join('detalle_inscripciones', 'inscripciones.idInscripcion', '=', 'detalle_inscripciones.idInscripcion')
             ->whereNotNull('detalle_inscripciones.idMembresia')
             ->whereBetween('inscripciones.fechaInscripcion', [now()->startOfWeek(), now()->endOfWeek()])
-            ->sum('inscripciones.montoPagado');
+            ->sum('inscripciones.totalPago');
 
         // Ingresos por Servicios y Membresías para Este Mes
         $incomeThisMonthServices = DB::table('inscripciones')
@@ -87,13 +87,13 @@ class AdminController extends Controller
             ->join('detalle_inscripciones', 'inscripciones.idInscripcion', '=', 'detalle_inscripciones.idInscripcion')
             ->whereNotNull('detalle_inscripciones.idServicio')
             ->whereYear('inscripciones.fechaInscripcion', date('Y'))
-            ->sum('inscripciones.montoPagado');
+            ->sum('inscripciones.totalPago');
 
         $incomeThisYearMemberships = DB::table('inscripciones')
             ->join('detalle_inscripciones', 'inscripciones.idInscripcion', '=', 'detalle_inscripciones.idInscripcion')
             ->whereNotNull('detalle_inscripciones.idMembresia')
             ->whereYear('inscripciones.fechaInscripcion', date('Y'))
-            ->sum('inscripciones.montoPagado');
+            ->sum('inscripciones.totalPago');
 
 
         // Métricas de Membresías
@@ -141,7 +141,7 @@ class AdminController extends Controller
 
         // Preparar datos para ECharts
         $incomeOverTime = DB::table('inscripciones')
-            ->select(DB::raw('DATE(fechaInscripcion) as date'), DB::raw('SUM(montoPagado) as total'))
+            ->select(DB::raw('DATE(fechaInscripcion) as date'), DB::raw('SUM(totalPago) as total'))
             ->groupBy('date')
             ->orderBy('date')
             ->take(30) // Últimos 30 días

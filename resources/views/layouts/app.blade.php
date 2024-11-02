@@ -27,8 +27,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap.min.css" />
 
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
-    
-    
+
+
 
 
     <!-- Layout config Js -->
@@ -45,9 +45,9 @@
     <script src="{{ url('assets/plugins/qrCode.min.js') }}"></script>
 
     <link href="{{ asset('package/dist/sweetalert2.min.css') }}" rel="stylesheet">
-    <script src="{{ asset('package/dist/sweetalert2.all.min.js') }}"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <!-- En el <head> o justo antes de </body> -->
     <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 
@@ -278,168 +278,244 @@
                     </div>
                     <ul class="navbar-nav" id="navbar-nav">
                         <li class="menu-title"><span data-key="t-menu">Menu</span></li>
-                    
+
                         <!-- Común para todos los roles -->
                         <li class="nav-item">
-                            <a class="nav-link menu-link {{ Request::routeIs('admin.index') ? 'active' : '' }}" href="{{ route('admin.index') }}">
+                            <a class="nav-link menu-link {{ Request::routeIs('admin.index') ? 'active' : '' }}"
+                                href="{{ route('admin.index') }}">
                                 <i class="ri-dashboard-2-line"></i> <span>Panel de control</span>
                             </a>
                         </li>
-                    
-                        <!-- Solo visible para Administradores -->
-                        @if(auth()->user()->rol == 'Administrador')
-                        <li class="nav-item">
-                            <a class="nav-link menu-link {{ Request::is('admin/usuarios*') ? 'active' : '' }}" href="#sidebarUsuarios" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarUsuarios">
-                                <i class="ri-team-line"></i><span data-key="t-usuarios">Usuarios</span>
-                            </a>
-                            <div class="collapse menu-dropdown {{ Request::is('admin/usuarios*') ? 'show' : '' }}" id="sidebarUsuarios">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.usuarios.index') }}" class="nav-link" data-key="t-lista-usuarios">
-                                            <i class="ri-user-3-line"></i> Lista de Usuarios
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        @endif
-                    
-                        <!-- Visible para ambos roles (Administrador y Vendedor) -->
-                        @if(auth()->user()->rol == 'Administrador' || auth()->user()->rol == 'Vendedor')
 
-                        <!-- Entrenadores -->
-                        <li class="nav-item">
-                            <a class="nav-link menu-link {{ Request::is('admin/entrenadores*') ? 'active' : '' }}" href="#sidebarEntrenadores" data-bs-toggle="collapse" role="button" aria-expanded="{{ Request::is('admin/entrenadores*') ? 'true' : 'false' }}" aria-controls="sidebarEntrenadores">
-                                <i class="ri-run-line"></i><span data-key="t-entrenadores">Entrenadores</span>
-                            </a>
-                            <div class="collapse menu-dropdown {{ Request::is('admin/entrenadores*') ? 'show' : '' }}" id="sidebarEntrenadores">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.entrenadores.create') }}" class="nav-link {{ Request::routeIs('admin.entrenadores.create') ? 'active' : '' }}" data-key="t-add-entrenador">
-                                            <i class="ri-user-add-line"></i> Añadir Entrenador
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.entrenadores.index') }}" class="nav-link {{ Request::routeIs('admin.entrenadores.index') ? 'active' : '' }}" data-key="t-lista-entrenadores">
-                                            <i class="ri-list-unordered"></i> Lista de Entrenadores
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        
-                        <!-- Clientes -->
-                        <li class="nav-item">
-                            <a class="nav-link menu-link {{ Request::is('admin/clientes*') ? 'active' : '' }}" href="#sidebarClientes" data-bs-toggle="collapse" role="button" aria-expanded="{{ Request::is('admin/clientes*') ? 'true' : 'false' }}" aria-controls="sidebarClientes">
-                                <i class="ri-user-heart-line"></i><span data-key="t-clientes">Clientes</span>
-                            </a>
-                            <div class="collapse menu-dropdown {{ Request::is('admin/clientes*') ? 'show' : '' }}" id="sidebarClientes">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.clientes.create') }}" class="nav-link {{ Request::routeIs('admin.clientes.create') ? 'active' : '' }}" data-key="t-add-clientes">
-                                            <i class="ri-user-add-line"></i> Añadir Cliente
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.clientes.index') }}" class="nav-link {{ Request::routeIs('admin.clientes.index') ? 'active' : '' }}" data-key="t-lista-clientes">
-                                            <i class="ri-list-unordered"></i> Lista de Clientes
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        
-                        <!-- Inscripciones -->
-                        <li class="nav-item">
-                            <a class="nav-link menu-link {{ Request::is('admin/inscripciones*') ? 'active' : '' }}" href="#sidebarForms" data-bs-toggle="collapse" role="button" aria-expanded="{{ Request::is('admin/inscripciones*') ? 'true' : 'false' }}" aria-controls="sidebarForms">
-                                <i class="ri-file-list-3-line"></i> <span data-key="t-forms">Inscripciones</span>
-                            </a>
-                            <div class="collapse menu-dropdown {{ Request::is('admin/inscripciones*') ? 'show' : '' }}" id="sidebarForms">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.inscripciones.create') }}" class="nav-link {{ Request::routeIs('admin.inscripciones.create') ? 'active' : '' }}" data-key="t-basic-elements"><i class="ri-file-add-line"></i> Crear nueva inscripcion</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.inscripciones.index') }}" class="nav-link {{ Request::routeIs('admin.inscripciones.index') ? 'active' : '' }}" data-key="t-form-select"><i class="ri-file-list-2-line"></i> Ver Inscripciones</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        
-                        <!-- Asistencias -->
-                        <li class="nav-item">
-                            <a class="nav-link menu-link {{ Request::is('admin/asistencias*') ? 'active' : '' }}" href="#sidebarIcons" data-bs-toggle="collapse" role="button" aria-expanded="{{ Request::is('admin/asistencias*') ? 'true' : 'false' }}" aria-controls="sidebarIcons">
-                                <i class="ri-check-double-line"></i> <span data-key="t-icons">Asistencias</span>
-                            </a>
-                            <div class="collapse menu-dropdown {{ Request::is('admin/asistencias*') ? 'show' : '' }}" id="sidebarIcons">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.asistencias.index') }}" class="nav-link {{ Request::routeIs('admin.asistencias.index') ? 'active' : '' }}"><span data-key="t-remix"><i class="ri-edit-line"></i> Registrar</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.asistencias.ver') }}" class="nav-link {{ Request::routeIs('admin.asistencias.ver') ? 'active' : '' }}"><span data-key="t-boxicons"><i class="ri-eye-line"></i> Ver Asistencias</span></a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        
-                        <!-- Planes y Servicios -->
-                        <li class="nav-item">
-                            <a class="nav-link menu-link {{ Request::is('admin/membresias*') || Request::is('admin/servicios*') || Request::is('admin/categorias*') ? 'active' : '' }}" href="#sidebarTables" data-bs-toggle="collapse" role="button" aria-expanded="{{ Request::is('admin/membresias*') || Request::is('admin/servicios*') || Request::is('admin/categorias*') ? 'true' : 'false' }}" aria-controls="sidebarTables">
-                                <i class="ri-vip-crown-line"></i> <span data-key="t-tables">Planes y Servicios</span>
-                            </a>
-                            <div class="collapse menu-dropdown {{ Request::is('admin/membresias*') || Request::is('admin/servicios*') || Request::is('admin/categorias*') ? 'show' : '' }}" id="sidebarTables">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.membresias.index') }}" class="nav-link {{ Request::routeIs('admin.membresias.index') ? 'active' : '' }}" data-key="t-grid-js"><i class="ri-price-tag-3-line"></i> Planes de Membresias</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.servicios.index') }}" class="nav-link {{ Request::routeIs('admin.servicios.index') ? 'active' : '' }}" data-key="t-form-select"><i class="ri-service-line"></i> Lista de Servicios</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.categorias.index') }}" class="nav-link {{ Request::routeIs('admin.categorias.index') ? 'active' : '' }}" data-key="t-form-select"><i class="ri-service-line"></i> Categorias Servicios</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        
+                        <!-- Solo visible para Administradores -->
+                        @if (auth()->user()->rol == 'Administrador')
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ Request::is('admin/usuarios*') ? 'active' : '' }}"
+                                    href="#sidebarUsuarios" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="false" aria-controls="sidebarUsuarios">
+                                    <i class="ri-team-line"></i><span data-key="t-usuarios">Usuarios</span>
+                                </a>
+                                <div class="collapse menu-dropdown {{ Request::is('admin/usuarios*') ? 'show' : '' }}"
+                                    id="sidebarUsuarios">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.usuarios.index') }}" class="nav-link"
+                                                data-key="t-lista-usuarios">
+                                                <i class="ri-user-3-line"></i> Lista de Usuarios
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        @endif
+
+                        <!-- Visible para ambos roles (Administrador y Vendedor) -->
+                        @if (auth()->user()->rol == 'Administrador' || auth()->user()->rol == 'Vendedor')
+                            <!-- Entrenadores -->
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ Request::is('admin/entrenadores*') ? 'active' : '' }}"
+                                    href="#sidebarEntrenadores" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="{{ Request::is('admin/entrenadores*') ? 'true' : 'false' }}"
+                                    aria-controls="sidebarEntrenadores">
+                                    <i class="ri-run-line"></i><span data-key="t-entrenadores">Entrenadores</span>
+                                </a>
+                                <div class="collapse menu-dropdown {{ Request::is('admin/entrenadores*') ? 'show' : '' }}"
+                                    id="sidebarEntrenadores">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.entrenadores.create') }}"
+                                                class="nav-link {{ Request::routeIs('admin.entrenadores.create') ? 'active' : '' }}"
+                                                data-key="t-add-entrenador">
+                                                <i class="ri-user-add-line"></i> Añadir Entrenador
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.entrenadores.index') }}"
+                                                class="nav-link {{ Request::routeIs('admin.entrenadores.index') ? 'active' : '' }}"
+                                                data-key="t-lista-entrenadores">
+                                                <i class="ri-list-unordered"></i> Lista de Entrenadores
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <!-- Clientes -->
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ Request::is('admin/clientes*') ? 'active' : '' }}"
+                                    href="#sidebarClientes" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="{{ Request::is('admin/clientes*') ? 'true' : 'false' }}"
+                                    aria-controls="sidebarClientes">
+                                    <i class="ri-user-heart-line"></i><span data-key="t-clientes">Clientes</span>
+                                </a>
+                                <div class="collapse menu-dropdown {{ Request::is('admin/clientes*') ? 'show' : '' }}"
+                                    id="sidebarClientes">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.clientes.create') }}"
+                                                class="nav-link {{ Request::routeIs('admin.clientes.create') ? 'active' : '' }}"
+                                                data-key="t-add-clientes">
+                                                <i class="ri-user-add-line"></i> Añadir Cliente
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.clientes.index') }}"
+                                                class="nav-link {{ Request::routeIs('admin.clientes.index') ? 'active' : '' }}"
+                                                data-key="t-lista-clientes">
+                                                <i class="ri-list-unordered"></i> Lista de Clientes
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <!-- Inscripciones -->
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ Request::is('admin/inscripciones*') ? 'active' : '' }}"
+                                    href="#sidebarForms" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="{{ Request::is('admin/inscripciones*') ? 'true' : 'false' }}"
+                                    aria-controls="sidebarForms">
+                                    <i class="ri-file-list-3-line"></i> <span data-key="t-forms">Inscripciones</span>
+                                </a>
+                                <div class="collapse menu-dropdown {{ Request::is('admin/inscripciones*') ? 'show' : '' }}"
+                                    id="sidebarForms">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.inscripciones.create') }}"
+                                                class="nav-link {{ Request::routeIs('admin.inscripciones.create') ? 'active' : '' }}"
+                                                data-key="t-basic-elements"><i class="ri-file-add-line"></i> Crear
+                                                nueva inscripcion</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.inscripciones.index') }}"
+                                                class="nav-link {{ Request::routeIs('admin.inscripciones.index') ? 'active' : '' }}"
+                                                data-key="t-form-select"><i class="ri-file-list-2-line"></i> Ver
+                                                Inscripciones</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <!-- Asistencias -->
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ Request::is('admin/asistencias*') ? 'active' : '' }}"
+                                    href="#sidebarIcons" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="{{ Request::is('admin/asistencias*') ? 'true' : 'false' }}"
+                                    aria-controls="sidebarIcons">
+                                    <i class="ri-check-double-line"></i> <span data-key="t-icons">Asistencias</span>
+                                </a>
+                                <div class="collapse menu-dropdown {{ Request::is('admin/asistencias*') ? 'show' : '' }}"
+                                    id="sidebarIcons">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.asistencias.index') }}"
+                                                class="nav-link {{ Request::routeIs('admin.asistencias.index') ? 'active' : '' }}"><span
+                                                    data-key="t-remix"><i class="ri-edit-line"></i>
+                                                    Registrar</span></a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.asistencias.ver') }}"
+                                                class="nav-link {{ Request::routeIs('admin.asistencias.ver') ? 'active' : '' }}"><span
+                                                    data-key="t-boxicons"><i class="ri-eye-line"></i> Ver
+                                                    Asistencias</span></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <!-- Planes y Servicios -->
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ Request::is('admin/membresias*') || Request::is('admin/servicios*') || Request::is('admin/categorias*') ? 'active' : '' }}"
+                                    href="#sidebarTables" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="{{ Request::is('admin/membresias*') || Request::is('admin/servicios*') || Request::is('admin/categorias*') ? 'true' : 'false' }}"
+                                    aria-controls="sidebarTables">
+                                    <i class="ri-vip-crown-line"></i> <span data-key="t-tables">Planes y
+                                        Servicios</span>
+                                </a>
+                                <div class="collapse menu-dropdown {{ Request::is('admin/membresias*') || Request::is('admin/servicios*') || Request::is('admin/categorias*') ? 'show' : '' }}"
+                                    id="sidebarTables">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.membresias.index') }}"
+                                                class="nav-link {{ Request::routeIs('admin.membresias.index') ? 'active' : '' }}"
+                                                data-key="t-grid-js"><i class="ri-price-tag-3-line"></i> Planes de
+                                                Membresias</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.servicios.index') }}"
+                                                class="nav-link {{ Request::routeIs('admin.servicios.index') ? 'active' : '' }}"
+                                                data-key="t-form-select"><i class="ri-service-line"></i> Lista de
+                                                Servicios</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.categorias.index') }}"
+                                                class="nav-link {{ Request::routeIs('admin.categorias.index') ? 'active' : '' }}"
+                                                data-key="t-form-select"><i class="ri-service-line"></i> Categorias
+                                                Servicios</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
                         @endif
                         <!-- Solo visible para Administradores -->
-                        @if(auth()->user()->rol == 'Administrador')
-                        <!-- Reportes -->
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarMaps" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarMaps">
-                                <i class="ri-bar-chart-line"></i><span data-key="t-maps">Reportes</span>
-                            </a>
-                            <div class="collapse menu-dropdown" id="sidebarMaps">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.reportes.cliente') }}" class="nav-link" data-key="t-form-select">Reporte clientes</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.reportes.entrenadores') }}" class="nav-link" data-key="t-form-select">Reporte Entrenadores</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.reportes.ingresos') }}" class="nav-link"><span data-key="t-material-design">Reporte ingresos</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.reportes.asistencias') }}" class="nav-link"><span data-key="t-material-design">Reporte de Asistencias</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.reportes.inscripciones-mes-anio') }}" class="nav-link"><span data-key="t-material-design">Reportes de inscripciones</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.reportes.ingresos-vendedor') }}" class="nav-link"><span data-key="t-material-design">Reporte de ingresos por vendedor</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.reportes.ingresos-membresias') }}" class="nav-link"><span data-key="t-material-design">Reporte de Ingresos por Membresias</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('admin.reportes.ingresos-servicios') }}" class="nav-link"><span data-key="t-material-design">Reporte de Ingresos por Servicios</span></a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
+                        @if (auth()->user()->rol == 'Administrador')
+                            <!-- Reportes -->
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ Request::is('admin/reportes*') ? 'active' : '' }}"
+                                    href="#sidebarMaps" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="{{ Request::is('admin/reportes*') ? 'true' : 'false' }}"
+                                    aria-controls="sidebarMaps">
+                                    <i class="ri-bar-chart-line"></i><span data-key="t-maps">Reportes</span>
+                                </a>
+                                <div class="collapse menu-dropdown {{ Request::is('admin/reportes*') ? 'show' : '' }}"
+                                    id="sidebarMaps">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.reportes.cliente') }}"
+                                                class="nav-link {{ Request::routeIs('admin.reportes.cliente') ? 'active' : '' }}"
+                                                data-key="t-form-select">Reporte clientes</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.reportes.entrenadores') }}"
+                                                class="nav-link {{ Request::routeIs('admin.reportes.entrenadores') ? 'active' : '' }}"
+                                                data-key="t-form-select">Reporte Entrenadores</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.reportes.ingresos') }}"
+                                                class="nav-link {{ Request::routeIs('admin.reportes.ingresos') ? 'active' : '' }}">
+                                                <span data-key="t-material-design">Reporte ingresos</span></a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.reportes.asistencias') }}"
+                                                class="nav-link {{ Request::routeIs('admin.reportes.asistencias') ? 'active' : '' }}">
+                                                <span data-key="t-material-design">Reporte de Asistencias</span></a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.reportes.inscripciones-mes-anio') }}"
+                                                class="nav-link {{ Request::routeIs('admin.reportes.inscripciones-mes-anio') ? 'active' : '' }}">
+                                                <span data-key="t-material-design">Reportes de inscripciones</span></a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.reportes.ingresos-vendedor') }}"
+                                                class="nav-link {{ Request::routeIs('admin.reportes.ingresos-vendedor') ? 'active' : '' }}">
+                                                <span data-key="t-material-design">Reporte de ingresos por
+                                                    vendedor</span></a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.reportes.ingresos-membresias') }}"
+                                                class="nav-link {{ Request::routeIs('admin.reportes.ingresos-membresias') ? 'active' : '' }}">
+                                                <span data-key="t-material-design">Reporte de Ingresos por
+                                                    Membresias</span></a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.reportes.ingresos-servicios') }}"
+                                                class="nav-link {{ Request::routeIs('admin.reportes.ingresos-servicios') ? 'active' : '' }}">
+                                                <span data-key="t-material-design">Reporte de Ingresos por
+                                                    Servicios</span></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
                         @endif
                     </ul>
                 </div>
@@ -447,7 +523,7 @@
             </div>
 
 
-            
+
 
             <div class="sidebar-background"></div>
         </div>
@@ -489,11 +565,11 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-sm-6">
-                            <span id="currentYear"></span> © Velzon.
+                            <span id="currentYear"></span> © Alex.
                         </div>
                         <div class="col-sm-6">
                             <div class="text-sm-end d-none d-sm-block">
-                                Design & Develop by Themesbrand
+                                Disiño y Desarrollo en INCOS CBBA
                             </div>
                         </div>
                     </div>
@@ -1597,16 +1673,24 @@
 
 
     <script src="{{ url('dist/assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- jsPDF-AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="{{ asset('package/dist/sweetalert2.all.min.js') }}"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
     <script src="{{ url('dist/assets/libs/simplebar/simplebar.min.js') }}"></script>
     <script src="{{ url('dist/assets/libs/node-waves/waves.min.js') }}"></script>
     <script src="{{ url('dist/assets/libs/feather-icons/feather.min.js') }}"></script>
     <script src="{{ url('dist/assets/js/pages/plugins/lord-icon-2.1.0.js') }}"></script>
     <script src="{{ url('dist/assets/js/plugins.js') }}"></script>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-   
+
+
+
     <!--datatable js-->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>

@@ -27,7 +27,7 @@
                 </div>
             </div>
         </div>
-    
+
         <!-- Tarjeta de Servicios -->
         <div class="col-xl-2 col-md-4">
             <div class="card bg-secondary text-white">
@@ -37,7 +37,7 @@
                 </div>
             </div>
         </div>
-    
+
         <!-- Tarjeta de Activas -->
         <div class="col-xl-2 col-md-4">
             <div class="card bg-success text-white">
@@ -47,7 +47,7 @@
                 </div>
             </div>
         </div>
-    
+
         <!-- Tarjeta de Vencidas -->
         <div class="col-xl-2 col-md-4">
             <div class="card bg-danger text-white">
@@ -57,7 +57,7 @@
                 </div>
             </div>
         </div>
-    
+
         <!-- Tarjeta de Canceladas -->
         <div class="col-xl-2 col-md-4">
             <div class="card bg-warning text-white">
@@ -68,7 +68,7 @@
             </div>
         </div>
     </div>
-    
+
 
     <!-- Pestañas para membresías y servicios -->
     <div class="row">
@@ -186,21 +186,26 @@
 
                                                     <!-- Botón para imprimir comprobante -->
                                                     <a href="javascript:void(0);"
-                                                        onclick="abrirVentanaPDF({{ $inscripcion->idInscripcion }})"
-                                                        class="btn btn-info btn-sm" title="Imprimir Comprobante">
+                                                        onclick="abrirVentanaPDF({{ $inscripcion->idInscripcion }}, '{{ $inscripcion->cliente->qrCode }}')"
+                                                        class="btn btn-info btn-sm {{ $inscripcion->cliente->qrCode ? '' : 'disabled' }}"
+                                                        title="Imprimir Comprobante">
                                                         <i class="ri-printer-line"></i>
                                                     </a>
 
                                                     <!-- Botón para anular venta -->
                                                     @if ($inscripcion->estado != 'cancelada')
-                                                    <form action="{{ route('admin.inscripciones.cancelar', $inscripcion->idInscripcion) }}" method="POST" style="display:inline;">
-                                                        @csrf
-                                                        @method('PUT') <!-- Esto simula el método PUT en el formulario -->
-                                                        <button type="submit" class="btn btn-danger btn-sm" title="Anular Venta" onclick="return confirm('¿Está seguro de anular esta venta?')">
-                                                            <i class="ri-delete-bin-line"></i>
-                                                        </button>
-                                                    </form>
-                                                    
+                                                        <form
+                                                            action="{{ route('admin.inscripciones.cancelar', $inscripcion->idInscripcion) }}"
+                                                            method="POST" style="display:inline;">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <!-- Esto simula el método PUT en el formulario -->
+                                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                                title="Anular Venta"
+                                                                onclick="return confirm('¿Está seguro de anular esta venta?')">
+                                                                <i class="ri-delete-bin-line"></i>
+                                                            </button>
+                                                        </form>
                                                     @endif
 
                                                     <!-- Botón para generar credencial y enviar por WhatsApp -->
@@ -209,8 +214,6 @@
                                                             class="btn btn-primary btn-sm" title="Generar QR">
                                                             <i class="ri-qr-code-line"></i>
                                                         </a>
-
-                                                        
                                                     @endif
                                                 </td>
                                             </tr>
@@ -228,8 +231,7 @@
                                         <tr>
                                             <th>Cliente</th>
                                             <th>Servicio</th>
-                                            <th>Fecha Inicio</th>
-                                            <th>Fecha Fin</th>
+                                            <th>Fecha de Inscripción</th>
                                             <th>Estado</th>
                                             <th>Monto Pagado</th>
                                             <th>Acciones</th>
@@ -241,35 +243,30 @@
                                                 <td>{{ $inscripcion->cliente->nombre }}
                                                     {{ $inscripcion->cliente->primerApellido }}</td>
 
-                                                @php
-                                                    // Verificar si la relación detallesInscripciones está cargada y no es null
-                                                    $detalleServicio = $inscripcion->detallesInscripciones
-                                                        ? $inscripcion->detallesInscripciones->firstWhere(
-                                                            'tipoProducto',
-                                                            'servicio',
-                                                        )
-                                                        : null;
-                                                @endphp
-
-                                                <td>{{ $detalleServicio && $detalleServicio->servicio ? $detalleServicio->servicio->nombre : 'Servicio no disponible' }}
-                                                </td>
-
                                                 <td>
-                                                    @if ($detalleServicio && $detalleServicio->servicio)
-                                                        {{ $detalleServicio->servicio->fechaInicio ? \Carbon\Carbon::parse($detalleServicio->servicio->fechaInicio)->format('d/m/Y') : 'N/A' }}
+                                                    @if ($inscripcion->detallesInscripciones)
+                                                        @php
+                                                            // Filtrar los detalles que corresponden a servicios
+                                                            $servicios = $inscripcion->detallesInscripciones->where(
+                                                                'tipoProducto',
+                                                                'servicio',
+                                                            );
+                                                        @endphp
+                                                        @if ($servicios->isNotEmpty())
+                                                            <ul>
+                                                                @foreach ($servicios as $detalleServicio)
+                                                                    <li>{{ $detalleServicio->servicio ? $detalleServicio->servicio->nombre : 'Servicio no disponible' }}
+                                                                    </li>
+                                                                @endforeach
+                                                            </ul>
+                                                        @else
+                                                            Servicio no disponible
+                                                        @endif
                                                     @else
-                                                        N/A
+                                                        Servicio no disponible
                                                     @endif
                                                 </td>
-
-                                                <td>
-                                                    @if ($detalleServicio && $detalleServicio->servicio)
-                                                        {{ $detalleServicio->servicio->fechaFin ? \Carbon\Carbon::parse($detalleServicio->servicio->fechaFin)->format('d/m/Y') : 'N/A' }}
-                                                    @else
-                                                        N/A
-                                                    @endif
-                                                </td>
-
+                                                <td>{{ $inscripcion->fechaInscripcion ? $inscripcion->fechaInscripcion->format('d/m/Y') : 'N/A' }}</td>
                                                 <td>
                                                     <span
                                                         class="badge text-{{ $inscripcion->estado == 'activa' ? 'info' : ($inscripcion->estado == 'vencida' ? 'danger' : 'warning') }} fw-bold">
@@ -292,18 +289,21 @@
 
                                                     <!-- Botón para anular venta -->
                                                     @if ($inscripcion->estado != 'cancelada')
-                                                    <form action="{{ route('admin.inscripciones.cancelar', $inscripcion->idInscripcion) }}" method="POST" style="display:inline;">
-                                                        @csrf
-                                                        @method('PUT') <!-- Esto simula una solicitud PUT -->
-                                                        <button type="submit" class="btn btn-danger btn-sm" title="Anular Venta" onclick="return confirm('¿Está seguro de anular esta venta?')">
-                                                            <i class="ri-delete-bin-line"></i>
-                                                        </button>
-                                                    </form>
-                                                    
+                                                        <form
+                                                            action="{{ route('admin.inscripciones.cancelar', $inscripcion->idInscripcion) }}"
+                                                            method="POST" style="display:inline;">
+                                                            @csrf
+                                                            @method('PUT') <!-- Esto simula una solicitud PUT -->
+                                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                                title="Anular Venta"
+                                                                onclick="return confirm('¿Está seguro de anular esta venta?')">
+                                                                <i class="ri-delete-bin-line"></i>
+                                                            </button>
+                                                        </form>
                                                     @endif
 
-                                                    
-                                                    
+
+
 
                                                 </td>
                                             </tr>
@@ -384,9 +384,18 @@
 
         });
 
-        function abrirVentanaPDF(idInscripcion) {
+        function abrirVentanaPDF(idInscripcion, qrCode) {
+            if (!qrCode) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'QR no disponible',
+                    text: 'El cliente no tiene un código QR generado. No se puede generar el comprobante.',
+                });
+                return;
+            }
+
             // Generar la URL de la ruta usando el ID de la inscripción
-            const url = new URL('{{ route('admin.inscripciones.comprobante', ':id') }}'.replace(':id', idInscripcion),
+            const url = new URL('{{ route('admin.inscripciones.comprobante2', ':id') }}'.replace(':id', idInscripcion),
                 window.location.origin);
 
             // Abrir la URL en una nueva ventana con el tamaño especificado

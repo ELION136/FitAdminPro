@@ -15,11 +15,11 @@
                     <div class="row g-3">
                         <div class="col-lg-4 col-md-6">
                             <label for="fechaInicio" class="form-label">Fecha desde</label>
-                            <input type="date" name="fechaInicio" class="form-control"  value="{{ request('fechaInicio', now()->format('Y-m-d')) }}">
+                            <input type="date" name="fechaInicio" class="form-control" value="{{ request('fechaInicio', now()->format('Y-m-d')) }}" max="{{ now()->format('Y-m-d') }}">
                         </div>
                         <div class="col-lg-4 col-md-6">
                             <label for="fechaFin" class="form-label">Fecha hasta</label>
-                            <input type="date" name="fechaFin" class="form-control" value="{{ old('fechaFin', now()->format('Y-m-d')) }}" max="{{ now()->format('Y-m-d') }}">
+                            <input type="date" name="fechaFin" class="form-control" value="{{ request('fechaFin', now()->format('Y-m-d')) }}" max="{{ now()->format('Y-m-d') }}">
                         </div>                                          
                         <div class="col-lg-4 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary me-2"><i class="ri-filter-3-line me-1"></i> Filtrar</button>
@@ -46,6 +46,7 @@
                 <table class="table table-hover table-striped table-bordered align-middle">
                     <thead class="table text-center">
                         <tr>
+                            <th>#</th>
                             <th><i class="ri-calendar-line me-1"></i> Fecha de Inscripción</th>
                             <th><i class="ri-user-line me-1"></i> Cliente</th>
                             <th><i class="ri-shopping-bag-line me-1"></i> Tipo de Producto</th>
@@ -56,14 +57,15 @@
                         </tr>
                     </thead>
                     <tbody class="text-center">
-                        @foreach ($ingresos as $ingreso)
+                        @foreach ($ingresos as $index => $ingreso)
                             <tr>
+                                <td>{{ $index + 1 }}</td> <!-- Numeración -->
                                 <td>{{ \Carbon\Carbon::parse($ingreso->fechaInscripcion)->format('d/m/Y') }}</td>
                                 <td>{{ $ingreso->clienteNombre }}</td>
                                 <td>{{ $ingreso->tipoProducto }}</td>
-                                <td>{{ number_format($ingreso->precio, 2) }}</td>
-                                <td>{{ number_format($ingreso->descuento, 2) }}</td>
-                                <td>{{ number_format($ingreso->subtotal, 2) }}</td>
+                                <td>{{ number_format($ingreso->precio, 2) }} BOB</td>
+                                <td>{{ number_format($ingreso->descuento, 2) }} BOB</td>
+                                <td>{{ number_format($ingreso->subtotal, 2) }} BOB</td>
                                 <td>{{ $ingreso->vendedor }}</td>
                             </tr>
                         @endforeach
@@ -73,8 +75,8 @@
         </div>
 
         <!-- Total de ingresos -->
-        <div class="mt-4">
-            <h4><i class="ri-money-dollar-box-line me-2"></i>Total de Ingresos: {{ number_format($totalIngresos, 2) }} BOB</h4>
+        <div class="mt-4 text-center">
+            <h4 class="fw-bold text-primary"><i class="ri-money-dollar-box-line me-2"></i>Total de Ingresos: <span class="text-dark">{{ number_format($totalIngresos, 2) }} BOB</span></h4>
         </div>
 
     </div>
@@ -83,7 +85,6 @@
 @endsection
 
 @push('scripts')
-
 <script>
     function abrirVentanaPDF() {
         const url = new URL('{{ route('admin.reportes.ingresos-pdf') }}', window.location.origin);
@@ -92,5 +93,4 @@
         window.open(url, '_blank', 'width=800,height=600');
     }
 </script>
-
 @endpush

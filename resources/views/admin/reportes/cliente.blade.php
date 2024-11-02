@@ -9,42 +9,43 @@
     <div class="card-body">
 
         <!-- Cards de estadísticas -->
-        <div class="row mb-4">
+        <div class="row mb-3">
             <div class="col-md-6 col-lg-4">
-                <div class="card text-white bg-primary mb-3 shadow-sm">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="ri-group-line display-4 me-3"></i>
+                <div class="card text-white bg-primary mb-2 shadow-sm" style="padding: 8px;">
+                    <div class="card-body d-flex align-items-center" style="padding: 8px;">
+                        <i class="ri-group-line" style="font-size: 1.6rem; margin-right: 8px;"></i>
                         <div>
-                            <h6 class="card-title">Total de Clientes</h6>
-                            <h2 class="mb-0">{{ $totalClientes }}</h2>
+                            <h6 class="card-title" style="font-size: 0.8rem; margin-bottom: 3px;">Total de Clientes</h6>
+                            <h3 class="mb-0" style="font-size: 1.2rem;">{{ $totalClientes }}</h3>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
-                <div class="card text-white bg-success mb-3 shadow-sm">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="ri-men-line display-4 me-3"></i>
+                <div class="card text-white bg-success mb-2 shadow-sm" style="padding: 8px;">
+                    <div class="card-body d-flex align-items-center" style="padding: 8px;">
+                        <i class="ri-men-line" style="font-size: 1.6rem; margin-right: 8px;"></i>
                         <div>
-                            <h6 class="card-title">Total de Hombres</h6>
-                            <h2 class="mb-0">{{ $totalHombres }}</h2>
+                            <h6 class="card-title" style="font-size: 0.8rem; margin-bottom: 3px;">Total de Hombres</h6>
+                            <h3 class="mb-0" style="font-size: 1.2rem;">{{ $totalHombres }}</h3>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
-                <div class="card text-white bg-info mb-3 shadow-sm">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="ri-women-line display-4 me-3"></i>
+                <div class="card text-white bg-info mb-2 shadow-sm" style="padding: 8px;">
+                    <div class="card-body d-flex align-items-center" style="padding: 8px;">
+                        <i class="ri-women-line" style="font-size: 1.6rem; margin-right: 8px;"></i>
                         <div>
-                            <h6 class="card-title">Total de Mujeres</h6>
-                            <h2 class="mb-0">{{ $totalMujeres }}</h2>
+                            <h6 class="card-title" style="font-size: 0.8rem; margin-bottom: 3px;">Total de Mujeres</h6>
+                            <h3 class="mb-0" style="font-size: 1.2rem;">{{ $totalMujeres }}</h3>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
+        
+        
         <!-- Formulario de filtros -->
         <div class="card mb-4 shadow-sm">
             <div class="card-body">
@@ -58,7 +59,7 @@
                         </div>
                         <div class="col-lg-4">
                             <select name="genero" class="form-control">
-                                <option value="">Todos los géneros</option>
+                                <option value="">seleccione</option>
                                 <option value="Masculino" {{ request('genero') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
                                 <option value="Femenino" {{ request('genero') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
                                 <option value="Otro" {{ request('genero') == 'Otro' ? 'selected' : '' }}>Otro</option>
@@ -67,12 +68,11 @@
                     </div>
                     <div class="row g-3 mt-3">
                         <div class="col-lg-4 col-md-6">
-                            <input type="date" name="fechaCreacionInicio" class="form-control" placeholder="Fecha de creación desde" value="{{ request('fechaCreacionInicio') }}">
+                            <input type="date" name="fechaCreacionInicio" class="form-control" placeholder="Fecha de creación desde" value="{{ request('fechaCreacionInicio', Carbon\Carbon::now()->format('Y-m-d')) }}" max="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
                         </div>
                         <div class="col-lg-4 col-md-6">
-                            <input type="date" name="fechaCreacionFin" class="form-control" placeholder="Fecha de creación hasta" value="{{ request('fechaCreacionFin') }}" max="{{ now()->format('Y-m-d') }}">
+                            <input type="date" name="fechaCreacionFin" class="form-control" placeholder="Fecha de creación hasta" value="{{ request('fechaCreacionFin', Carbon\Carbon::now()->format('Y-m-d')) }}" max="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
                         </div>
-                        
                         <div class="col-lg-4 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary me-2"><i class="ri-filter-3-line me-1"></i> Filtrar</button>
                             <a href="{{ route('admin.reportes.cliente') }}" class="btn btn-secondary"><i class="ri-refresh-line me-1"></i> Limpiar Filtros</a>
@@ -91,8 +91,9 @@
         <!-- Tabla de clientes -->
         <div class="table-responsive">
             <table class="table table-hover table-striped table-bordered align-middle">
-                <thead class="table-dark text-center">
+                <thead class="table text-center">
                     <tr>
+                        <th>#</th>
                         <th><i class="ri-user-line me-1"></i> Nombre</th>
                         <th><i class="ri-user-line me-1"></i> Primer Apellido</th>
                         <th><i class="ri-user-line me-1"></i> Segundo Apellido</th>
@@ -102,8 +103,9 @@
                     </tr>
                 </thead>
                 <tbody class="text-center">
-                    @foreach ($clientes as $cliente)
+                    @forelse ($clientes as $cliente)
                         <tr>
+                            <td>{{ $loop->iteration }}</td>
                             <td>{{ $cliente->nombre }}</td>
                             <td>{{ $cliente->primerApellido }}</td>
                             <td>{{ $cliente->segundoApellido }}</td>
@@ -111,10 +113,15 @@
                             <td>{{ $cliente->fechaNacimiento->format('d/m/Y') }}</td>
                             <td>{{ $cliente->fechaCreacion->format('d/m/Y') }}</td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center">No se encontraron resultados.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
+        
 
     </div>
 </div>

@@ -11,39 +11,40 @@
         <!-- Cards de estadísticas -->
         <div class="row mb-4">
             <div class="col-md-6 col-lg-4">
-                <div class="card text-white bg-primary mb-3 shadow-sm">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="ri-group-line display-4 me-3"></i>
+                <div class="card text-white bg-primary mb-2 shadow-sm" style="padding: 8px;">
+                    <div class="card-body d-flex align-items-center" style="padding: 8px;">
+                        <i class="ri-group-line" style="font-size: 1.6rem; margin-right: 8px;"></i>
                         <div>
-                            <h6 class="card-title">Total de Entrenadores</h6>
-                            <h2 class="mb-0">{{ $totalEntrenadores }}</h2>
+                            <h6 class="card-title" style="font-size: 0.8rem; margin-bottom: 3px;">Total de Entrenadores</h6>
+                            <h3 class="mb-0" style="font-size: 1.2rem;">{{ $totalEntrenadores }}</h3>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
-                <div class="card text-white bg-success mb-3 shadow-sm">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="ri-men-line display-4 me-3"></i>
+                <div class="card text-white bg-success mb-2 shadow-sm" style="padding: 8px;">
+                    <div class="card-body d-flex align-items-center" style="padding: 8px;">
+                        <i class="ri-men-line" style="font-size: 1.6rem; margin-right: 8px;"></i>
                         <div>
-                            <h6 class="card-title">Total de Hombres</h6>
-                            <h2 class="mb-0">{{ $totalHombres }}</h2>
+                            <h6 class="card-title" style="font-size: 0.8rem; margin-bottom: 3px;">Total de Hombres</h6>
+                            <h3 class="mb-0" style="font-size: 1.2rem;">{{ $totalHombres }}</h3>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
-                <div class="card text-white bg-info mb-3 shadow-sm">
-                    <div class="card-body d-flex align-items-center">
-                        <i class="ri-women-line display-4 me-3"></i>
+                <div class="card text-white bg-info mb-2 shadow-sm" style="padding: 8px;">
+                    <div class="card-body d-flex align-items-center" style="padding: 8px;">
+                        <i class="ri-women-line" style="font-size: 1.6rem; margin-right: 8px;"></i>
                         <div>
-                            <h6 class="card-title">Total de Mujeres</h6>
-                            <h2 class="mb-0">{{ $totalMujeres }}</h2>
+                            <h6 class="card-title" style="font-size: 0.8rem; margin-bottom: 3px;">Total de Mujeres</h6>
+                            <h3 class="mb-0" style="font-size: 1.2rem;">{{ $totalMujeres }}</h3>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
 
         <!-- Formulario de filtros -->
         <div class="card mb-4 shadow-sm">
@@ -55,7 +56,7 @@
                         </div>
                         <div class="col-lg-4 col-md-6">
                             <select name="especialidad" class="form-control">
-                                <option value="">Todas las especialidades</option>
+                                <option value="">Seleccione una especialidad</option>
                                 <option value="Entrenamiento Personal" {{ request('especialidad') == 'Entrenamiento Personal' ? 'selected' : '' }}>Entrenamiento Personal</option>
                                 <option value="Entrenamiento Cardiovascular" {{ request('especialidad') == 'Entrenamiento Cardiovascular' ? 'selected' : '' }}>Entrenamiento Cardiovascular</option>
                                 <option value="Boxeo" {{ request('especialidad') == 'Boxeo' ? 'selected' : '' }}>Boxeo</option>
@@ -66,7 +67,7 @@
                         </div>
                         <div class="col-lg-4">
                             <select name="genero" class="form-control">
-                                <option value="">Todos los géneros</option>
+                                <option value="">Selecciones</option>
                                 <option value="Masculino" {{ request('genero') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
                                 <option value="Femenino" {{ request('genero') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
                                 <option value="Otro" {{ request('genero') == 'Otro' ? 'selected' : '' }}>Otro</option>
@@ -75,10 +76,10 @@
                     </div>
                     <div class="row g-3 mt-3">
                         <div class="col-lg-4 col-md-6">
-                            <input type="date" name="fechaCreacionInicio" class="form-control" placeholder="Fecha de creación desde" value="{{ request('fechaCreacionInicio') }}">
+                            <input type="date" name="fechaCreacionInicio" class="form-control" value="{{ request('fechaCreacionInicio', \Carbon\Carbon::now()->format('Y-m-d')) }}" max="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
                         </div>
                         <div class="col-lg-4 col-md-6">
-                            <input type="date" name="fechaCreacionFin" class="form-control" placeholder="Fecha de creación hasta" value="{{ request('fechaCreacionFin') }}">
+                            <input type="date" name="fechaCreacionFin" class="form-control" value="{{ request('fechaCreacionFin', \Carbon\Carbon::now()->format('Y-m-d')) }}" max="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
                         </div>
                         <div class="col-lg-4 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary me-2"><i class="ri-filter-3-line me-1"></i> Filtrar</button>
@@ -98,8 +99,9 @@
         <!-- Tabla de entrenadores -->
         <div class="table-responsive">
             <table class="table table-hover table-striped table-bordered align-middle">
-                <thead class="table-dark text-center">
+                <thead class="table text-center">
                     <tr>
+                        <th>#</th>
                         <th><i class="ri-user-line me-1"></i> Nombre</th>
                         <th><i class="ri-user-line me-1"></i> Primer Apellido</th>
                         <th><i class="ri-user-line me-1"></i> Segundo Apellido</th>
@@ -111,8 +113,9 @@
                     </tr>
                 </thead>
                 <tbody class="text-center">
-                    @foreach ($entrenadores as $entrenador)
+                    @forelse ($entrenadores as $entrenador)
                         <tr>
+                            <td>{{ $loop->iteration }}</td>
                             <td>{{ $entrenador->nombre }}</td>
                             <td>{{ $entrenador->primerApellido }}</td>
                             <td>{{ $entrenador->segundoApellido }}</td>
@@ -122,7 +125,11 @@
                             <td>{{ \Carbon\Carbon::parse($entrenador->fechaNacimiento)->format('d/m/Y') }}</td>
                             <td>{{ \Carbon\Carbon::parse($entrenador->fechaContratacion)->format('d/m/Y') }}</td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="9" class="text-center">No se encontraron entrenadores.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -136,9 +143,8 @@
 <script>
     function abrirVentanaPDF() {
         const url = new URL('{{ route('admin.reportes.entrenadores-pdf') }}', window.location.origin);
-        const params = new URLSearchParams(window.location.search); // Obtener los filtros actuales de la URL
+        const params = new URLSearchParams(window.location.search); 
         url.search = params;
-
         window.open(url, '_blank', 'width=800,height=600');
     }
 </script>

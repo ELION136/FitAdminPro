@@ -1,175 +1,183 @@
 @extends('layouts.app')
 @section('content')
     <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
-                <h4 class="mb-sm-0">Panel Principal</h4>
+        <div class="col">
+            <div class="h-100">
+                <div class="row">
+                    <div class="col-12">
+                        <div
+                            class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
+                            <h4 class="mb-sm-0">Panel Principal</h4>
 
-                <div class="page-title-right">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboards</a></li>
-                        <li class="breadcrumb-item active">Inicio</li>
-                    </ol>
+                            <div class="page-title-right">
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboards</a></li>
+                                    <li class="breadcrumb-item active">Inicio</li>
+                                </ol>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
-
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        @php
-            $summaryCards = [
-                [
-                    'title' => 'Ingresos Hoy',
-                    'icon' => 'ri-wallet-line',
-                    'value' => number_format($incomeToday, 2),
-                    'color' => 'bg-success',
-                    'subtitle' => 'Total diario',
-                    'isIncome' => true,
-                ],
-                [
-                    'title' => 'Ingresos Esta Semana',
-                    'icon' => 'ri-calendar-line',
-                    'value' => number_format($incomeThisWeek, 2),
-                    'color' => 'bg-primary',
-                    'subtitle' => 'Total semanal',
-                    'isIncome' => true,
-                ],
-                [
-                    'title' => 'Ingresos Este Mes',
-                    'icon' => 'ri-bar-chart-line',
-                    'value' => number_format($incomeThisMonth, 2),
-                    'color' => 'bg-warning',
-                    'subtitle' => 'Total mensual',
-                    'isIncome' => true,
-                ],
-                [
-                    'title' => 'Ingresos Totales',
-                    'icon' => 'ri-bank-line',
-                    'value' => number_format($totalIncome, 2),
-                    'color' => 'bg-danger',
-                    'subtitle' => 'Acumulado',
-                    'isIncome' => true,
-                ],
-                [
-                    'title' => 'Membresías Activas',
-                    'icon' => 'ri-group-line',
-                    'value' => $totalMembresiasActivas,
-                    'color' => 'bg-info',
-                    'subtitle' => 'Clientes activos',
-                    'isIncome' => false,
-                ],
-                [
-                    'title' => 'Clientes Nuevos Este Mes',
-                    'icon' => 'ri-user-add-line',
-                    'value' => $newClientsThisMonth,
-                    'color' => 'bg-secondary',
-                    'subtitle' => 'Nuevas membresías',
-                    'isIncome' => false,
-                ],
-                [
-                    'title' => 'Check-ins Hoy',
-                    'icon' => 'ri-check-line',
-                    'value' => $checkInsToday,
-                    'color' => 'bg-dark',
-                    'subtitle' => 'Entradas registradas',
-                    'isIncome' => false,
-                ],
-                [
-                    'title' => 'Total de Clientes',
-                    'icon' => 'ri-group-line',
-                    'value' => $totalClientes,
-                    'color' => 'bg-primary',
-                    'subtitle' => 'Clientes registrados',
-                    'isIncome' => false,
-                ],
-            ];
-        @endphp
-        @foreach ($summaryCards as $card)
-            <div class="col-xl-3 col-md-6">
-                <!-- card -->
-                <div class="card card-animate {{ $card['color'] }}">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-grow-1">
-                                <p class="text-uppercase fw-medium text-white mb-0">{{ $card['title'] }}</p>
+                <div class="row">
+                    @php
+                        $summaryCards = [
+                            [
+                                'title' => 'Ingresos Hoy',
+                                'icon' => 'ri-wallet-line',
+                                'value' => number_format($incomeToday, 2),
+                                'color' => 'bg-success',
+                                'subtitle' => 'Total diario',
+                                'isIncome' => true,
+                            ],
+                            [
+                                'title' => 'Ingresos Esta Semana',
+                                'icon' => 'ri-calendar-line',
+                                'value' => number_format($incomeThisWeek, 2),
+                                'color' => 'bg-primary',
+                                'subtitle' => 'Total semanal',
+                                'isIncome' => true,
+                            ],
+                            [
+                                'title' => 'Ingresos Este Mes',
+                                'icon' => 'ri-bar-chart-line',
+                                'value' => number_format($incomeThisMonth, 2),
+                                'color' => 'bg-warning',
+                                'subtitle' => 'Total mensual',
+                                'isIncome' => true,
+                            ],
+                            [
+                                'title' => 'Ingresos Totales',
+                                'icon' => 'ri-bank-line',
+                                'value' => number_format($totalIncome, 2),
+                                'color' => 'bg-danger',
+                                'subtitle' => 'Acumulado',
+                                'isIncome' => true,
+                            ],
+                            [
+                                'title' => 'Membresías Activas',
+                                'icon' => 'ri-group-line',
+                                'value' => $totalMembresiasActivas,
+                                'color' => 'bg-info',
+                                'subtitle' => 'Clientes activos',
+                                'isIncome' => false,
+                            ],
+                            [
+                                'title' => 'Clientes Nuevos Este Mes',
+                                'icon' => 'ri-user-add-line',
+                                'value' => $newClientsThisMonth,
+                                'color' => 'bg-secondary',
+                                'subtitle' => 'Nuevas membresías',
+                                'isIncome' => false,
+                            ],
+                            [
+                                'title' => 'Check-ins Hoy',
+                                'icon' => 'ri-check-line',
+                                'value' => $checkInsToday,
+                                'color' => 'bg-dark',
+                                'subtitle' => 'Entradas registradas',
+                                'isIncome' => false,
+                            ],
+                            [
+                                'title' => 'Total de Clientes',
+                                'icon' => 'ri-group-line',
+                                'value' => $totalClientes,
+                                'color' => 'bg-primary',
+                                'subtitle' => 'Clientes registrados',
+                                'isIncome' => false,
+                            ],
+                        ];
+                    @endphp
+                    @foreach ($summaryCards as $card)
+                        <div class="col-xl-3 col-md-6">
+                            <!-- card -->
+                            <div class="card card-animate {{ $card['color'] }}">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <p class="text-uppercase fw-medium text-white mb-0">{{ $card['title'] }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-end justify-content-between mt-4">
+                                        <div>
+                                            <h4 class="fs-22 fw-semibold ff-secondary mb-4 text-white">
+                                                @if ($card['isIncome'])
+                                                    Bs. {{ $card['value'] }}
+                                                @else
+                                                    {{ $card['value'] }}
+                                                @endif
+                                            </h4>
+                                            <span
+                                                class="text-decoration-underline text-white-50">{{ $card['subtitle'] }}</span>
+                                        </div>
+                                        <div class="avatar-sm flex-shrink-0">
+                                            <span class="avatar-title bg-white bg-opacity-25 rounded fs-3 material-shadow">
+                                                <i class="{{ $card['icon'] }} text-white"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div><!-- end card body -->
+                            </div><!-- end card -->
+                        </div><!-- end col -->
+                    @endforeach
+                </div>
+                <div class="row mt-4">
+                    <div class="col-xl-8 col-lg-7">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">Ingresos en los Últimos 30 Días</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="incomeChart" style="height: 400px;"></div>
                             </div>
                         </div>
-                        <div class="d-flex align-items-end justify-content-between mt-4">
-                            <div>
-                                <h4 class="fs-22 fw-semibold ff-secondary mb-4 text-white">
-                                    @if ($card['isIncome'])
-                                        Bs. {{ $card['value'] }}
-                                    @else
-                                        {{ $card['value'] }}
-                                    @endif
-                                </h4>
-                                <span class="text-decoration-underline text-white-50">{{ $card['subtitle'] }}</span>
+                    </div>
+                    <div class="col-xl-4 col-lg-5">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">Servicios Más Solicitados</h6>
                             </div>
-                            <div class="avatar-sm flex-shrink-0">
-                                <span class="avatar-title bg-white bg-opacity-25 rounded fs-3 material-shadow">
-                                    <i class="{{ $card['icon'] }} text-white"></i>
-                                </span>
+                            <div class="card-body">
+                                <div id="servicesChart" style="height: 400px;"></div>
                             </div>
                         </div>
-                    </div><!-- end card body -->
-                </div><!-- end card -->
-            </div><!-- end col -->
-        @endforeach
-    </div>
-    <div class="row mt-4">
-        <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Ingresos en los Últimos 30 Días</h6>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div id="incomeChart" style="height: 400px;"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Servicios Más Solicitados</h6>
-                </div>
-                <div class="card-body">
-                    <div id="servicesChart" style="height: 400px;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xl-6">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Asistencias de Esta Semana</h6>
-                </div>
-                <div class="card-body">
-                    <div id="attendanceChart" style="height: 350px;"></div>
-                </div>
-            </div>
-        </div>
+                <div class="row">
+                    <div class="col-xl-6">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">Asistencias de Esta Semana</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="attendanceChart" style="height: 350px;"></div>
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="col-xl-6">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Membresías Más Adquiridas</h6>
-                </div>
-                <div class="card-body">
-                    <div id="membershipsChart" style="height: 350px;"></div>
-                </div>
-            </div>
-        </div>
+                    <div class="col-xl-6">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">Membresías Más Adquiridas</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="membershipsChart" style="height: 350px;"></div>
+                            </div>
+                        </div>
+                    </div>
 
-    </div>
-    <div class="row">
-        <div class="col-xl-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">ingresos</h6>
                 </div>
-                <div class="card-body">
-                    <div id="incomeInteractiveChart" style="height: 500px;"></div>
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">ingresos</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="incomeInteractiveChart" style="height: 500px;"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

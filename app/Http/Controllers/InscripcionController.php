@@ -182,15 +182,70 @@ class InscripcionController extends Controller
             $inscripcion->totalPago = $totalPago;
             $inscripcion->save();
 
-            DB::commit();
 
-            return redirect()->route('admin.inscripciones.create')->with('success', 'Inscripción realizada correctamente.');
+            // Obtener los datos necesarios para el comprobante
+
+            // Preparar los datos del comprobante
+            $cliente = Cliente::find($request->idCliente);
+            $fecha = now()->format('d/m/Y');
+
+            $productosDetalles = [];
+            foreach ($productos as $productoData) {
+                $precioFinal = $productoData['precio'] - ($productoData['precio'] * ($productoData['descuento'] ?? 0) / 100);
+                $productosDetalles[] = [
+                    'nombre' => $productoData['nombre'],
+                    'tipoProducto' => $productoData['tipoProducto'],
+                    'precio' => $productoData['precio'],
+                    'descuento' => $productoData['descuento'] ?? 0,
+                    'precioFinal' => $precioFinal,
+                ];
+            }
+
+            $data = [
+                'cliente' => [
+                    'nombreCompleto' => $cliente->nombre . ' ' . $cliente->primerApellido,
+                ],
+                'fecha' => $fecha,
+                'productos' => $productosDetalles,
+                'totalPago' => $totalPago,
+            ];
+
+            // Generar un identificador único para el comprobante
+            $comprobanteId = uniqid();
+
+            // Almacenar los datos del comprobante en la sesión
+            session()->put('comprobantes.' . $comprobanteId, $data);
+            DB::commit();
+            // Devolver la respuesta JSON
+            return response()->json(['comprobanteId' => $comprobanteId]);
+
+            //  return redirect()->route('admin.inscripciones.create')->with('success', 'Inscripción realizada correctamente.');
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->withErrors(['Ocurrió un error al realizar la inscripción: ' . $e->getMessage()]);
         }
     }
 
+
+
+    public function generarPDF($id)
+    {
+        // Recuperar los datos del comprobante
+        $data = session()->get('comprobantes.' . $id);
+
+        if (!$data) {
+            return redirect()->route('admin.inscripciones.create')->with('error', 'El comprobante no está disponible.');
+        }
+
+        // Generar el PDF
+        $pdf = PDF::loadView('pdf.comprobante2', compact('data'));
+
+        // Eliminar los datos del comprobante de la sesión
+        session()->forget('comprobantes.' . $id);
+
+        // Mostrar el PDF en el navegador
+        return $pdf->stream('comprobante_inscripcion.pdf');
+    }
 
     public function storeCliente(Request $request)
     {
@@ -285,7 +340,7 @@ class InscripcionController extends Controller
         $logo = public_path('dist/assets/images/logo3.png');  // Ruta del logo
 
         // Cargar la vista del comprobante y generar el PDF
-        $pdf = Pdf::loadView('admin.inscripciones.comprobante', compact('inscripcion', 'qrCodePath', 'logo'))
+        $pdf = Pdf::loadView('admin.inscripciones.comprobanteFinal', compact('inscripcion', 'qrCodePath', 'logo'))
             ->setPaper('a4', 'portrait'); // Ajusta el tamaño y la orientación del papel si es necesario
 
         // Habilitar la carga remota de imágenes

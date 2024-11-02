@@ -70,11 +70,11 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'America/La_Paz',
 
     /*
     |--------------------------------------------------------------------------
-    | Application Locale Configuration
+    | Application Locale Configuration UTC
     |--------------------------------------------------------------------------
     |
     | The application locale determines the default locale that will be used

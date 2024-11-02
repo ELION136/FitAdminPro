@@ -120,6 +120,14 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/admin/inscripciones/storeCliente', [App\Http\Controllers\InscripcionController::class, 'storeCliente'])->name('admin.inscripciones.storeCliente');
 
+
+    Route::post('admin/inscripciones/store', [App\Http\Controllers\InscripcionController::class, 'store'])->name('admin.inscripciones.store');
+    Route::get('admin/inscripciones/comprobante/{id}', [App\Http\Controllers\InscripcionController::class, 'generarPDF'])->name('admin.inscripciones.generarPDF');
+    
+
+
+
+
     Route::get('/admin/clientes', [App\Http\Controllers\ClienteController::class, 'index'])->name('admin.clientes.index');
     Route::get('/admin/clientes/create', [App\Http\Controllers\ClienteController::class, 'create'])->name('admin.clientes.create');
     Route::post('/admin/clientes', [App\Http\Controllers\ClienteController::class, 'store'])->name('admin.clientes.store');
@@ -210,7 +218,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/admin/inscripciones/{id}/generar-qr2', [App\Http\Controllers\InscripcionController::class, 'generarQr2'])->name('admin.inscripciones.generarQr2');
 
-    Route::get('/admin/inscripciones/{id}/comprobante', [App\Http\Controllers\InscripcionController::class, 'generarComprobante'])->name('admin.inscripciones.comprobante');
+    Route::get('/admin/inscripciones/comprobanteFinal/{id}', [App\Http\Controllers\InscripcionController::class, 'generarComprobante'])->name('admin.inscripciones.comprobante2');
 
     //Route::get('/admin/inscripciones/{id}/comprobante', [App\Http\Controllers\InscripcionController::class, 'generarComprobanteTCPDF'])->name('admin.inscripciones.comprobante');
 

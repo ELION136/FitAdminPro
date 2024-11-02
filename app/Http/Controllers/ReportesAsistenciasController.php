@@ -16,73 +16,11 @@ class ReportesAsistenciasController extends Controller
     // Mostrar el reporte de asistencias con filtros y estadísticas
     public function index(Request $request)
     {
-        // Iniciar la consulta
-        $asistencias = Asistencia::query()
-            ->join('clientes', 'asistencias.idCliente', '=', 'clientes.idCliente')
-            ->select(
-                'asistencias.fechaAsistencia',
-                'clientes.nombre as clienteNombre',
-                'asistencias.metodoRegistro',
-                'asistencias.estado'
-            );
+        // Obtener la fecha actual como valor predeterminado
+        $fechaInicio = $request->input('fechaInicio', Carbon::now()->format('Y-m-d'));
+        $fechaFin = $request->input('fechaFin', Carbon::now()->format('Y-m-d'));
 
-        // Verificar si se aplicaron filtros
-        if ($request->filled('fechaInicio') || $request->filled('fechaFin')) {
-            // Aplicar los filtros según las fechas proporcionadas
-            $asistencias = $asistencias
-                ->when($request->filled('fechaInicio'), function ($query) use ($request) {
-                    $query->whereDate('asistencias.fechaAsistencia', '>=', $request->fechaInicio);
-                })
-                ->when($request->filled('fechaFin'), function ($query) use ($request) {
-                    $query->whereDate('asistencias.fechaAsistencia', '<=', $request->fechaFin);
-                })
-                ->get();
-        } else {
-            // Si no se aplicaron filtros, no obtener resultados
-            $asistencias = collect(); // Retorna una colección vacía
-        }
-
-        // Calcular las estadísticas solo si hay datos
-        $totalAsistencias = $asistencias->count();
-        $totalQR = $asistencias->where('metodoRegistro', 'QR')->count();
-        $totalManual = $asistencias->where('metodoRegistro', 'manual')->count();
-
-        return view('admin.reportes.asistencias', compact('asistencias', 'totalAsistencias', 'totalQR', 'totalManual'));
-    }
-
-    public function exportarPDF(Request $request)
-    {
-        $asistencias = $this->filtrarAsistencias($request);
-
-        // Capturar las fechas para el reporte
-        $fechaInicio = $request->fechaInicio;
-        $fechaFin = $request->fechaFin;
-
-        // Generar el PDF en orientación vertical (portrait)
-        $pdf = Pdf::loadView('admin.reportes.asistencias-pdf', compact('asistencias', 'fechaInicio', 'fechaFin'))
-            ->setPaper('a4', 'portrait');
-
-        // Configurar DomPDF para permitir archivos externos
-        $pdf->getDomPDF()->set_option("enable_remote", true);
-        $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
-
-        // Establecer la ruta base para las imágenes
-        $pdf->getDomPDF()->set_option("chroot", public_path());
-
-        // Devolver el PDF para verlo en una nueva pestaña
-        return $pdf->stream('reporte_asistencias.pdf');
-    }
-
-    // Exportar a Excel
-    public function exportarExcel(Request $request)
-    {
-        $asistencias = $this->filtrarAsistencias($request);
-        return Excel::download(new AsistenciasExport($asistencias), 'reporte_asistencias.xlsx');
-    }
-
-    // Filtrar asistencias según los parámetros de búsqueda
-    private function filtrarAsistencias(Request $request)
-    {
+        // Consultar asistencias dentro del rango de fechas
         $asistencias = Asistencia::query()
             ->join('clientes', 'asistencias.idCliente', '=', 'clientes.idCliente')
             ->select(
@@ -91,14 +29,71 @@ class ReportesAsistenciasController extends Controller
                 'asistencias.metodoRegistro',
                 'asistencias.estado'
             )
-            ->when($request->filled('fechaInicio'), function ($query) use ($request) {
-                $query->whereDate('asistencias.fechaAsistencia', '>=', $request->fechaInicio);
-            })
-            ->when($request->filled('fechaFin'), function ($query) use ($request) {
-                $query->whereDate('asistencias.fechaAsistencia', '<=', $request->fechaFin);
-            })
+            ->whereDate('asistencias.fechaAsistencia', '>=', $fechaInicio)
+            ->whereDate('asistencias.fechaAsistencia', '<=', $fechaFin)
             ->get();
 
-        return $asistencias;
+        // Calcular las estadísticas de asistencias
+        $totalAsistencias = $asistencias->count();
+        $totalQR = $asistencias->where('metodoRegistro', 'QR')->count();
+        $totalManual = $asistencias->where('metodoRegistro', 'manual')->count();
+
+        // Calcular el total de asistencias del día actual
+        $asistenciasHoy = Asistencia::whereDate('fechaAsistencia', Carbon::today())->count();
+
+        return view('admin.reportes.asistencias', compact(
+            'asistencias',
+            'totalAsistencias',
+            'totalQR',
+            'totalManual',
+            'fechaInicio',
+            'fechaFin',
+            'asistenciasHoy'
+        ));
+    }
+
+    // Exportar el reporte de asistencias a PDF
+    public function exportarPDF(Request $request)
+    {
+        $fechaInicio = $request->input('fechaInicio', Carbon::now()->format('Y-m-d'));
+        $fechaFin = $request->input('fechaFin', Carbon::now()->format('Y-m-d'));
+
+        $asistencias = $this->filtrarAsistencias($fechaInicio, $fechaFin);
+
+        $pdf = Pdf::loadView('admin.reportes.asistencias-pdf', compact('asistencias', 'fechaInicio', 'fechaFin'))
+            ->setPaper('a4', 'portrait');
+
+        // Configuraciones adicionales para DomPDF
+        $pdf->getDomPDF()->set_option("enable_remote", true);
+        $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
+        $pdf->getDomPDF()->set_option("chroot", public_path());
+
+        return $pdf->stream('reporte_asistencias.pdf');
+    }
+
+    // Exportar el reporte de asistencias a Excel
+    public function exportarExcel(Request $request)
+    {
+        $fechaInicio = $request->input('fechaInicio', Carbon::now()->format('Y-m-d'));
+        $fechaFin = $request->input('fechaFin', Carbon::now()->format('Y-m-d'));
+
+        $asistencias = $this->filtrarAsistencias($fechaInicio, $fechaFin);
+        return Excel::download(new AsistenciasExport($asistencias), 'reporte_asistencias.xlsx');
+    }
+
+    // Filtrar asistencias según el rango de fechas
+    private function filtrarAsistencias($fechaInicio, $fechaFin)
+    {
+        return Asistencia::query()
+            ->join('clientes', 'asistencias.idCliente', '=', 'clientes.idCliente')
+            ->select(
+                'asistencias.fechaAsistencia',
+                'clientes.nombre as clienteNombre',
+                'asistencias.metodoRegistro',
+                'asistencias.estado'
+            )
+            ->whereDate('asistencias.fechaAsistencia', '>=', $fechaInicio)
+            ->whereDate('asistencias.fechaAsistencia', '<=', $fechaFin)
+            ->get();
     }
 }

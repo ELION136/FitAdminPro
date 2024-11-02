@@ -31,9 +31,19 @@ class ReportesController extends Controller
         $totalHombres = Cliente::where('genero', 'Masculino')->count();
         $totalMujeres = Cliente::where('genero', 'Femenino')->count();
 
-        // Aplicar filtros solo si se han enviado
-        if ($request->filled('nombre') || $request->filled('primerApellido') || $request->filled('genero') || $request->filled('fechaCreacionInicio') || $request->filled('fechaCreacionFin')) {
-
+        // Si no hay filtros aplicados, mostrar los clientes del día actual
+        if (!$request->filled('nombre') && 
+            !$request->filled('primerApellido') && 
+            !$request->filled('genero') && 
+            !$request->filled('fechaCreacionInicio') && 
+            !$request->filled('fechaCreacionFin')) {
+            
+            $fechaActual = Carbon::now()->format('Y-m-d');
+            $clientes->whereDate('fechaCreacion', $fechaActual);
+            $clientes = $clientes->get();
+        }
+        // Si hay filtros, aplicarlos
+        else {
             if ($request->filled('nombre')) {
                 $clientes->where('nombre', 'like', '%' . $request->nombre . '%');
             }
@@ -42,7 +52,6 @@ class ReportesController extends Controller
                 $clientes->where('primerApellido', 'like', '%' . $request->primerApellido . '%');
             }
 
-            // Aquí modificamos la lógica para el género
             if ($request->filled('genero') && $request->genero != '') {
                 $clientes->where('genero', $request->genero);
             }
@@ -51,9 +60,16 @@ class ReportesController extends Controller
                 $clientes->whereBetween('fechaCreacion', [$request->fechaCreacionInicio, $request->fechaCreacionFin]);
             }
 
-            $clientes = $clientes->get(); // Solo obtener clientes si hay filtros
-        } else {
-            $clientes = collect(); // Retornar una colección vacía si no hay filtros
+            $clientes = $clientes->get();
+        }
+
+        // Establecer valores por defecto para las fechas en la vista
+        $fechaActual = Carbon::now()->format('Y-m-d');
+        if (!$request->filled('fechaCreacionInicio')) {
+            $request->merge(['fechaCreacionInicio' => $fechaActual]);
+        }
+        if (!$request->filled('fechaCreacionFin')) {
+            $request->merge(['fechaCreacionFin' => $fechaActual]);
         }
 
         return view('admin.reportes.cliente', compact('clientes', 'totalClientes', 'totalHombres', 'totalMujeres'));

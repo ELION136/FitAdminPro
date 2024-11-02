@@ -2,21 +2,21 @@
 
 @section('content')
 
-<div class="row">
-    <div class="col-12">
-        <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
-            <h4 class="mb-sm-0">Nueva Inscripcion </h4>
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
+                <h4 class="mb-sm-0">Nueva Inscripcion </h4>
 
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">Productos</a></li>
-                    <li class="breadcrumb-item active">Inscripcion</li>
-                </ol>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">Productos</a></li>
+                        <li class="breadcrumb-item active">Inscripcion</li>
+                    </ol>
+                </div>
+
             </div>
-
         </div>
     </div>
-</div>
 
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -168,7 +168,9 @@
                                         <button type="button" class="btn btn-success btn-sm btnAgregarProducto"
                                             data-tipo="servicio" data-id="{{ $servicio->idServicio }}"
                                             data-nombre="{{ $servicio->nombre }}"
-                                            data-precio="{{ $servicio->precioTotal }}">
+                                            data-precio="{{ $servicio->precioTotal }}"
+                                            data-capacidad="{{ $servicio->capacidad }}">
+
                                             <i class="las la-plus"></i>
                                         </button>
                                     </div>
@@ -231,6 +233,10 @@
 @endsection
 
 @push('scripts')
+    <!-- jsPDF -->
+
+    <!-- SweetAlert -->
+
     <!-- Script personalizado -->
     <script>
         $(document).ready(function() {
@@ -315,6 +321,17 @@
                 let idProducto = $(this).data('id');
                 let nombre = $(this).data('nombre');
                 let precio = parseFloat($(this).data('precio'));
+                let capacidad = parseInt($(this).data('capacidad'));
+
+
+                if (tipoProducto === 'servicio' && capacidad <= 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Servicio lleno',
+                        text: 'Este servicio ya está lleno y no puede ser seleccionado.'
+                    });
+                    return; // Detener el proceso si la capacidad es 0
+                }
 
                 // Verificar si ya hay una membresía agregada
                 if (tipoProducto == 'membresia') {
@@ -418,13 +435,14 @@
 
             // Al enviar el formulario, recopilar los datos necesarios
             $('#inscripcionForm').submit(function(event) {
+                event.preventDefault(); // Prevenir el envío normal del formulario
+
                 if (productosSeleccionados.length == 0) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
                         text: 'Debe seleccionar al menos un producto.'
                     });
-                    event.preventDefault();
                     return false;
                 }
 
@@ -434,6 +452,61 @@
                     value: JSON.stringify(productosSeleccionados)
                 });
                 $(this).append(productosInput);
+
+                // Obtener los datos del formulario
+                var formData = $(this).serialize();
+
+                // Enviar los datos mediante AJAX
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        // Mostrar mensaje de éxito
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Éxito!',
+                            text: 'Inscripción realizada correctamente.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            // Generar el comprobante en PDF
+                            // Generar la URL del comprobante con el ID de inscripción
+                            const url = new URL(
+                                '{{ route('admin.inscripciones.generarPDF', ':id') }}'
+                                .replace(':id', response.comprobanteId), window
+                                .location.origin);
+
+                            // Abrir la URL en una nueva ventana con tamaño específico
+                            window.open(url, '_blank', 'width=800,height=600');
+                        });
+
+                        // Limpiar el formulario y los productos seleccionados
+                        $('#inscripcionForm')[0].reset();
+                        productosSeleccionados = [];
+                        mostrarDetalleVenta();
+                        calcularTotal();
+
+                        // Eliminar el input temporal de productos
+                        productosInput.remove();
+                    },
+                    error: function(xhr) {
+                        // Mostrar errores
+                        let errors = xhr.responseJSON.errors;
+                        let errorMessage = '';
+                        $.each(errors, function(key, value) {
+                            errorMessage += value + '\n';
+                        });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorMessage
+                        });
+
+                        // Eliminar el input temporal de productos
+                        productosInput.remove();
+                    }
+                });
             });
         });
     </script>

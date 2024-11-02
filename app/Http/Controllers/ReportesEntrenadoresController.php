@@ -43,6 +43,15 @@ class ReportesEntrenadoresController extends Controller
             $entrenadores = collect();
         }
 
+        // Establecer valores por defecto para las fechas en la vista
+        $fechaActual = Carbon::now()->format('Y-m-d');
+        if (!$request->filled('fechaCreacionInicio')) {
+            $request->merge(['fechaCreacionInicio' => $fechaActual]);
+        }
+        if (!$request->filled('fechaCreacionFin')) {
+            $request->merge(['fechaCreacionFin' => $fechaActual]);
+        }
+
         return view('admin.reportes.entrenadores', compact('entrenadores', 'totalEntrenadores', 'totalHombres', 'totalMujeres'));
     }
 

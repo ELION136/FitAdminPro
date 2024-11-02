@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte de Entrenadores</title>
     <style>
-        <style>
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             font-size: 12px;
@@ -30,7 +29,7 @@
         }
 
         .header img {
-            width: 50px; /* Ajuste de tamaño del logo */
+            width: 50px;
         }
 
         .report-info {
@@ -81,6 +80,25 @@
             background-color: #f9f9f9;
         }
 
+        .total-count {
+            margin-top: 10px;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .signature {
+            margin-top: 40px;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .notes {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #555;
+            text-align: left;
+        }
+
         footer {
             text-align: center;
             font-size: 10px;
@@ -92,36 +110,35 @@
             z-index: 2;
         }
 
-        /* Para compatibilidad con DomPDF */
         .pagenum:before {
             content: counter(page);
         }
 
-        /* Marca de agua */
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 100px;
-            color: rgba(0, 0, 0, 0.05); /* Texto semitransparente */
+            color: rgba(0, 0, 0, 0.05);
             z-index: 0;
             text-align: center;
             white-space: nowrap;
         }
-
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header con el logo -->
         <div class="header">
             <img src="{{ public_path('dist/assets/images/logo1.png') }}" alt="Logo">
         </div>
 
+        <!-- Información del reporte -->
         <div class="report-info">
             <h1>Reporte de Entrenadores</h1>
             <p>Generado el {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}</p>
-            <p>Sucursal: Nombre de la Sucursal</p>
+            <p>Sucursal: Gimnasio Urbano - Sacaba, Abra</p>
 
             <!-- Mostrar el rango de fechas si está disponible -->
             @if($fechaCreacionInicio && $fechaCreacionFin)
@@ -131,9 +148,11 @@
             @endif
         </div>
 
+        <!-- Tabla de datos -->
         <table>
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Nombre</th>
                     <th>Primer Apellido</th>
                     <th>Segundo Apellido</th>
@@ -145,8 +164,9 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($entrenadores as $entrenador)
+                @foreach ($entrenadores as $index => $entrenador)
                     <tr>
+                        <td>{{ $index + 1 }}</td> <!-- Enumeración -->
                         <td>{{ $entrenador->nombre }}</td>
                         <td>{{ $entrenador->primerApellido }}</td>
                         <td>{{ $entrenador->segundoApellido }}</td>
@@ -159,15 +179,35 @@
                 @endforeach
             </tbody>
         </table>
+
+        <!-- Indicador de Total de Entrenadores -->
+        <div class="total-count">
+            <p>Total de Entrenadores: {{ count($entrenadores) }}</p>
+        </div>
+
+        <!-- Sección de Notas -->
+        <div class="notes">
+            <p><strong>Notas:</strong> Aquí puedes incluir comentarios adicionales o información relevante al reporte.</p>
+        </div>
+
+        <!-- Firma del Responsable -->
+        <div class="signature">
+            <p>__________________________</p>
+            <p>Firma del Responsable</p>
+            <p>Nombre del Responsable</p>
+            <p>Fecha: {{ \Carbon\Carbon::now()->format('d/m/Y') }}</p>
+        </div>
     </div>
 
+    <!-- Footer con número de página -->
     <footer>
-        <p>&copy; {{ date('Y') }} Nombre de la Empresa | Página <span class="pagenum"></span></p>
+        <p>&copy; {{ date('Y') }} Gimnasio Urbano - Sacaba, Abra | Página <span class="pagenum"></span></p>
     </footer>
 
+    <!-- Marca de agua -->
     <div class="watermark">
         <img src="{{ public_path('dist/assets/images/logo1.png') }}" alt="Logo" style="opacity: 0.1; width: 300px; display: block; margin: 0 auto;" />
-        <p>FitAdminPro</p>
+        <p>Gimnasio Urbano</p>
     </div>
 </body>
 </html>
