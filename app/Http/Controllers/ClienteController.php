@@ -9,6 +9,7 @@ use App\Models\Asistencia;
 use App\Models\Servicio;
 use App\Models\Inscripcion;
 use App\Models\User;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -39,25 +40,72 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
+        // Validar la solicitud
+        $validator = Validator::make($request->all(), [
+            'telefonoEmergencia' => [
+                'nullable',
+                'string',
+                'max:15',
+                'regex:/^[0-9+\-\s]+$/', // Solo permite números, espacios y símbolos + o -
+            ],
+            'nombre' => [
+                'required',
+                'string',
+                'min:2', // Longitud mínima de 2 caracteres
+                'max:50',
+                'regex:/^[\pL\s\-]+$/u', // Solo permite letras, espacios y guiones
+            ],
+            'primerApellido' => [
+                'required',
+                'string',
+                'min:2',
+                'max:50',
+                'regex:/^[\pL\s\-]+$/u', // Solo permite letras, espacios y guiones
+            ],
+            'segundoApellido' => [
+                'nullable',
+                'string',
+                'min:2',
+                'max:50',
+                'regex:/^[\pL\s\-]+$/u', // Solo permite letras, espacios y guiones
+            ],
+            'fechaNacimiento' => [
+                'required',
+                'date',
+                'before:today', // Asegura que sea una fecha pasada
+                'after:1900-01-01', // Opcional: asegura que la fecha sea razonable
+            ],
+            'genero' => [
+                'required',
+                'in:Masculino,Femenino,Otro',
+            ],
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,gif',
+                'max:2048', // Máximo tamaño de archivo en KB
+                'dimensions:min_width=100,min_height=100,max_width=2000,max_height=2000', // Dimensiones mínimas y máximas
+            ],
+        ]);
+        // Si la validación falla, retorna los errores en formato JSON
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         // Obtener el usuario autenticado
         $user = Auth::user();
         if (!$user) {
-            return redirect()->route('login')->with('error', 'Usuario no autenticado');
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuario no autenticado'
+            ], 401);
         }
 
-        // Validar la solicitud
-        $request->validate([
-            'telefonoEmergencia' => 'nullable|string|max:15',
-            'nombre' => 'required|string|max:50',
-            'primerApellido' => 'required|string|max:50',
-            'segundoApellido' => 'nullable|string|max:50',
-            'fechaNacimiento' => 'required|date',
-            'genero' => 'required|in:Masculino,Femenino,Otro',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        // Crear el cliente asociado
-        $cliente = Cliente::create([
+        // Crear el cliente
+        $cliente = new Cliente([
             'nombre' => $request->nombre,
             'primerApellido' => $request->primerApellido,
             'segundoApellido' => $request->segundoApellido,
@@ -65,23 +113,29 @@ class ClienteController extends Controller
             'genero' => $request->genero,
             'telefonoEmergencia' => $request->telefonoEmergencia,
             'fechaCreacion' => now(),
-            'idAutor' => $user->idUsuario // Asigna el ID del usuario autenticado
+            'idAutor' => $user->idUsuario
         ]);
 
+        // Guardar imagen si se proporciona
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('profile_images', 'public');
             $cliente->image = $path;
-            $cliente->save();
         }
 
-        if (!$cliente) {
-            return redirect()->back()->with('error', 'Error al crear al cliente');
+        if ($cliente->save()) {
+            // Respuesta de éxito en formato JSON
+            return response()->json([
+                'success' => true,
+                'message' => 'El cliente fue registrado correctamente.'
+            ]);
+        } else {
+            // Respuesta de error si la creación falla
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al crear al cliente'
+            ], 500);
         }
-
-        // Redirigir con un mensaje de éxito
-        return redirect()->route('admin.clientes.index')->with('mensaje', 'El cliente fue registrado correctamente.')->with('icono', 'success');
     }
-
     public function edit($id)
     {
         $cliente = Cliente::findOrFail($id);
@@ -93,24 +147,27 @@ class ClienteController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $cliente = Cliente::findOrFail($id);
+        // Validar la solicitud con los mensajes de error personalizados
+        $validator = Validator::make($request->all(), [
+            'telefonoEmergencia' => 'nullable|string|max:15|regex:/^[0-9+\-\s]+$/',
+            'nombre' => 'required|string|max:50|regex:/^[\pL\s\-]+$/u',
+            'primerApellido' => 'required|string|max:50|regex:/^[\pL\s\-]+$/u',
+            'segundoApellido' => 'nullable|string|max:50|regex:/^[\pL\s\-]+$/u',
+            'fechaNacimiento' => 'required|date|before:today',
+            'genero' => 'required|in:Masculino,Femenino,Otro',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:min_width=100,min_height=100,max_width=2000,max_height=2000',
+        ]);
 
-        // Obtener el usuario autenticado
-        $user = Auth::user();
-        if (!$user) {
-            return redirect()->route('login')->with('error', 'Usuario no autenticado');
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Validar la solicitud
-        $request->validate([
-            'telefonoEmergencia' => 'nullable|string|max:15',
-            'nombre' => 'required|string|max:50',
-            'primerApellido' => 'required|string|max:50',
-            'segundoApellido' => 'nullable|string|max:50',
-            'fechaNacimiento' => 'required|date',
-            'genero' => 'required|in:Masculino,Femenino,Otro',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        $cliente = Cliente::findOrFail($id);
+        
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'Usuario no autenticado'], 401);
+        }
 
         // Actualizar los datos del cliente
         $cliente->update([
@@ -120,22 +177,19 @@ class ClienteController extends Controller
             'fechaNacimiento' => $request->fechaNacimiento,
             'genero' => $request->genero,
             'telefonoEmergencia' => $request->telefonoEmergencia,
-            'idAutor' => $user->idUsuario, // Asigna el ID del usuario autenticado
+            'idAutor' => $user->idUsuario,
         ]);
 
         if ($request->hasFile('image')) {
-            // Eliminar la imagen anterior si existe
             if ($cliente->image) {
                 Storage::disk('public')->delete($cliente->image);
             }
-            // Guardar la nueva imagen
             $path = $request->file('image')->store('profile_images', 'public');
             $cliente->image = $path;
             $cliente->save();
         }
 
-        // Redirigir con un mensaje de éxito
-        return redirect()->route('admin.clientes.index')->with('mensaje', 'El cliente fue actualizado correctamente.')->with('icono', 'success');
+        return response()->json(['success' => true, 'message' => 'Cliente actualizado correctamente']);
     }
 
     public function destroy(string $id)

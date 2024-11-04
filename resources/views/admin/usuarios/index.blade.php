@@ -261,6 +261,7 @@
 
         // Función común para enviar solicitudes AJAX
         function sendAjaxRequest(url, method, formData, successMessage) {
+           
             $.ajax({
                 url: url,
                 method: method,
@@ -287,7 +288,7 @@
             event.preventDefault();
             let formData = new FormData(this);
             sendAjaxRequest("{{ route('admin.usuarios.store') }}", 'POST', formData,
-                'Usuario creado exitosamente!');
+                'Usuario creado y correo enviado exitosamente!');
         });
 
         // Enviar formulario de edición

@@ -55,11 +55,11 @@
                                                 onclick="editMembresia({{ $membresia }})">
                                                 <i class="ri-pencil-fill align-bottom"></i>
                                             </button>
-                                            @if(auth()->user()->rol == 'Administrador')
-                                            <button class="btn btn-danger btn-sm"
-                                                onclick="deleteMembresia({{ $membresia->idMembresia }})">
-                                                <i class="ri-delete-bin-fill align-bottom"></i>
-                                            </button>
+                                            @if (auth()->user()->rol == 'Administrador')
+                                                <button class="btn btn-danger btn-sm"
+                                                    onclick="deleteMembresia({{ $membresia->idMembresia }})">
+                                                    <i class="ri-delete-bin-fill align-bottom"></i>
+                                                </button>
                                             @endif
                                         </td>
                                     </tr>
@@ -112,12 +112,6 @@
                             <input type="number" step="0.01" class="form-control" id="precio" name="precio"
                                 required>
                         </div>
-
-                        <!-- Fecha de Inicio -->
-                        <div class="mb-3">
-                            <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
-                            <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
-                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -162,6 +156,7 @@
                 $form[0].reset();
                 $('#membresiaId').val('');
                 $('#modalMembresiaLabel').text('Añadir Membresía');
+                clearValidationErrors(); // Limpiar errores previos
                 $('#modalMembresia').modal('show');
             };
 
@@ -173,10 +168,16 @@
                 $('#descripcion').val(membresia.descripcion);
                 $('#duracionDias').val(membresia.duracionDias);
                 $('#precio').val(membresia.precio);
-                $('#fechaInicio').val(membresia.fechaInicio);
                 $('#modalMembresiaLabel').text('Editar Membresía');
+                clearValidationErrors(); // Limpiar errores previos
                 $('#modalMembresia').modal('show');
             };
+
+            // Limpiar errores de validación
+            function clearValidationErrors() {
+                $('.is-invalid').removeClass('is-invalid');
+                $('.invalid-feedback').remove();
+            }
 
             // Crear o Editar Membresía
             $form.on('submit', function(e) {
@@ -190,6 +191,10 @@
                     formData += '&_method=PUT';
                 }
 
+                // Desactivar el botón de guardar temporalmente
+                let $submitButton = $form.find('button[type="submit"]');
+                $submitButton.prop('disabled', true);
+
                 $.post(url, formData)
                     .done(function(data) {
                         Swal.fire({
@@ -202,19 +207,26 @@
                         });
                     })
                     .fail(function(xhr) {
-                        let errorMessage = 'Ha ocurrido un error en el servidor';
+                        $submitButton.prop('disabled', false); // Reactivar el botón en caso de error
+                        clearValidationErrors(); // Limpiar errores previos
+
                         let errors = xhr.responseJSON?.errors;
-
                         if (errors) {
-                            errorMessage = Object.values(errors).flat().join('<br>');
+                            // Mostrar errores específicos de cada campo
+                            $.each(errors, function(field, messages) {
+                                let input = $(`#${field}`);
+                                input.addClass('is-invalid');
+                                input.after(
+                                    `<div class="invalid-feedback">${messages[0]}</div>`);
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Ha ocurrido un error en el servidor',
+                                confirmButtonText: 'Aceptar'
+                            });
                         }
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            html: errorMessage,
-                            confirmButtonText: 'Aceptar'
-                        });
                     });
             });
 
@@ -232,31 +244,31 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `{{ route('admin.membresias.destroy', '') }}/${id}`,
-                            type: 'POST',
-                            data: {
-                                _method: 'DELETE',
-                                _token: $('meta[name="csrf-token"]').attr('content')
-                            }
-                        })
-                        .done(function(data) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Eliminado',
-                                text: 'La membresía ha sido eliminada correctamente',
-                                confirmButtonText: 'Aceptar'
-                            }).then(() => {
-                                location.reload();
+                                url: `{{ route('admin.membresias.destroy', '') }}/${id}`,
+                                type: 'POST',
+                                data: {
+                                    _method: 'DELETE',
+                                    _token: $('meta[name="csrf-token"]').attr('content')
+                                }
+                            })
+                            .done(function(data) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Eliminado',
+                                    text: 'La membresía ha sido eliminada correctamente',
+                                    confirmButtonText: 'Aceptar'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            })
+                            .fail(function() {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Ha ocurrido un error en el servidor',
+                                    confirmButtonText: 'Aceptar'
+                                });
                             });
-                        })
-                        .fail(function() {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Ha ocurrido un error en el servidor',
-                                confirmButtonText: 'Aceptar'
-                            });
-                        });
                     }
                 });
             };

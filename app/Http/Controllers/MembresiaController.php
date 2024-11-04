@@ -24,20 +24,25 @@ class MembresiaController extends Controller
         try {
             // Validar los datos de entrada
             $validator = Validator::make($request->all(), [
-                'nombre' => 'required|string|max:50',
+                'nombre' => [
+                    'required',
+                    'string',
+                    'max:50',
+                    'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u' // Solo letras y espacios
+                ],
                 'descripcion' => 'nullable|string',
                 'duracionDias' => 'required|integer|min:1|max:365',
                 'precio' => 'required|numeric|min:0',
-                'fechaInicio' => 'required|date',
+
             ]);
-            
+
             // Si la validación falla, devolver los errores
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
             // Calcular la fecha de fin basada en la duración
-            $fechaFin = Carbon::parse($request->fechaInicio)->addDays($request->duracionDias);
+
 
             // Crear una nueva membresía
             Membresia::create([
@@ -45,8 +50,7 @@ class MembresiaController extends Controller
                 'descripcion' => $request->descripcion,
                 'duracionDias' => $request->duracionDias,
                 'precio' => $request->precio,
-                'fechaInicio' => $request->fechaInicio,
-                'fechaFin' => $fechaFin,  // Fecha de fin calculada
+
                 'idAutor' => auth()->id(),
             ]);
 
@@ -61,11 +65,16 @@ class MembresiaController extends Controller
         try {
             // Validar los datos de entrada
             $validator = Validator::make($request->all(), [
-                'nombre' => 'required|string|max:50',
+                'nombre' => [
+                    'required',
+                    'string',
+                    'max:50',
+                    'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u' // Solo letras y espacios
+                ],
                 'descripcion' => 'nullable|string',
                 'duracionDias' => 'required|integer|min:1|max:365',
                 'precio' => 'required|numeric|min:0',
-                'fechaInicio' => 'required|date',
+
             ]);
 
             // Si la validación falla, devolver los errores
@@ -77,7 +86,7 @@ class MembresiaController extends Controller
             $membresia = Membresia::findOrFail($id);
 
             // Calcular la nueva fecha de fin basada en la fecha de inicio y duración
-            $fechaFin = Carbon::parse($request->fechaInicio)->addDays($request->duracionDias);
+
 
             // Actualizar la membresía
             $membresia->update([
@@ -85,8 +94,6 @@ class MembresiaController extends Controller
                 'descripcion' => $request->descripcion,
                 'duracionDias' => $request->duracionDias,
                 'precio' => $request->precio,
-                'fechaInicio' => $request->fechaInicio,
-                'fechaFin' => $fechaFin,  // Fecha de fin calculada
                 'idAutor' => auth()->id(),
             ]);
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte de Inscripciones por Mes y Año</title>
+    <title>Reporte de Inscripciones por Día, Mes y Año</title>
     <style>
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
@@ -20,17 +20,26 @@
             margin: 0 auto;
             position: relative;
             z-index: 1;
+            padding-bottom: 80px;
         }
 
         .header {
             text-align: left;
             padding: 20px 0;
-            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             z-index: 2;
         }
 
         .header img {
             width: 50px;
+        }
+
+        .company-info {
+            font-size: 12px;
+            color: #555;
+            line-height: 1.5;
         }
 
         .report-info {
@@ -60,9 +69,7 @@
             position: relative;
         }
 
-        table,
-        th,
-        td {
+        table, th, td {
             border: 1px solid #dddddd;
         }
 
@@ -83,11 +90,15 @@
             background-color: #f9f9f9;
         }
 
+        .total {
+            font-weight: bold;
+            text-align: right;
+        }
+
         footer {
             text-align: center;
             font-size: 10px;
             padding: 10px;
-            margin-top: 20px;
             position: fixed;
             bottom: 0;
             width: 100%;
@@ -103,7 +114,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 100px;
+            font-size: 80px;
             color: rgba(0, 0, 0, 0.05);
             z-index: 0;
             text-align: center;
@@ -114,49 +125,91 @@
 
 <body>
     <div class="container">
+        <!-- Encabezado con logo e información de la empresa -->
         <div class="header">
             <img src="{{ public_path('dist/assets/images/logo1.png') }}" alt="Logo">
+            <div class="company-info">
+                <strong>GIMNASIO URBANO</strong><br>
+                <strong>Dirección:</strong> El Abra, Sacaba, Cochabamba<br>
+                <strong>Teléfono:</strong> 75983258<br>
+                <strong>Email:</strong> info@gimnasiourbano.com<br>
+                <strong>NIT:</strong> 1234567890
+            </div>
         </div>
 
+        <!-- Información del reporte -->
         <div class="report-info">
-            <h1>Reporte de Inscripciones por Mes y Año</h1>
+            <h1>Reporte de Inscripciones por Día, Mes y Año</h1>
             <p>Generado el {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}</p>
         </div>
 
+        <!-- Tabla de datos de inscripciones -->
         <table>
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Año</th>
                     <th>Mes</th>
+                    <th>Día</th>
                     <th>Total de Inscripciones</th>
-                    <th>Total Pagado (BOB)</th> <!-- Nueva columna -->
+                    <th>Total Pagado (BOB)</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($inscripciones as $inscripcion)
+                @foreach ($inscripciones as $index => $inscripcion)
                     <tr>
+                        <td>{{ $index + 1 }}</td>
                         <td>{{ $inscripcion->anio }}</td>
                         <td>{{ \Carbon\Carbon::create()->month($inscripcion->mes)->locale('es')->isoFormat('MMMM') }}</td>
+                        <td>{{ $inscripcion->dia }}</td>
                         <td>{{ $inscripcion->totalInscripciones }}</td>
-                        <td>{{ number_format($inscripcion->totalPagado, 2) }} BOB</td> <!-- Mostrar total pagado -->
+                        <td>{{ number_format($inscripcion->totalPagado, 2) }} BOB</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
 
-        <!-- Mostrar el total ganado al final de la tabla -->
-        <h3>Total Ganado: {{ number_format($totalGanado, 2) }} BOB</h3> <!-- Total global -->
+        <!-- Total global ganado -->
+        <h3 class="total">Total Ganado: {{ number_format($totalGanado, 2) }} BOB</h3>
 
+        <!-- Reporte Anual -->
+        <h2 style="margin-top: 40px;">Reporte Total Anual</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Año</th>
+                    <th>Total de Inscripciones</th>
+                    <th>Total Ganado (BOB)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($reporteAnual as $anio)
+                    <tr>
+                        <td>{{ $anio->anio }}</td>
+                        <td>{{ $anio->totalInscripciones }}</td>
+                        <td>{{ number_format($anio->totalGanado, 2) }} BOB</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <!-- Firma del responsable -->
+        <div style="margin-top: 30px; text-align: right;">
+            <p>__________________________</p>
+            <p>Firma del Responsable</p>
+            <p>Nombre del Responsable</p>
+            <p>Fecha: {{ \Carbon\Carbon::now()->format('d/m/Y') }}</p>
+        </div>
     </div>
 
+    <!-- Pie de página con numeración -->
     <footer>
-        <p>&copy; {{ date('Y') }} Nombre de la Empresa | Página <span class="pagenum"></span></p>
+        <p>&copy; {{ date('Y') }} Gimnasio Urbano | Página <span class="pagenum"></span></p>
     </footer>
 
+    <!-- Marca de agua -->
     <div class="watermark">
-        <img src="{{ public_path('dist/assets/images/logo1.png') }}" alt="Logo"
-            style="opacity: 0.1; width: 300px; display: block; margin: 0 auto;" />
-        <p>FitAdminPro</p>
+        GIMNASIO URBANO
     </div>
 </body>
 

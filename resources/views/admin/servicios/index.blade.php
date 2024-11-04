@@ -17,14 +17,6 @@
     </div>
 
     <!-- Botón para añadir servicio -->
-    <div class="row mb-3">
-        <div class="col-sm-auto">
-            <div class="d-flex flex-wrap align-items-start gap-2">
-                <button class="btn btn-success add-btn" onclick="createServicio()"><i
-                        class="ri-add-line align-bottom me-1"></i> Añadir Servicio</button>
-            </div>
-        </div>
-    </div>
 
 
     <!-- Tabla de Servicios -->
@@ -32,7 +24,19 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header border-bottom-dashed">
-                    <h5 class="card-title mb-0">Lista de Servicios</h5>
+                    <h5 class="card-title mb-0">Lista de Servicios</h5><br>
+                    <div class="row mb-3">
+
+                        <div class="col-sm-auto">
+                            <div class="d-flex flex-wrap align-items-start gap-2">
+                                <button class="btn btn-success add-btn" onclick="createServicio()"><i
+                                        class="ri-add-line align-bottom me-1"></i> Añadir Servicio</button>
+                                <a href="{{ route('admin.servicios.calendarioGeneral') }}" class="btn btn-primary">Ver
+                                    Calendario General de Horarios</a>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -59,18 +63,17 @@
                                         <td>{{ $servicio->estado ? 'Activo' : 'Inactivo' }}</td>
                                         <td>
                                             <div class="d-flex gap-2">
-                                                <a href="{{ route('servicio.horarios.edit', $servicio->idServicio) }}" 
-                                                    class="btn btn-info btn-sm" 
-                                                    title="Editar Horarios">
+                                                <a href="{{ route('servicio.horarios.edit', $servicio->idServicio) }}"
+                                                    class="btn btn-info btn-sm" title="Editar Horarios">
                                                     <i class="ri-calendar-check-line"></i>
-                                                 </a>
+                                                </a>
                                                 <button class="btn btn-primary btn-sm"
                                                     onclick="editServicio({{ $servicio }})"><i
                                                         class="ri-pencil-fill"></i></button>
-                                                @if(auth()->user()->rol == 'Administrador')
+                                                @if (auth()->user()->rol == 'Administrador')
                                                     <button class="btn btn-danger btn-sm"
                                                         onclick="deleteServicio({{ $servicio->idServicio }})"><i
-                                                        class="ri-delete-bin-fill"></i></button>
+                                                            class="ri-delete-bin-fill"></i></button>
                                                 @endif
                                             </div>
                                         </td>
@@ -101,14 +104,16 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="nombre" class="form-label">Nombre</label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" required maxlength="50">
+                                    <input type="text" class="form-control" id="nombre" name="nombre" required
+                                        maxlength="50">
                                 </div>
                             </div>
                             <!-- Capacidad -->
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="capacidad" class="form-label">Capacidad</label>
-                                    <input type="number" class="form-control" id="capacidad" name="capacidad" required min="1">
+                                    <input type="number" class="form-control" id="capacidad" name="capacidad" required
+                                        min="1">
                                 </div>
                             </div>
                         </div>
@@ -117,14 +122,16 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="precioTotal" class="form-label">Precio Total (BOB)</label>
-                                    <input type="number" step="0.01" class="form-control" id="precioTotal" name="precioTotal" required min="0" max="10000">
+                                    <input type="number" step="0.01" class="form-control" id="precioTotal"
+                                        name="precioTotal" required min="0" max="10000">
                                 </div>
                             </div>
                             <!-- Sesiones -->
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="cantidadSesiones" class="form-label">Cantidad de Sesiones</label>
-                                    <input type="number" class="form-control" id="cantidadSesiones" name="cantidadSesiones" min="1">
+                                    <input type="number" class="form-control" id="cantidadSesiones" name="cantidadSesiones"
+                                        min="1">
                                 </div>
                             </div>
                         </div>
@@ -135,11 +142,25 @@
                                 <select class="form-control" id="idEntrenador" name="idEntrenador" required>
                                     <option value="">Seleccione un entrenador</option>
                                     @foreach ($entrenadores as $entrenador)
-                                        <option value="{{ $entrenador->idEntrenador }}">{{ $entrenador->nombre }}</option>
+                                        <option value="{{ $entrenador->idEntrenador }}">{{ $entrenador->nombre }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
+                        <!-- Categoría -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="idCategoria" class="form-label">Categoría</label>
+                                <select class="form-control" id="idCategoria" name="idCategoria" required>
+                                    <option value="">Seleccione una categoría</option>
+                                    @foreach ($categorias as $categoria)
+                                        <option value="{{ $categoria->idCategoria }}">{{ $categoria->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
                         <!-- Descripción -->
                         <div class="col-md-12">
                             <div class="mb-3">
@@ -168,6 +189,7 @@
             function createServicio() {
                 $form[0].reset();
                 $('#servicioId').val('');
+                $('#idCategoria').val('');
                 $('#modalServicioLabel').text('Añadir Servicio');
                 $('#formErrors').addClass('d-none');
                 $('#modalServicio').modal('show');
@@ -181,6 +203,7 @@
                 $('#capacidad').val(servicio.capacidad);
                 $('#precioTotal').val(servicio.precioTotal);
                 $('#cantidadSesiones').val(servicio.cantidadSesiones);
+                $('#idCategoria').val(servicio.idCategoria);
                 $('#idEntrenador').val(servicio.idEntrenador);
                 $('#modalServicioLabel').text('Editar Servicio');
                 $('#modalServicio').modal('show');
@@ -215,7 +238,8 @@
             $form.on('submit', function(e) {
                 e.preventDefault();
                 let servicioId = $('#servicioId').val();
-                let url = servicioId ? `{{ url('admin/servicios') }}/${servicioId}` : `{{ url('admin/servicios') }}`;
+                let url = servicioId ? `{{ url('admin/servicios') }}/${servicioId}` :
+                    `{{ url('admin/servicios') }}`;
                 let formData = new FormData($form[0]);
 
                 if (servicioId) {
@@ -225,7 +249,9 @@
                 $.ajax({
                     url: url,
                     method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
                     data: formData,
                     processData: false,
                     contentType: false,
@@ -256,12 +282,29 @@
             window.deleteServicio = deleteServicio;
 
             $('#servicioTable').DataTable({
+                lengthMenu: [5, 10, 25, 50, 100],
                 pageLength: 5,
                 language: {
                     lengthMenu: "Mostrar _MENU_ registros por página",
+                    decimal: "",
+                    emptyTable: "No hay datos disponibles en la tabla",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                    infoEmpty: "Mostrando 0 a 0 de 0 entradas",
+                    infoFiltered: "(filtrado de _MAX_ entradas totales)",
+                    loadingRecords: "Cargando...",
+                    processing: "Procesando...",
                     search: "Buscar:",
                     zeroRecords: "No se encontraron registros coincidentes",
-                    paginate: { first: "Primero", last: "Último", next: "Siguiente", previous: "Anterior" }
+                    paginate: {
+                        first: "Primero",
+                        last: "Último",
+                        next: "Siguiente",
+                        previous: "Anterior"
+                    },
+                    aria: {
+                        sortAscending: ": activar para ordenar la columna de manera ascendente",
+                        sortDescending: ": activar para ordenar la columna de manera descendente"
+                    }
                 },
             });
         });

@@ -101,9 +101,10 @@ Route::middleware(['auth'])->group(function () {
     // Route::delete('/admin/secciones/{id}', [App\Http\Controllers\SeccionController::class, 'destroy'])->name('admin.secciones.destroy');
     Route::get('admin/servicios/{id}/horarios', [App\Http\Controllers\ServicioHorarioController::class, 'edit'])->name('servicio.horarios.edit');
     Route::put('admin/servicios/{id}/horarios', [App\Http\Controllers\ServicioHorarioController::class, 'update'])->name('servicio.horarios.update');
-   // Route::delete('admin/servicios/{id}/horarios/{idDia}/{horaInicio}', [App\Http\Controllers\ServicioHorarioController::class, 'destroy'])->name('servicio.horarios.destroy');
+    // Route::delete('admin/servicios/{id}/horarios/{idDia}/{horaInicio}', [App\Http\Controllers\ServicioHorarioController::class, 'destroy'])->name('servicio.horarios.destroy');
     Route::delete('/admin/servicios/{servicio}/horarios/{dia}/{hora}', [App\Http\Controllers\ServicioHorarioController::class, 'destroy'])->name('servicio.horario.destroy');
-
+    Route::get('/admin/servicios/calendario', [App\Http\Controllers\ServiciosController::class, 'calendarioGeneral'])
+        ->name('admin.servicios.calendarioGeneral');
 
 
     Route::get('/admin/inscripciones', [App\Http\Controllers\InscripcionController::class, 'index'])->name('admin.inscripciones.index');
@@ -123,9 +124,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('admin/inscripciones/store', [App\Http\Controllers\InscripcionController::class, 'store'])->name('admin.inscripciones.store');
     Route::get('admin/inscripciones/comprobante/{id}', [App\Http\Controllers\InscripcionController::class, 'generarPDF'])->name('admin.inscripciones.generarPDF');
-    
+
+    Route::get('/admin/generar-qr-membresia/{idCliente}', [App\Http\Controllers\InscripcionController::class, 'generarQrParaMembresia'])->name('admin.generar.qr-membresia');
+    Route::post('/admin/generar-qr-servicio/{idDetalleInscripcion}', [App\Http\Controllers\InscripcionController::class, 'generarQrParaServicio'])->name('admin.generar.qr-servicio');
+
+    Route::get('/admin/inscripciones/{id}/detalle-servicios', [App\Http\Controllers\InscripcionController::class, 'detalleServicios'])->name('admin.inscripciones.detalleServicios');
 
 
+    Route::put('/admin/inscripciones/{id}/marcar-vencida', [App\Http\Controllers\InscripcionController::class, 'marcarComoVencida'])
+        ->name('admin.inscripciones.marcarVencida');
 
 
     Route::get('/admin/clientes', [App\Http\Controllers\ClienteController::class, 'index'])->name('admin.clientes.index');
@@ -219,6 +226,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/inscripciones/{id}/generar-qr2', [App\Http\Controllers\InscripcionController::class, 'generarQr2'])->name('admin.inscripciones.generarQr2');
 
     Route::get('/admin/inscripciones/comprobanteFinal/{id}', [App\Http\Controllers\InscripcionController::class, 'generarComprobante'])->name('admin.inscripciones.comprobante2');
+    Route::get('/admin/inscripciones/comprobante-servicio/{idDetalle}', [App\Http\Controllers\InscripcionController::class, 'generarComprobanteServicio'])->name('admin.inscripciones.comprobante_servicio');
 
     //Route::get('/admin/inscripciones/{id}/comprobante', [App\Http\Controllers\InscripcionController::class, 'generarComprobanteTCPDF'])->name('admin.inscripciones.comprobante');
 

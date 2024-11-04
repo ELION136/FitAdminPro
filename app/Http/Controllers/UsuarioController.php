@@ -211,7 +211,7 @@ class UsuarioController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'nombreUsuario' => 'required|string|max:255',
+            'nombreUsuario' => 'required|string|max:255|min:3',
             'email' => 'required|string|email|max:255|unique:usuarios,email,' . $user->idUsuario . ',idUsuario',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'nullable|string|min:8|confirmed',
@@ -248,25 +248,7 @@ class UsuarioController extends Controller
     }
 
 
-    public function validateProfile(Request $request)
-    {
-        $user = auth()->user();
-        $validator = Validator::make($request->all(), [
-            'nombreUsuario' => 'required|string|max:255|unique:usuarios,nombreUsuario,' . $user->idUsuario . ',idUsuario',
-            'telefono' => 'nullable|digits_between:7,10',
-            'email' => 'required|string|email|max:255|unique:usuarios,email,' . $user->idUsuario . ',idUsuario',
-            'password' => 'nullable|min:8|confirmed',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        return response()->json(['success' => 'Validación exitosa']);
-    }
-
+    
 
 }
 

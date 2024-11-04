@@ -15,13 +15,13 @@ class ReportesIngresosServiciosController extends Controller
     // Mostrar la vista principal con filtros
     public function index(Request $request)
     {
-        // Filtros por fecha
-        $fechaInicio = $request->input('fechaInicio');
-        $fechaFin = $request->input('fechaFin');
+        // Definir la fecha actual como predeterminado
+        $fechaHoy = Carbon::now()->format('Y-m-d');
+        $fechaInicio = $request->input('fechaInicio', $fechaHoy);
+        $fechaFin = $request->input('fechaFin', $fechaHoy);
 
         // Si no se han seleccionado filtros de fecha, devolver una colección vacía
         if (!$request->filled('fechaInicio') || !$request->filled('fechaFin')) {
-            // Tabla vacía y estadísticas vacías
             $ingresosPorServicios = collect(); // Colección vacía
             $totalInscripciones = 0;
             $totalGanado = 0;
@@ -40,12 +40,8 @@ class ReportesIngresosServiciosController extends Controller
                 ->join('usuarios', 'inscripciones.idUsuario', '=', 'usuarios.idUsuario')
                 ->join('servicios', 'detalle_inscripciones.idServicio', '=', 'servicios.idServicio')
                 ->where('detalle_inscripciones.tipoProducto', 'servicio') // Solo servicios
-                ->when($fechaInicio, function ($query) use ($fechaInicio) {
-                    $query->whereDate('inscripciones.fechaInscripcion', '>=', $fechaInicio);
-                })
-                ->when($fechaFin, function ($query) use ($fechaFin) {
-                    $query->whereDate('inscripciones.fechaInscripcion', '<=', $fechaFin);
-                })
+                ->whereDate('inscripciones.fechaInscripcion', '>=', $fechaInicio)
+                ->whereDate('inscripciones.fechaInscripcion', '<=', $fechaFin)
                 ->groupBy('clientes.idCliente', 'servicios.idServicio', 'usuarios.idUsuario')
                 ->orderBy('totalGanado', 'desc')
                 ->get();
@@ -61,11 +57,13 @@ class ReportesIngresosServiciosController extends Controller
     // Exportar a PDF
     public function exportarPDF(Request $request)
     {
-        $ingresosPorServicios = $this->filtrarIngresosPorServicios($request);
+        // Definir la fecha actual como predeterminado
+        $fechaHoy = Carbon::now()->format('Y-m-d');
+        $fechaInicio = $request->input('fechaInicio', $fechaHoy);
+        $fechaFin = $request->input('fechaFin', $fechaHoy);
 
-        // Obtener las fechas del request
-        $fechaInicio = $request->input('fechaInicio');
-        $fechaFin = $request->input('fechaFin');
+        // Obtener los datos filtrados
+        $ingresosPorServicios = $this->filtrarIngresosPorServicios($request);
 
         // Calcular los totales generales
         $totalInscripciones = $ingresosPorServicios->sum('totalInscripciones');
@@ -93,8 +91,10 @@ class ReportesIngresosServiciosController extends Controller
     // Filtrar inscripciones por servicios según los parámetros de búsqueda
     private function filtrarIngresosPorServicios(Request $request)
     {
-        $fechaInicio = $request->input('fechaInicio');
-        $fechaFin = $request->input('fechaFin');
+        // Definir la fecha actual como predeterminado
+        $fechaHoy = Carbon::now()->format('Y-m-d');
+        $fechaInicio = $request->input('fechaInicio', $fechaHoy);
+        $fechaFin = $request->input('fechaFin', $fechaHoy);
 
         return Inscripcion::select(
             'clientes.nombre as clienteNombre',
@@ -109,12 +109,8 @@ class ReportesIngresosServiciosController extends Controller
             ->join('usuarios', 'inscripciones.idUsuario', '=', 'usuarios.idUsuario')
             ->join('servicios', 'detalle_inscripciones.idServicio', '=', 'servicios.idServicio')
             ->where('detalle_inscripciones.tipoProducto', 'servicio')
-            ->when($fechaInicio, function ($query) use ($fechaInicio) {
-                $query->whereDate('inscripciones.fechaInscripcion', '>=', $fechaInicio);
-            })
-            ->when($fechaFin, function ($query) use ($fechaFin) {
-                $query->whereDate('inscripciones.fechaInscripcion', '<=', $fechaFin);
-            })
+            ->whereDate('inscripciones.fechaInscripcion', '>=', $fechaInicio)
+            ->whereDate('inscripciones.fechaInscripcion', '<=', $fechaFin)
             ->groupBy('clientes.idCliente', 'servicios.idServicio', 'usuarios.idUsuario')
             ->orderBy('totalGanado', 'desc')
             ->get();

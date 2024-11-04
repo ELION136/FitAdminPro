@@ -65,7 +65,7 @@ class ReportesIngresosController extends Controller
             $dompdf->set_option('isPhpEnabled', true);
             $dompdf->set_option('isFontSubsettingEnabled', true);
             $dompdf->set_option('chroot', public_path());
-            $dompdf->set_option('dpi', '150');
+            
             $dompdf->set_option('defaultFont', 'helvetica');
             $dompdf->set_option('fontHeightRatio', 0.9);
             $dompdf->set_option('enable_css_float', true);
@@ -92,14 +92,17 @@ class ReportesIngresosController extends Controller
 
     // Exportar a Excel
     public function exportarExcel(Request $request)
-    {
-        $fechaInicio = $request->input('fechaInicio', Carbon::now()->format('Y-m-d'));
-        $fechaFin = $request->input('fechaFin', Carbon::now()->format('Y-m-d'));
-
-        $ingresos = $this->filtrarIngresos($request, $fechaInicio, $fechaFin);
-        return Excel::download(new IngresosExport($ingresos), 'reporte_ingresos.xlsx');
-    }
-
+{
+    $fechaInicio = $request->input('fechaInicio', Carbon::now()->format('Y-m-d'));
+    $fechaFin = $request->input('fechaFin', Carbon::now()->format('Y-m-d'));
+    
+    $ingresos = $this->filtrarIngresos($request, $fechaInicio, $fechaFin);
+    
+    return Excel::download(
+        new IngresosExport($ingresos, $fechaInicio, $fechaFin),
+        'reporte_ingresos_' . Carbon::now()->format('dmY_His') . '.xlsx'
+    );
+}
     // Filtrar ingresos según los parámetros de búsqueda
     private function filtrarIngresos(Request $request, $fechaInicio, $fechaFin)
     {

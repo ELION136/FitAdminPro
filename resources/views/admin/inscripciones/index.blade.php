@@ -85,39 +85,35 @@
 
                 <div class="card-body border-bottom-dashed border-bottom">
                     <!-- Formulario de filtros -->
-                    <form method="GET" action="{{ route('admin.inscripciones.index') }}" class="mb-4">
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label for="fecha_inicio">Fecha de Inicio</label>
-                                <input type="date" name="fecha_inicio" class="form-control"
-                                    value="{{ request('fecha_inicio') }}">
+                    <form method="GET" action="{{ route('admin.inscripciones.index') }}" class="mb-2">
+                        <div class="row g-1 align-items-end">
+                            <div class="col-md-2">
+                                <input type="date" name="fecha_inicio" class="form-control form-control-sm"
+                                    placeholder="Fecha de Inicio" value="{{ request('fecha_inicio') }}">
                             </div>
-                            <div class="col-md-3">
-                                <label for="fecha_fin">Fecha de Fin</label>
-                                <input type="date" name="fecha_fin" class="form-control"
-                                    value="{{ request('fecha_fin') }}">
+                            <div class="col-md-2">
+                                <input type="date" name="fecha_fin" class="form-control form-control-sm"
+                                    placeholder="Fecha de Fin" value="{{ request('fecha_fin') }}">
                             </div>
-                            <div class="col-md-3">
-                                <label for="estado">Estado</label>
-                                <select name="estado" class="form-control">
+                            <div class="col-md-2">
+                                <select name="estado" class="form-control form-control-sm">
                                     <option value="">Todos los estados</option>
                                     <option value="activa" {{ request('estado') == 'activa' ? 'selected' : '' }}>Activa
                                     </option>
-                                    <option value="vencida" {{ request('estado') == 'vencida' ? 'selected' : '' }}>
-                                        Vencida
+                                    <option value="vencida" {{ request('estado') == 'vencida' ? 'selected' : '' }}>Vencida
                                     </option>
                                     <option value="cancelada" {{ request('estado') == 'cancelada' ? 'selected' : '' }}>
                                         Cancelada</option>
                                 </select>
                             </div>
-                            <div class="col-md-3 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="ri-equalizer-fill me-2 align-bottom"></i> Aplicar Filtros
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                    <i class="ri-equalizer-fill me-2 align-bottom"></i> Aplicar
                                 </button>
                             </div>
-                            <div class="col-md-3 d-flex align-items-end">
-                                <a href="{{ route('admin.inscripciones.index') }}" class="btn btn-secondary w-100">
-                                    <i class="ri-refresh-fill me-2 align-bottom"></i> Limpiar Filtros
+                            <div class="col-md-2">
+                                <a href="{{ route('admin.inscripciones.index') }}" class="btn btn-secondary btn-sm w-100">
+                                    <i class="ri-refresh-fill me-2 align-bottom"></i> Limpiar
                                 </a>
                             </div>
                         </div>
@@ -163,7 +159,14 @@
                                                 <td>{{ $inscripcion->producto }}</td>
                                                 <td>{{ $inscripcion->fechaInicio ? $inscripcion->fechaInicio->format('d/m/Y') : 'N/A' }}
                                                 </td>
-                                                <td>{{ $inscripcion->fechaFin ? $inscripcion->fechaFin->format('d/m/Y') : 'N/A' }}
+                                                <td>
+                                                    @if ($inscripcion->fechaFin && $inscripcion->fechaFin->isPast())
+                                                        <span
+                                                            class="text-danger">{{ $inscripcion->fechaFin->format('d/m/Y') }}</span>
+                                                    @else
+                                                        {{ $inscripcion->fechaFin ? $inscripcion->fechaFin->format('d/m/Y') : 'N/A' }}
+                                                    @endif
+                                                </td>
                                                 </td>
                                                 <td>
                                                     <span
@@ -172,45 +175,50 @@
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    @if ($inscripcion->cliente->qrCode)
+                                                    @if ($inscripcion->estado == 'activa' && $inscripcion->cliente->qrCode)
                                                         <img src="{{ asset('storage/' . $inscripcion->cliente->qrCode) }}"
-                                                            alt="Código QR de cliente" width="100">
+                                                            alt="Código QR de cliente" width="50">
                                                     @else
                                                         <p>Sin QR generado</p>
                                                     @endif
                                                 </td>
-                                                <td>{{ number_format($inscripcion->montoPago, 2) }}</td>
-                                                <td>
-                                                    <!-- Botón para ver detalle (modal) -->
 
+                                                <td>{{ number_format($inscripcion->totalPago, 2) }}</td>
+                                                @php
+                                                    $hoy = \Carbon\Carbon::today();
+                                                @endphp
+                                                <td>
+                                                    <!-- Botón para marcar como vencida -->
+                                                    @if ($inscripcion->estado == 'activa' && $inscripcion->fechaFin && $inscripcion->fechaFin->lessThanOrEqualTo($hoy))
+                                                        <button
+                                                            onclick="marcarComoVencida({{ $inscripcion->idInscripcion }})"
+                                                            class="btn btn-warning btn-sm" title="Marcar como Vencida">
+                                                            <i class="ri-time-line"></i> Vencer
+                                                        </button>
+                                                    @endif
 
                                                     <!-- Botón para imprimir comprobante -->
-                                                    <a href="javascript:void(0);"
-                                                        onclick="abrirVentanaPDF({{ $inscripcion->idInscripcion }}, '{{ $inscripcion->cliente->qrCode }}')"
-                                                        class="btn btn-info btn-sm {{ $inscripcion->cliente->qrCode ? '' : 'disabled' }}"
-                                                        title="Imprimir Comprobante">
-                                                        <i class="ri-printer-line"></i>
-                                                    </a>
+                                                    @if ($inscripcion->estado == 'activa')
+                                                        <a href="javascript:void(0);"
+                                                            onclick="abrirVentanaPDF({{ $inscripcion->idInscripcion }}, '{{ $inscripcion->cliente->qrCode }}')"
+                                                            class="btn btn-info btn-sm {{ $inscripcion->cliente->qrCode ? '' : 'disabled' }}"
+                                                            title="Imprimir Comprobante">
+                                                            <i class="ri-printer-line"></i>
+                                                        </a>
+                                                    @endif
 
                                                     <!-- Botón para anular venta -->
                                                     @if ($inscripcion->estado != 'cancelada')
-                                                        <form
-                                                            action="{{ route('admin.inscripciones.cancelar', $inscripcion->idInscripcion) }}"
-                                                            method="POST" style="display:inline;">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <!-- Esto simula el método PUT en el formulario -->
-                                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                                title="Anular Venta"
-                                                                onclick="return confirm('¿Está seguro de anular esta venta?')">
-                                                                <i class="ri-delete-bin-line"></i>
-                                                            </button>
-                                                        </form>
+                                                        <button onclick="anularVenta({{ $inscripcion->idInscripcion }})"
+                                                            class="btn btn-danger btn-sm" title="Anular Venta">
+                                                            <i class="ri-delete-bin-line"></i>
+                                                        </button>
                                                     @endif
+
 
                                                     <!-- Botón para generar credencial y enviar por WhatsApp -->
                                                     @if ($inscripcion->estado == 'activa')
-                                                        <a href="{{ route('admin.inscripciones.generarQr', $inscripcion->idInscripcion) }}"
+                                                        <a href="{{ route('admin.generar.qr-membresia', $inscripcion->cliente->idCliente) }}"
                                                             class="btn btn-primary btn-sm" title="Generar QR">
                                                             <i class="ri-qr-code-line"></i>
                                                         </a>
@@ -233,87 +241,86 @@
                                             <th>Servicio</th>
                                             <th>Fecha de Inscripción</th>
                                             <th>Estado</th>
-                                            <th>Monto Pagado</th>
+                                            <th>Total Pagado</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="list form-check-all">
+                                    <tbody>
                                         @foreach ($inscripcionesServicios as $inscripcion)
                                             <tr>
                                                 <td>{{ $inscripcion->cliente->nombre }}
                                                     {{ $inscripcion->cliente->primerApellido }}</td>
+                                                <td>{{ ucfirst($inscripcion->tipoProducto) }} -
+                                                    {{ $inscripcion->producto }}</td>
 
-                                                <td>
-                                                    @if ($inscripcion->detallesInscripciones)
-                                                        @php
-                                                            // Filtrar los detalles que corresponden a servicios
-                                                            $servicios = $inscripcion->detallesInscripciones->where(
-                                                                'tipoProducto',
-                                                                'servicio',
-                                                            );
-                                                        @endphp
-                                                        @if ($servicios->isNotEmpty())
-                                                            <ul>
-                                                                @foreach ($servicios as $detalleServicio)
-                                                                    <li>{{ $detalleServicio->servicio ? $detalleServicio->servicio->nombre : 'Servicio no disponible' }}
-                                                                    </li>
-                                                                @endforeach
-                                                            </ul>
-                                                        @else
-                                                            Servicio no disponible
-                                                        @endif
-                                                    @else
-                                                        Servicio no disponible
-                                                    @endif
+                                                <td>{{ $inscripcion->fechaInscripcion ? $inscripcion->fechaInscripcion->format('d/m/Y') : 'N/A' }}
                                                 </td>
-                                                <td>{{ $inscripcion->fechaInscripcion ? $inscripcion->fechaInscripcion->format('d/m/Y') : 'N/A' }}</td>
                                                 <td>
                                                     <span
                                                         class="badge text-{{ $inscripcion->estado == 'activa' ? 'info' : ($inscripcion->estado == 'vencida' ? 'danger' : 'warning') }} fw-bold">
                                                         {{ ucfirst($inscripcion->estado) }}
                                                     </span>
                                                 </td>
-
                                                 <td>{{ number_format($inscripcion->totalPago, 2) }}</td>
-
                                                 <td>
-                                                    <!-- Botones de acciones -->
-
-                                                    <!-- Botón para imprimir comprobante, con el color cambiado -->
-                                                    <a href="javascript:void(0);"
-                                                        onclick="abrirVentanaPDF({{ $inscripcion->idInscripcion }})"
-                                                        class="btn btn-info btn-sm" title="Imprimir Comprobante">
-                                                        <i class="ri-printer-line"></i>
-                                                    </a>
-
-
-                                                    <!-- Botón para anular venta -->
+                                                    <!-- Botón para abrir el modal de detalles de servicios -->
                                                     @if ($inscripcion->estado != 'cancelada')
-                                                        <form
-                                                            action="{{ route('admin.inscripciones.cancelar', $inscripcion->idInscripcion) }}"
-                                                            method="POST" style="display:inline;">
-                                                            @csrf
-                                                            @method('PUT') <!-- Esto simula una solicitud PUT -->
-                                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                                title="Anular Venta"
-                                                                onclick="return confirm('¿Está seguro de anular esta venta?')">
-                                                                <i class="ri-delete-bin-line"></i>
-                                                            </button>
-                                                        </form>
+                                                        <button
+                                                            data-url="{{ route('admin.inscripciones.detalleServicios', ['id' => $inscripcion->idInscripcion]) }}"
+                                                            onclick="verDetalleServicios(this)"
+                                                            class="btn btn-info btn-sm" title="Ver Detalle de Servicios">
+                                                            <i class="ri-eye-line"></i> Detalle
+                                                        </button>
                                                     @endif
 
-
-
-
+                                                    <!-- Botón para anular la inscripción -->
+                                                    @if ($inscripcion->estado != 'cancelada')
+                                                        <button onclick="anularVenta({{ $inscripcion->idInscripcion }})"
+                                                            class="btn btn-danger btn-sm" title="Anular Venta">
+                                                            <i class="ri-delete-bin-line"></i> Anular
+                                                        </button>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
-
                                 </table>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal de Detalle de Servicios -->
+    <div class="modal fade" id="detalleServiciosModal" tabindex="-1" aria-labelledby="detalleServiciosLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detalleServiciosLabel">Detalle de Servicios</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Servicio</th>
+                                <th>Precio</th>
+                                <th>Código QR</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detalleServiciosTableBody">
+                            <!-- Los servicios se cargarán con JavaScript al abrir el modal -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -323,83 +330,177 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            // Mostrar alertas de éxito y error con Swal si existen en la sesión
+            const showAlert = (type, message) => {
+                Swal.fire({
+                    icon: type,
+                    title: type === 'success' ? '¡Éxito!' : '¡Error!',
+                    text: message
+                });
+            };
+
+            @if (session('success'))
+                showAlert('success', '{{ session('success') }}');
+            @endif
+
+            @if (session('error'))
+                showAlert('error', '{{ session('error') }}');
+            @endif
+
             // Inicializar DataTables para cada tabla
-            $('#membresiasTable').DataTable({
-                responsive: false,
-                lengthMenu: [5, 10, 25, 50, 100],
-                pageLength: 10,
-                language: {
-                    lengthMenu: "Mostrar _MENU_ registros por página",
-                    decimal: "",
-                    emptyTable: "No hay datos disponibles en la tabla",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-                    infoEmpty: "Mostrando 0 a 0 de 0 entradas",
-                    infoFiltered: "(filtrado de _MAX_ entradas totales)",
-                    loadingRecords: "Cargando...",
-                    processing: "Procesando...",
-                    search: "Buscar:",
-                    zeroRecords: "No se encontraron registros coincidentes",
-                    paginate: {
-                        first: "Primero",
-                        last: "Último",
-                        next: "Siguiente",
-                        previous: "Anterior"
-                    },
-                    aria: {
-                        sortAscending: ": activar para ordenar la columna de manera ascendente",
-                        sortDescending: ": activar para ordenar la columna de manera descendente"
+            const initDataTable = (selector) => {
+                $(selector).DataTable({
+                    responsive: true,
+                    lengthMenu: [5, 10, 25, 50, 100],
+                    pageLength: 5,
+                    language: {
+                        lengthMenu: "Mostrar _MENU_ registros por página",
+                        emptyTable: "No hay datos disponibles en la tabla",
+                        info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                        infoEmpty: "Mostrando 0 a 0 de 0 entradas",
+                        infoFiltered: "(filtrado de _MAX_ entradas totales)",
+                        search: "Buscar:",
+                        zeroRecords: "No se encontraron registros coincidentes",
+                        paginate: {
+                            first: "Primero",
+                            last: "Último",
+                            next: "Siguiente",
+                            previous: "Anterior"
+                        }
                     }
-                },
-            });
+                });
+            };
 
-            $('#serviciosTable').DataTable({
-                responsive: true,
-                lengthMenu: [5, 10, 25, 50, 100],
-                pageLength: 10,
-                language: {
-                    lengthMenu: "Mostrar _MENU_ registros por página",
-                    decimal: "",
-                    emptyTable: "No hay datos disponibles en la tabla",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-                    infoEmpty: "Mostrando 0 a 0 de 0 entradas",
-                    infoFiltered: "(filtrado de _MAX_ entradas totales)",
-                    loadingRecords: "Cargando...",
-                    processing: "Procesando...",
-                    search: "Buscar:",
-                    zeroRecords: "No se encontraron registros coincidentes",
-                    paginate: {
-                        first: "Primero",
-                        last: "Último",
-                        next: "Siguiente",
-                        previous: "Anterior"
-                    },
-                    aria: {
-                        sortAscending: ": activar para ordenar la columna de manera ascendente",
-                        sortDescending: ": activar para ordenar la columna de manera descendente"
+            initDataTable('#membresiasTable');
+            initDataTable('#serviciosTable');
+
+            // Función para abrir ventana con comprobante PDF
+            const abrirVentanaPDF = (url, qrCode) => {
+                if (!qrCode) {
+                    showAlert('warning', 'El QR no está disponible. No se puede generar el comprobante.');
+                    return;
+                }
+                window.open(url, '_blank', 'width=800,height=600');
+            };
+
+            window.abrirVentanaPDF = (idInscripcion, qrCode) => {
+                abrirVentanaPDF(`{{ route('admin.inscripciones.comprobante2', ':id') }}`.replace(':id',
+                    idInscripcion), qrCode);
+            };
+
+            window.abrirVentanaPDFServicio = (idDetalle, qrCode) => {
+                abrirVentanaPDF(`{{ route('admin.inscripciones.comprobante_servicio', ':id') }}`.replace(':id',
+                    idDetalle), qrCode);
+            };
+
+            // Función para anular venta con Swal
+            window.anularVenta = (idInscripcion) => {
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "Esta acción no se puede deshacer.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, anular',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `{{ route('admin.inscripciones.cancelar', ':id') }}`.replace(
+                                ':id', idInscripcion),
+                            type: 'PUT',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: (response) => {
+                                showAlert('success', response.success);
+                                location.reload();
+                            },
+                            error: () => showAlert('error',
+                                'Hubo un problema al anular la venta.')
+                        });
                     }
-                },
-            });
+                });
+            };
 
+            // Función para ver detalle de servicios en modal
+            window.verDetalleServicios = (button) => {
+                const url = $(button).data('url');
+                $.get(url, (response) => {
+                    let tableBody = '';
+                    response.detallesServicios.forEach(servicio => {
+                        const qrImagePath = servicio.qrCode ?
+                            `{{ asset('storage') }}/${servicio.qrCode}` : '';
+                        tableBody += `
+                <tr>
+                    <td>${servicio.nombre}</td>
+                    <td>${parseFloat(servicio.precio).toFixed(2)}</td>
+                    <td>${servicio.qrCode ? `<img src="${qrImagePath}" width="50" />` : 'Sin QR'}</td>
+                    <td>
+                        <button onclick="generarQr(${servicio.idDetalle})" class="btn btn-primary btn-sm ${servicio.qrCode ? 'disabled' : ''}" title="Generar QR"><i class="ri-qr-code-line"></i></button>
+                        <button onclick="generarComprobante(${servicio.idDetalle})" class="btn btn-warning btn-sm" title="Generar Comprobante"><i class="ri-printer-line"></i></button>
+                    </td>
+                </tr>`;
+                    });
+                    $('#detalleServiciosTableBody').html(tableBody);
+                    $('#detalleServiciosModal').modal('show');
+                }).fail(() => showAlert('error', 'No se pudo cargar el detalle de servicios.'));
+            };
 
+            // Función para generar QR
+            window.generarQr = (idDetalle) => {
+                $.post(`{{ route('admin.generar.qr-servicio', ':id') }}`.replace(':id', idDetalle), {
+                        _token: '{{ csrf_token() }}'
+                    })
+                    .done((response) => {
+                        showAlert('success', response.success);
+                        location.reload();
+                    })
+                    .fail(() => showAlert('error', 'No se pudo generar el QR.'));
+            };
 
+            // Función para generar comprobante de servicio
+            window.generarComprobante = (idDetalle) => {
+                const url = `{{ route('admin.inscripciones.comprobante_servicio', ':id') }}`.replace(':id',
+                    idDetalle);
+                window.open(url, '_blank');
+            };
+
+            window.marcarComoVencida = (idInscripcion) => {
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "Esta acción marcará la membresía como vencida.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, marcar como vencida',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `{{ route('admin.inscripciones.marcarVencida', ':id') }}`
+                                .replace(':id',
+                                    idInscripcion),
+                            type: 'PUT',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: (response) => {
+                                showAlert('success', response.success);
+                                location.reload();
+                            },
+                            error: (xhr) => {
+                                const error = xhr.responseJSON.error ||
+                                    'Hubo un problema al marcar la membresía como vencida.';
+                                showAlert('error', error);
+                            }
+                        });
+                    }
+                });
+            };
         });
 
-        function abrirVentanaPDF(idInscripcion, qrCode) {
-            if (!qrCode) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'QR no disponible',
-                    text: 'El cliente no tiene un código QR generado. No se puede generar el comprobante.',
-                });
-                return;
-            }
-
-            // Generar la URL de la ruta usando el ID de la inscripción
-            const url = new URL('{{ route('admin.inscripciones.comprobante2', ':id') }}'.replace(':id', idInscripcion),
-                window.location.origin);
-
-            // Abrir la URL en una nueva ventana con el tamaño especificado
-            window.open(url, '_blank', 'width=800,height=600');
-        }
     </script>
 @endpush

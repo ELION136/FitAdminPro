@@ -38,20 +38,18 @@ class EntrenadorController extends Controller
      */
     public function store(Request $request)
     {
-        // Obtener el usuario autenticado
         $user = Auth::user();
         if (!$user) {
-            return redirect()->route('login')->with('error', 'Usuario no autenticado');
+            return response()->json(['error' => 'Usuario no autenticado'], 401);
         }
 
-        // Formatear y validar la solicitud
         $request->merge([
             'nombre' => Str::title(trim($request->input('nombre'))),
             'primerApellido' => Str::title(trim($request->input('primerApellido'))),
             'segundoApellido' => Str::title(trim($request->input('segundoApellido')))
         ]);
 
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:50|regex:/^[^\s].*[^\s]$/',
             'primerApellido' => 'required|string|max:50|regex:/^[^\s].*[^\s]$/',
             'segundoApellido' => 'nullable|string|max:50|regex:/^[^\s].*[^\s]$/',
@@ -62,9 +60,13 @@ class EntrenadorController extends Controller
             'direccion' => 'nullable|string|max:50',
             'especialidad' => 'required',
             'descripcion' => 'nullable|string|max:100',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Subir y guardar la imagen si existe
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
         $imageName = null;
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -72,7 +74,6 @@ class EntrenadorController extends Controller
             Storage::disk('public')->put($imageName, file_get_contents($image));
         }
 
-        // Crear el entrenador
         $entrenador = Entrenador::create([
             'nombre' => $request->nombre,
             'primerApellido' => $request->primerApellido,
@@ -89,15 +90,7 @@ class EntrenadorController extends Controller
             'fechaCreacion' => now(),
         ]);
 
-        // Verificar que el entrenador se ha creado correctamente
-        if (!$entrenador) {
-            return redirect()->back()->with('error', 'Error al crear el entrenador');
-        }
-
-        // Redirigir con un mensaje de éxito
-        return redirect()->route('admin.entrenadores.index')
-            ->with('mensaje', 'El entrenador fue registrado correctamente.')
-            ->with('icono', 'success');
+        return response()->json(['success' => true, 'message' => 'El entrenador fue registrado correctamente.']);
     }
     /**
      * Muestra el formulario para editar un entrenador.
@@ -116,21 +109,28 @@ class EntrenadorController extends Controller
         $user = Auth::user();
         $entrenador = Entrenador::findOrFail($id);
 
-        $request->validate([
-            'nombre' => 'required|string|max:50',
-            'primerApellido' => 'required|string|max:50',
-            'segundoApellido' => 'nullable|string|max:50',
-            'telefono' => 'nullable|digits_between:7,15',
-            'fechaNacimiento' => 'required|date',
-            'genero' => 'required|in:Masculino,Femenino,Otro',
-            'fechaContratacion' => 'required|date',
-            'direccion' => 'nullable|string|max:50',
-            'especialidad' => 'required',
-            'descripcion' => 'nullable|string|max:100',
+        $validator = Validator::make($request->all(), [
+            'nombre' => 'required|string|max:50|regex:/^[\pL\s]+$/u', // Solo letras y espacios, sin caracteres especiales
+            'primerApellido' => 'required|string|max:50|regex:/^[\pL\s]+$/u', // Solo letras y espacios
+            'segundoApellido' => 'nullable|string|max:50|regex:/^[\pL\s]+$/u', // Solo letras y espacios
+            'telefono' => 'nullable|digits_between:7,15', // Solo dígitos con longitud entre 7 y 15
+            'fechaNacimiento' => 'required|date|before:today|after:1900-01-01', // Fecha válida antes de hoy y después de 1900
+            'genero' => 'required|in:Masculino,Femenino,Otro', // Solo los valores permitidos
+            'fechaContratacion' => 'required|date|before_or_equal:today|after:fechaNacimiento', // Fecha válida antes o igual a hoy y después de nacimiento
+            'direccion' => 'nullable|string|max:100', // Extendido el límite para detalles más largos
+            'especialidad' => 'required|string|in:Entrenamiento Personal,Entrenamiento Cardiovascular,Boxeo,Entrenamiento de Resistencia,Nutrición y Bienestar,Otro', // Especialidades permitidas
+            'descripcion' => 'nullable|string|max:100', // Máximo 100 caracteres para la descripción
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validación de imagen (jpeg, png, jpg, gif) y tamaño máximo de 2MB
         ]);
 
-        // Actualizar la imagen si se ha subido una nueva
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
         if ($request->hasFile('image')) {
+            if ($entrenador->image) {
+                Storage::disk('public')->delete($entrenador->image);
+            }
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
             Storage::disk('public')->put($imageName, file_get_contents($image));
@@ -151,9 +151,7 @@ class EntrenadorController extends Controller
             'idAutor' => $user->idUsuario,
         ]);
 
-        return redirect()->route('admin.entrenadores.index')
-            ->with('mensaje', 'El entrenador se actualizó correctamente.')
-            ->with('icono', 'success');
+        return response()->json(['success' => true, 'message' => 'El entrenador se actualizó correctamente.']);
     }
 
     /**

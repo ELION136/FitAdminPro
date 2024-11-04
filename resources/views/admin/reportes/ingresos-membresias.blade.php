@@ -11,23 +11,23 @@
         <!-- Cards de estadísticas -->
         <div class="row mb-4">
             <div class="col-md-6 col-lg-4">
-                <div class="card text-white bg-primary mb-3 shadow-sm">
+                <div class="card text-white bg-primary mb-2 shadow-sm" style="font-size: 0.9rem;">
                     <div class="card-body d-flex align-items-center">
-                        <i class="ri-group-line display-4 me-3"></i>
+                        <i class="ri-group-line me-2" style="font-size: 2.5rem;"></i>
                         <div>
-                            <h6 class="card-title">Total de Inscripciones</h6>
-                            <h2 class="mb-0">{{ $totalInscripciones }}</h2>
+                            <h6 class="card-title mb-1">Total de Inscripciones</h6>
+                            <h4 class="mb-0">{{ $totalInscripciones }}</h4>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
-                <div class="card text-white bg-success mb-3 shadow-sm">
+                <div class="card text-white bg-success mb-2 shadow-sm" style="font-size: 0.9rem;">
                     <div class="card-body d-flex align-items-center">
-                        <i class="ri-money-dollar-circle-line display-4 me-3"></i>
+                        <i class="ri-money-dollar-circle-line me-2" style="font-size: 2.5rem;"></i>
                         <div>
-                            <h6 class="card-title">Total Ganado</h6>
-                            <h2 class="mb-0">{{ number_format($totalGanado, 2) }} BOB</h2>
+                            <h6 class="card-title mb-1">Total Ganado</h6>
+                            <h4 class="mb-0">{{ number_format($totalGanado, 2) }} BOB</h4>
                         </div>
                     </div>
                 </div>
@@ -41,11 +41,11 @@
                     <div class="row g-3">
                         <div class="col-lg-4 col-md-6">
                             <label for="fechaInicio" class="form-label">Fecha Inicio</label>
-                            <input type="date" name="fechaInicio" class="form-control" value="{{ request('fechaInicio') }}">
+                            <input type="date" name="fechaInicio" class="form-control" value="{{ request('fechaInicio', now()->format('Y-m-d')) }}" max="{{ now()->format('Y-m-d') }}">
                         </div>
                         <div class="col-lg-4 col-md-6">
                             <label for="fechaFin" class="form-label">Fecha Fin</label>
-                            <input type="date" name="fechaFin" class="form-control" value="{{ request('fechaFin') }}">
+                            <input type="date" name="fechaFin" class="form-control" value="{{ request('fechaFin', now()->format('Y-m-d')) }}" max="{{ now()->format('Y-m-d') }}">
                         </div>
                         <div class="col-lg-4 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary me-2"><i class="ri-filter-3-line me-1"></i> Filtrar</button>
@@ -65,8 +65,9 @@
         <!-- Tabla de ingresos por membresías -->
         <div class="table-responsive">
             <table class="table table-hover table-striped table-bordered align-middle">
-                <thead class="table-dark text-center">
+                <thead class="table text-center">
                     <tr>
+                        <th>#</th>
                         <th><i class="ri-user-line me-1"></i> Cliente</th>
                         <th><i class="ri-ticket-line me-1"></i> Membresía</th>
                         <th><i class="ri-user-3-line me-1"></i> Vendedor</th>
@@ -74,14 +75,26 @@
                     </tr>
                 </thead>
                 <tbody class="text-center">
-                    @foreach ($ingresosPorMembresias as $ingreso)
+                    @forelse ($ingresosPorMembresias as $index => $ingreso)
                         <tr>
+                            <td>{{ $index + 1 }}</td>
                             <td>{{ $ingreso->clienteNombre }} {{ $ingreso->clienteApellido }}</td>
                             <td>{{ $ingreso->membresiaNombre }}</td>
                             <td>{{ $ingreso->vendedor }}</td>
                             <td>{{ number_format($ingreso->totalPagado, 2) }} BOB</td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center">Sin elementos</td>
+                        </tr>
+                    @endforelse
+                    <!-- Fila de totales -->
+                    @if($ingresosPorMembresias->isNotEmpty())
+                        <tr>
+                            <td colspan="4" style="text-align: right; font-weight: bold;">Total General:</td>
+                            <td style="font-weight: bold;">{{ number_format($totalGanado, 2) }} BOB</td>
+                        </tr>
+                    @endif
                 </tbody>
             </table>
         </div>

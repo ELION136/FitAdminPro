@@ -156,29 +156,49 @@
                                     <th>Cliente</th>
                                     <th>Fecha</th>
                                     <th>Método de Registro</th>
+                                    <th>Tipo de Producto</th>
+                                    <th>Nombre del Producto</th>
+                                    <th>Restantes</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($asistencias as $asistencia)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $asistencia->cliente->nombre }}</td>
-                                        <td>{{ $asistencia->fechaAsistencia }}</td>
-                                        <td>{{ ucfirst($asistencia->metodoRegistro) }}</td>
-                                        <td>
-                                            <!-- Botón para ver detalles o anular asistencia -->
-                                            
-                                            <form method="POST" action="{{ route('admin.asistencias.anular', $asistencia->idAsistencia) }}" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de anular esta asistencia?')">
-                                                    <i class="fas fa-trash"></i> Anular
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
+                                    @foreach ($asistencia->inscripcion->detallesInscripciones as $detalle)
+                                        <tr>
+                                            <td>{{ $loop->parent->iteration }}.{{ $loop->iteration }}</td> <!-- Mostrar el índice de cada detalle individualmente -->
+                                            <td>{{ $asistencia->cliente->nombre }} {{ $asistencia->cliente->primerApellido }}</td>
+                                            <td>{{ $asistencia->fechaAsistencia }}</td>
+                                            <td>{{ ucfirst($asistencia->metodoRegistro) }}</td>
+                                            <td>{{ ucfirst($detalle->tipoProducto) }}</td>
+                                            <td>
+                                                @if($detalle->tipoProducto == 'membresia')
+                                                    {{ $detalle->membresia->nombre }}
+                                                @elseif($detalle->tipoProducto == 'servicio')
+                                                    {{ $detalle->servicio->nombre }}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($detalle->tipoProducto == 'membresia')
+                                                    {{ $asistencia->inscripcion->diasRestantes }} días
+                                                @elseif($detalle->tipoProducto == 'servicio')
+                                                    {{ $detalle->sesionesRestantes }} sesiones
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <!-- Botón de anulación o cualquier otra acción -->
+                                                <form method="POST" action="{{ route('admin.asistencias.anular', $asistencia->idAsistencia) }}" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de anular esta asistencia?')">
+                                                        <i class="fas fa-trash"></i> Anular
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                 @endforeach
                             </tbody>
+                            
                         </table>
                     </div>
                 </div>

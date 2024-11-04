@@ -15,43 +15,33 @@ class ReportesIngresosMembresiasController extends Controller
     // Mostrar la vista principal con filtros
     public function index(Request $request)
     {
-        // Filtros por fecha
-        $fechaInicio = $request->input('fechaInicio');
-        $fechaFin = $request->input('fechaFin');
+        // Definir la fecha actual como predeterminado
+        $fechaHoy = Carbon::now()->format('Y-m-d');
+        $fechaInicio = $request->input('fechaInicio', $fechaHoy);
+        $fechaFin = $request->input('fechaFin', $fechaHoy);
 
-        // Si no se han seleccionado filtros de fecha, devolver una colección vacía
-        if (!$request->filled('fechaInicio') || !$request->filled('fechaFin')) {
-            $ingresosPorMembresias = collect(); // Colección vacía
-            $totalInscripciones = 0;
-            $totalGanado = 0;
-        } else {
-            // Consulta para obtener ingresos solo por membresías
-            $ingresosPorMembresias = Inscripcion::select(
-                'clientes.nombre as clienteNombre',
-                'clientes.primerApellido as clienteApellido',
-                'membresias.nombre as membresiaNombre',
-                'usuarios.nombreUsuario as vendedor',
-                DB::raw('SUM(detalle_inscripciones.precio) as totalPagado')  // Total pagado por cada membresía
-            )
-                ->join('detalle_inscripciones', 'inscripciones.idInscripcion', '=', 'detalle_inscripciones.idInscripcion')
-                ->join('clientes', 'inscripciones.idCliente', '=', 'clientes.idCliente')
-                ->join('usuarios', 'inscripciones.idUsuario', '=', 'usuarios.idUsuario')
-                ->join('membresias', 'detalle_inscripciones.idMembresia', '=', 'membresias.idMembresia')
-                ->where('detalle_inscripciones.tipoProducto', 'membresia') // Solo membresías
-                ->when($fechaInicio, function ($query) use ($fechaInicio) {
-                    $query->whereDate('inscripciones.fechaInscripcion', '>=', $fechaInicio);
-                })
-                ->when($fechaFin, function ($query) use ($fechaFin) {
-                    $query->whereDate('inscripciones.fechaInscripcion', '<=', $fechaFin);
-                })
-                ->groupBy('clientes.idCliente', 'membresias.idMembresia', 'usuarios.idUsuario')
-                ->orderBy('totalPagado', 'desc')
-                ->get();
+        // Consulta para obtener ingresos solo por membresías
+        $ingresosPorMembresias = Inscripcion::select(
+            'clientes.nombre as clienteNombre',
+            'clientes.primerApellido as clienteApellido',
+            'membresias.nombre as membresiaNombre',
+            'usuarios.nombreUsuario as vendedor',
+            DB::raw('SUM(detalle_inscripciones.precio) as totalPagado')  // Total pagado por cada membresía
+        )
+            ->join('detalle_inscripciones', 'inscripciones.idInscripcion', '=', 'detalle_inscripciones.idInscripcion')
+            ->join('clientes', 'inscripciones.idCliente', '=', 'clientes.idCliente')
+            ->join('usuarios', 'inscripciones.idUsuario', '=', 'usuarios.idUsuario')
+            ->join('membresias', 'detalle_inscripciones.idMembresia', '=', 'membresias.idMembresia')
+            ->where('detalle_inscripciones.tipoProducto', 'membresia') // Solo membresías
+            ->whereDate('inscripciones.fechaInscripcion', '>=', $fechaInicio)
+            ->whereDate('inscripciones.fechaInscripcion', '<=', $fechaFin)
+            ->groupBy('clientes.idCliente', 'membresias.idMembresia', 'usuarios.idUsuario')
+            ->orderBy('totalPagado', 'desc')
+            ->get();
 
-            // Calcular los totales generales
-            $totalInscripciones = $ingresosPorMembresias->count();
-            $totalGanado = $ingresosPorMembresias->sum('totalPagado');
-        }
+        // Calcular los totales generales
+        $totalInscripciones = $ingresosPorMembresias->count();
+        $totalGanado = $ingresosPorMembresias->sum('totalPagado');
 
         return view('admin.reportes.ingresos-membresias', compact('ingresosPorMembresias', 'totalInscripciones', 'totalGanado', 'fechaInicio', 'fechaFin'));
     }
@@ -59,14 +49,16 @@ class ReportesIngresosMembresiasController extends Controller
     // Exportar a PDF
     public function exportarPDF(Request $request)
     {
+        // Definir la fecha actual como predeterminado
+        $fechaHoy = Carbon::now()->format('Y-m-d');
+        $fechaInicio = $request->input('fechaInicio', $fechaHoy);
+        $fechaFin = $request->input('fechaFin', $fechaHoy);
+
+        // Obtener los datos filtrados
         $ingresosPorMembresias = $this->filtrarIngresosPorMembresias($request);
 
-        // Capturar las fechas seleccionadas en los filtros
-        $fechaInicio = $request->input('fechaInicio');
-        $fechaFin = $request->input('fechaFin');
-
         // Calcular los totales generales
-        $totalInscripciones = $ingresosPorMembresias->sum('totalInscripciones');
+        $totalInscripciones = $ingresosPorMembresias->count();
         $totalGanado = $ingresosPorMembresias->sum('totalGanado');
 
         // Enviar las variables necesarias a la vista
@@ -81,7 +73,6 @@ class ReportesIngresosMembresiasController extends Controller
         return $pdf->stream('reporte_ingresos_membresias.pdf');
     }
 
-
     // Exportar a Excel
     public function exportarExcel(Request $request)
     {
@@ -92,8 +83,10 @@ class ReportesIngresosMembresiasController extends Controller
     // Filtrar inscripciones por membresías según los parámetros de búsqueda
     private function filtrarIngresosPorMembresias(Request $request)
     {
-        $fechaInicio = $request->input('fechaInicio');
-        $fechaFin = $request->input('fechaFin');
+        // Definir la fecha actual como predeterminado
+        $fechaHoy = Carbon::now()->format('Y-m-d');
+        $fechaInicio = $request->input('fechaInicio', $fechaHoy);
+        $fechaFin = $request->input('fechaFin', $fechaHoy);
 
         return Inscripcion::select(
             'clientes.nombre as clienteNombre',
@@ -107,14 +100,10 @@ class ReportesIngresosMembresiasController extends Controller
             ->join('usuarios', 'inscripciones.idUsuario', '=', 'usuarios.idUsuario')
             ->join('membresias', 'detalle_inscripciones.idMembresia', '=', 'membresias.idMembresia')
             ->where('detalle_inscripciones.tipoProducto', 'membresia')
-            ->when($fechaInicio, function ($query) use ($fechaInicio) {
-                $query->whereDate('inscripciones.fechaInscripcion', '>=', $fechaInicio);
-            })
-            ->when($fechaFin, function ($query) use ($fechaFin) {
-                $query->whereDate('inscripciones.fechaInscripcion', '<=', $fechaFin);
-            })
+            ->whereDate('inscripciones.fechaInscripcion', '>=', $fechaInicio)
+            ->whereDate('inscripciones.fechaInscripcion', '<=', $fechaFin)
             ->groupBy('clientes.idCliente', 'membresias.idMembresia', 'usuarios.idUsuario')
             ->orderBy('totalGanado', 'desc')
             ->get();
-    }
+    }       
 }

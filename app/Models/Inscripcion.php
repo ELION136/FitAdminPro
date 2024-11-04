@@ -29,6 +29,7 @@ class Inscripcion extends Model
         
         'fechaModificacion' => 'datetime',
         'fechaInscripcion' => 'datetime',
+        'fechaFin' => 'datetime',
 
     ];
     public function cliente()

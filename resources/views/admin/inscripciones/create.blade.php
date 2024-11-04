@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
@@ -18,25 +17,7 @@
         </div>
     </div>
 
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->any() ? $errors->all() : [] as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
 
-    @if (session('success'))
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: '{{ session('success') }}',
-            });
-        </script>
-    @endif
 
     <form id="inscripcionForm" action="{{ route('admin.inscripciones.store') }}" method="POST">
         @csrf
@@ -229,7 +210,6 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @push('scripts')
@@ -278,6 +258,13 @@
                     method: 'POST',
                     data: formData,
                     success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Éxito!',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
                         // Cerrar el modal y agregar el cliente al select2
                         $('#modalAgregarCliente').modal('hide');
                         var newOption = new Option(response.text, response.id, true, true);
@@ -433,9 +420,10 @@
                 $('#totalPagar').text(total.toFixed(2));
             }
 
-            // Al enviar el formulario, recopilar los datos necesarios
+
+
             $('#inscripcionForm').submit(function(event) {
-                event.preventDefault(); // Prevenir el envío normal del formulario
+                event.preventDefault();
 
                 if (productosSeleccionados.length == 0) {
                     Swal.fire({
@@ -453,16 +441,13 @@
                 });
                 $(this).append(productosInput);
 
-                // Obtener los datos del formulario
                 var formData = $(this).serialize();
 
-                // Enviar los datos mediante AJAX
                 $.ajax({
                     url: $(this).attr('action'),
                     method: 'POST',
                     data: formData,
                     success: function(response) {
-                        // Mostrar mensaje de éxito
                         Swal.fire({
                             icon: 'success',
                             title: '¡Éxito!',
@@ -470,40 +455,49 @@
                             timer: 2000,
                             showConfirmButton: false
                         }).then(() => {
-                            // Generar el comprobante en PDF
-                            // Generar la URL del comprobante con el ID de inscripción
                             const url = new URL(
                                 '{{ route('admin.inscripciones.generarPDF', ':id') }}'
                                 .replace(':id', response.comprobanteId), window
                                 .location.origin);
-
-                            // Abrir la URL en una nueva ventana con tamaño específico
                             window.open(url, '_blank', 'width=800,height=600');
                         });
 
-                        // Limpiar el formulario y los productos seleccionados
                         $('#inscripcionForm')[0].reset();
                         productosSeleccionados = [];
                         mostrarDetalleVenta();
                         calcularTotal();
-
-                        // Eliminar el input temporal de productos
                         productosInput.remove();
                     },
                     error: function(xhr) {
-                        // Mostrar errores
-                        let errors = xhr.responseJSON.errors;
                         let errorMessage = '';
-                        $.each(errors, function(key, value) {
-                            errorMessage += value + '\n';
-                        });
+
+                        // Manejar diferentes tipos de respuestas de error
+                        if (xhr.responseJSON) {
+                            if (xhr.responseJSON.message) {
+                                // Si hay un mensaje general de error
+                                errorMessage = xhr.responseJSON.message;
+                            } else if (xhr.responseJSON.errors) {
+                                // Si hay múltiples errores de validación
+                                Object.values(xhr.responseJSON.errors).forEach(function(
+                                    errors) {
+                                    errors.forEach(function(error) {
+                                        errorMessage += error + '\n';
+                                    });
+                                });
+                            }
+                        } else {
+                            // Si no hay respuesta JSON
+                            errorMessage = 'Ha ocurrido un error al procesar la inscripción.';
+                        }
+
+                        // Mostrar el mensaje de error
                         Swal.fire({
                             icon: 'error',
-                            title: 'Error',
-                            text: errorMessage
+                            title: 'Error en la inscripción',
+                            text: errorMessage,
+                            confirmButtonText: 'Entendido'
                         });
 
-                        // Eliminar el input temporal de productos
                         productosInput.remove();
                     }
                 });

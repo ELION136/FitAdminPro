@@ -4,30 +4,30 @@
 
 <div class="card shadow-sm mb-4">
     <div class="card-header">
-        <h1 class="card-title mb-0"><i class="ri-calendar-line me-2"></i> Reporte de Inscripciones por Mes y Año</h1>
+        <h1 class="card-title mb-0"><i class="ri-calendar-line me-2"></i> Reporte de Inscripciones por Día, Mes y Año</h1>
     </div>
     <div class="card-body">
 
         <!-- Cards de estadísticas -->
         <div class="row mb-4">
-            <div class="col-md-6 col-lg-4">
+            <div class="col-md-4">
                 <div class="card text-white bg-primary mb-3 shadow-sm">
                     <div class="card-body d-flex align-items-center">
-                        <i class="ri-user-add-line display-4 me-3"></i>
+                        <i class="ri-user-add-line display-5 me-3"></i>
                         <div>
                             <h6 class="card-title">Total de Inscripciones</h6>
-                            <h2 class="mb-0">{{ $totalInscripciones }}</h2>
+                            <h3 class="mb-0">{{ $totalInscripciones }}</h3>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4">
+            <div class="col-md-4">
                 <div class="card text-white bg-success mb-3 shadow-sm">
                     <div class="card-body d-flex align-items-center">
-                        <i class="ri-money-dollar-circle-line display-4 me-3"></i>
+                        <i class="ri-money-dollar-circle-line display-5 me-3"></i>
                         <div>
                             <h6 class="card-title">Total Ganado</h6>
-                            <h2 class="mb-0">{{ number_format($totalGanado, 2) }} BOB</h2>
+                            <h3 class="mb-0">{{ number_format($totalGanado, 2) }} BOB</h3>
                         </div>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
                             <label for="anio" class="form-label">Año</label>
                             <select name="anio" class="form-control">
                                 @for ($i = date('Y'); $i >= 2020; $i--)
-                                    <option value="{{ $i }}" {{ request('anio') == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                    <option value="{{ $i }}" {{ request('anio', date('Y')) == $i ? 'selected' : '' }}>{{ $i }}</option>
                                 @endfor
                             </select>
                         </div>
@@ -51,8 +51,18 @@
                             <label for="mes" class="form-label">Mes</label>
                             <select name="mes" class="form-control">
                                 @for ($i = 1; $i <= 12; $i++)
-                                    <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}" {{ request('mes') == str_pad($i, 2, '0', STR_PAD_LEFT) ? 'selected' : '' }}>
+                                    <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}" {{ request('mes', date('m')) == str_pad($i, 2, '0', STR_PAD_LEFT) ? 'selected' : '' }}>
                                         {{ \Carbon\Carbon::create()->month($i)->locale('es')->isoFormat('MMMM') }}
+                                    </option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <label for="dia" class="form-label">Día</label>
+                            <select name="dia" class="form-control">
+                                @for ($i = 1; $i <= 31; $i++)
+                                    <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}" {{ request('dia', date('d')) == str_pad($i, 2, '0', STR_PAD_LEFT) ? 'selected' : '' }}>
+                                        {{ $i }}
                                     </option>
                                 @endfor
                             </select>
@@ -72,49 +82,63 @@
             <a href="{{ route('admin.reporte.inscripciones-excel', request()->query()) }}" class="btn btn-success"><i class="ri-file-excel-line me-1"></i> Exportar a Excel</a>
         </div>
 
-        <!-- Tabla de inscripciones por mes y año -->
+        <!-- Tabla de inscripciones por día, mes y año -->
         <div class="table-responsive">
             <table class="table table-hover table-striped table-bordered align-middle">
-                <thead class="table-dark text-center">
+                <thead class="table text-center">
                     <tr>
+                        <th>#</th>
                         <th><i class="ri-calendar-line me-1"></i> Año</th>
                         <th><i class="ri-calendar-event-line me-1"></i> Mes</th>
+                        <th><i class="ri-calendar-line me-1"></i> Día</th>
                         <th><i class="ri-bar-chart-line me-1"></i> Total de Inscripciones</th>
                         <th><i class="ri-money-dollar-circle-line me-1"></i> Total Pagado (BOB)</th>
                     </tr>
                 </thead>
                 <tbody class="text-center">
-                    @foreach ($inscripciones as $inscripcion)
+                    @forelse ($inscripciones as $index => $inscripcion)
                         <tr>
+                            <td>{{ $index + 1 }}</td>
                             <td>{{ $inscripcion->anio }}</td>
                             <td>{{ \Carbon\Carbon::create()->month($inscripcion->mes)->locale('es')->isoFormat('MMMM') }}</td>
+                            <td>{{ $inscripcion->dia }}</td>
                             <td>{{ $inscripcion->totalInscripciones }}</td>
                             <td>{{ number_format($inscripcion->totalGanado, 2) }} BOB</td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center">Sin elementos</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
 
-        <!-- Nueva tabla para el reporte anual -->
+        <!-- Tabla para el reporte anual -->
         <h2 class="mt-5"><i class="ri-calendar-check-line me-2"></i>Reporte Total Anual</h2>
         <div class="table-responsive">
             <table class="table table-hover table-striped table-bordered align-middle">
-                <thead class="table-dark text-center">
+                <thead class="table text-center">
                     <tr>
+                        <th>#</th>
                         <th><i class="ri-calendar-line me-1"></i> Año</th>
                         <th><i class="ri-bar-chart-line me-1"></i> Cant. Inscripciones</th>
                         <th><i class="ri-money-dollar-circle-line me-1"></i> Total Ganado (BOB)</th>
                     </tr>
                 </thead>
                 <tbody class="text-center">
-                    @foreach ($reporteAnual as $anio)
+                    @forelse ($reporteAnual as $index => $anio)
                         <tr>
+                            <td>{{ $index + 1 }}</td>
                             <td>{{ $anio->anio }}</td>
                             <td>{{ $anio->totalInscripciones }}</td>
                             <td>{{ number_format($anio->totalGanado, 2) }} BOB</td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center">Sin elementos</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -129,8 +153,8 @@
 <script>
     function abrirVentanaPDF() {
         const url = new URL('{{ route('admin.reportes.inscripciones-pdf') }}', window.location.origin);
-        const params = new URLSearchParams(window.location.search); // Obtener los filtros actuales de la URL
-        url.search = params; // Añadir los filtros a la URL
+        const params = new URLSearchParams(window.location.search);
+        url.search = params;
 
         window.open(url, '_blank', 'width=800,height=600');
     }

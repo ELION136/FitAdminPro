@@ -14,88 +14,77 @@ class ReportesIngresosVendedorController extends Controller
 {
     public function index(Request $request)
     {
-        // Filtros por fecha
-        $fechaInicio = $request->input('fechaInicio');
-        $fechaFin = $request->input('fechaFin');
+        // Definir la fecha actual
+        $fechaHoy = Carbon::now()->format('Y-m-d');
 
-        // Si no se han seleccionado filtros de fecha, devolver una colección vacía
-        if (!$request->filled('fechaInicio') || !$request->filled('fechaFin')) {
-            // Colección vacía cuando no hay filtros aplicados
-            $ingresosPorVendedor = collect();
-            $totalInscripciones = 0;
-            $totalGanado = 0;
-        } else {
-            // Consulta de inscripciones agrupadas por vendedor
-            $ingresosPorVendedor = Inscripcion::select(
-                'usuarios.nombreUsuario as vendedor',
-                DB::raw('COUNT(inscripciones.idInscripcion) as totalInscripciones'),
-                DB::raw('SUM(inscripciones.totalPago) as totalGanado')
-            )
-                ->join('usuarios', 'inscripciones.idUsuario', '=', 'usuarios.idUsuario')
-                ->when($fechaInicio, function ($query) use ($fechaInicio) {
-                    $query->whereDate('inscripciones.fechaInscripcion', '>=', $fechaInicio);
-                })
-                ->when($fechaFin, function ($query) use ($fechaFin) {
-                    $query->whereDate('inscripciones.fechaInscripcion', '<=', $fechaFin);
-                })
-                ->groupBy('usuarios.nombreUsuario')
-                ->orderBy('totalGanado', 'desc') // Ordenar por los ingresos más altos
-                ->get();
+        // Filtros por fecha, usando la fecha actual como predeterminado
+        $fechaInicio = $request->input('fechaInicio', $fechaHoy);
+        $fechaFin = $request->input('fechaFin', $fechaHoy);
 
-            // Calcular los totales generales
-            $totalInscripciones = $ingresosPorVendedor->sum('totalInscripciones');
-            $totalGanado = $ingresosPorVendedor->sum('totalGanado');
-        }
+        // Consulta de inscripciones agrupadas por vendedor
+        $ingresosPorVendedor = Inscripcion::select(
+            'usuarios.nombreUsuario as vendedor',
+            DB::raw('COUNT(inscripciones.idInscripcion) as totalInscripciones'),
+            DB::raw('SUM(inscripciones.totalPago) as totalGanado')
+        )
+            ->join('usuarios', 'inscripciones.idUsuario', '=', 'usuarios.idUsuario')
+            ->whereDate('inscripciones.fechaInscripcion', '>=', $fechaInicio)
+            ->whereDate('inscripciones.fechaInscripcion', '<=', $fechaFin)
+            ->groupBy('usuarios.nombreUsuario')
+            ->orderBy('totalGanado', 'desc') // Ordenar por los ingresos más altos
+            ->get();
+
+        // Calcular los totales generales
+        $totalInscripciones = $ingresosPorVendedor->sum('totalInscripciones');
+        $totalGanado = $ingresosPorVendedor->sum('totalGanado');
 
         return view('admin.reportes.ingresos-vendedor', compact('ingresosPorVendedor', 'totalInscripciones', 'totalGanado', 'fechaInicio', 'fechaFin'));
     }
+
 
     // Exportar a PDF
     // Exportar a PDF
     public function exportarPDF(Request $request)
     {
-        $ingresosPorVendedor = $this->filtrarIngresosPorVendedor($request);
-        $fechaInicio = $request->fechaInicio;
-        $fechaFin = $request->fechaFin;
+        // Definir la fecha actual
+        $fechaHoy = Carbon::now()->format('Y-m-d');
 
-        $pdf = Pdf::loadView('admin.reportes.ingresos-vendedor-pdf', compact('ingresosPorVendedor', 'fechaInicio', 'fechaFin'))
+        // Filtros de fecha para la exportación, usando la fecha actual como predeterminado
+        $fechaInicio = $request->input('fechaInicio', $fechaHoy);
+        $fechaFin = $request->input('fechaFin', $fechaHoy);
+
+        // Obtener los datos filtrados
+        $ingresosPorVendedor = $this->filtrarIngresosPorVendedorConFechas($fechaInicio, $fechaFin);
+
+        // Calcular los totales generales
+        $totalInscripciones = $ingresosPorVendedor->sum('totalInscripciones');
+        $totalGanado = $ingresosPorVendedor->sum('totalGanado');
+
+        $pdf = Pdf::loadView('admin.reportes.ingresos-vendedor-pdf', compact('ingresosPorVendedor', 'fechaInicio', 'fechaFin', 'totalInscripciones', 'totalGanado'))
             ->setPaper('a4', 'portrait');
-            $pdf->getDomPDF()->set_option("enable_remote", true);
-            $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
-    
-            // Establecer la ruta base para las imágenes
-            $pdf->getDomPDF()->set_option("chroot", public_path());
+        $pdf->getDomPDF()->set_option("enable_remote", true);
+        $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
+
+        // Establecer la ruta base para las imágenes
+        $pdf->getDomPDF()->set_option("chroot", public_path());
+
         return $pdf->stream('reporte_ingresos_vendedor.pdf');
     }
 
-
-    // Exportar a Excel
-    // public function exportarExcel(Request $request)
-    // {
-    //      $ingresosPorVendedor = $this->filtrarIngresosPorVendedor($request);
-    //    return Excel::download(new IngresosVendedorExport($ingresosPorVendedor), 'reporte_ingresos_vendedor.xlsx');
-    // }
-
-    // Función para aplicar filtros
-    private function filtrarIngresosPorVendedor(Request $request)
+    // Función modificada para aplicar filtros con fechas específicas
+    private function filtrarIngresosPorVendedorConFechas($fechaInicio, $fechaFin)
     {
-        $fechaInicio = $request->input('fechaInicio');
-        $fechaFin = $request->input('fechaFin');
-
         return Inscripcion::select(
             'usuarios.nombreUsuario as vendedor',
             DB::raw('COUNT(inscripciones.idInscripcion) as totalInscripciones'),
             DB::raw('SUM(inscripciones.totalPago) as totalGanado')
         )
             ->join('usuarios', 'inscripciones.idUsuario', '=', 'usuarios.idUsuario')
-            ->when($fechaInicio, function ($query) use ($fechaInicio) {
-                $query->whereDate('inscripciones.fechaInscripcion', '>=', $fechaInicio);
-            })
-            ->when($fechaFin, function ($query) use ($fechaFin) {
-                $query->whereDate('inscripciones.fechaInscripcion', '<=', $fechaFin);
-            })
+            ->whereDate('inscripciones.fechaInscripcion', '>=', $fechaInicio)
+            ->whereDate('inscripciones.fechaInscripcion', '<=', $fechaFin)
             ->groupBy('usuarios.nombreUsuario')
             ->orderBy('totalGanado', 'desc')
             ->get();
     }
+
 }

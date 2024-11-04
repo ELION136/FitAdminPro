@@ -9,6 +9,7 @@ use App\Models\Cliente;
 use App\Models\Inscripcion;
 use App\Models\User;
 use Carbon\Carbon;
+use App\Models\DetalleInscripcion;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 
@@ -24,41 +25,179 @@ class AsistenciaController extends Controller
     // Procesa el código QR y registra la asistencia
     public function registrarQR(Request $request)
     {
-        $dataQR = $request->input('dataQR');  // La respuesta del QR
+        $idCliente = $request->input('idCliente');
+        $tipoProducto = $request->input('tipoProducto');
+        $idDetalle = $request->input('idDetalle');
 
-        // Aquí extraemos los datos basados en el QR
-        $data = explode('|', $dataQR);  // Separar el contenido del QR
-        $idCliente = trim(explode(':', $data[0])[1]);
-        $idInscripcion = trim(explode(':', $data[1])[1]);
+        $cliente = Cliente::findOrFail($idCliente);
 
-        // Verificar si existe la inscripción y está activa
-        $inscripcion = Inscripcion::where('idInscripcion', $idInscripcion)
-            ->where('idCliente', $idCliente)
-            ->first();
-
-        if ($inscripcion && $inscripcion->estado === 'activa') {
-            // Verificar si ya existe una asistencia para el cliente en la fecha actual
-            $asistenciaExistente = Asistencia::where('idCliente', $idCliente)
-                ->where('idInscripcion', $idInscripcion)
-                ->whereDate('fechaAsistencia', now()->toDateString())  // Comparar por la fecha actual
+        if ($tipoProducto === 'membresia') {
+            // Verificar si el cliente tiene una membresía activa
+            $membresiaActiva = Inscripcion::where('idCliente', $idCliente)
+                ->where('estado', 'activa')
+                ->whereNotNull('diasRestantes')
                 ->first();
 
-            if ($asistenciaExistente) {
-                return response()->json(['error' => 'Ya has registrado tu asistencia para el día de hoy.']);
+            if ($membresiaActiva && $membresiaActiva->diasRestantes > 0) {
+                // Registrar asistencia y descontar un día
+                $membresiaActiva->diasRestantes--;
+                $membresiaActiva->save();
+
+                // Cambiar el estado a "vencida" si los días restantes son 0
+                if ($membresiaActiva->diasRestantes === 0) {
+                    $membresiaActiva->estado = 'vencida';
+                    $membresiaActiva->save();
+                }
+
+                // Crear registro de asistencia
+                Asistencia::create([
+                    'idCliente' => $idCliente,
+                    'idInscripcion' => $membresiaActiva->idInscripcion,
+                    'metodoRegistro' => 'QR',
+                    'estado' => 'activa'
+                ]);
+
+                return response()->json(['success' => 'Asistencia registrada para membresía.']);
+            } else {
+                return response()->json(['error' => 'La membresía no está activa o no tiene días restantes.'], 400);
+            }
+        } elseif ($tipoProducto === 'servicio') {
+            // Obtener el detalle de inscripción del servicio
+            $detalleInscripcion = DetalleInscripcion::findOrFail($idDetalle);
+
+            // Verificar que el detalle de inscripción es de tipo servicio y tiene sesiones restantes
+            if ($detalleInscripcion->tipoProducto !== 'servicio' || $detalleInscripcion->sesionesRestantes <= 0) {
+                return response()->json(['error' => 'El servicio no está activo o no tiene sesiones restantes.'], 400);
             }
 
-            // Registrar la nueva asistencia
+            // Obtener el día de la semana y hora actual
+            $now = Carbon::now();
+            $diaSemana = $now->dayOfWeekIso; // 1 (lunes) a 7 (domingo)
+            $horaActual = $now->format('H:i:s');
+
+            // Obtener los horarios programados para ese servicio en el día actual
+            $horariosServicio = DB::table('servicio_dias_horarios')
+                ->where('idServicio', $detalleInscripcion->idServicio)
+                ->where('idDia', $diaSemana)
+                ->get();
+
+            // Verificar si la hora actual está dentro de alguno de los rangos de horario
+            $asistenciaPermitida = false;
+
+            foreach ($horariosServicio as $horario) {
+                if ($horaActual >= $horario->horaInicio && $horaActual <= $horario->horaFin) {
+                    $asistenciaPermitida = true;
+                    break;
+                }
+            }
+
+            if (!$asistenciaPermitida) {
+                return response()->json(['error' => 'No puedes registrar asistencia en este momento el servicio tiene un dia y hora especifico.'], 400);
+            }
+
+            // Registrar asistencia y descontar una sesión
+            $detalleInscripcion->decrement('sesionesRestantes');
+
+            // Actualizar el modelo después de la operación
+            $detalleInscripcion->refresh();
+
+            // Cambiar el estado a "vencida" si las sesiones restantes son 0
+            if ($detalleInscripcion->sesionesRestantes === 0) {
+                $detalleInscripcion->estado = 'vencida';
+                $detalleInscripcion->save();
+            }
+
+            // Crear registro de asistencia
             Asistencia::create([
                 'idCliente' => $idCliente,
-                'idInscripcion' => $idInscripcion,
+                'idInscripcion' => $detalleInscripcion->idInscripcion,
                 'metodoRegistro' => 'QR',
+                'estado' => 'activa'
             ]);
 
-            return response()->json(['success' => 'Asistencia registrada correctamente']);
+            return response()->json(['success' => 'Asistencia registrada para servicio.']);
+        } else {
+            return response()->json(['error' => 'Tipo de producto inválido.'], 400);
         }
-
-        return response()->json(['error' => 'No se pudo registrar la asistencia. Inscripción no válida.']);
     }
+
+
+
+
+
+    public function registrarQR1($idCliente, $tipoProducto, $idDetalle = null)
+    {
+        $cliente = Cliente::findOrFail($idCliente);
+
+        if ($tipoProducto === 'membresia') {
+            // Verificar si el cliente tiene una membresía activa
+            $membresiaActiva = Inscripcion::where('idCliente', $idCliente)
+                ->where('estado', 'activa')
+                ->whereNotNull('diasRestantes')
+                ->first();
+
+            if ($membresiaActiva && $membresiaActiva->diasRestantes > 0) {
+                // Verificar que la fecha de fin no haya pasado
+                $hoy = Carbon::today();
+                if ($membresiaActiva->fechaFin < $hoy) {
+                    return response()->json(['error' => 'La membresía ha vencido, no se puede registrar asistencia.'], 400);
+                }
+
+                // Registrar asistencia y descontar un día
+                $detalleInscripcion = DetalleInscripcion::find($idDetalle);
+                $detalleInscripcion->decrement('sesionesRestantes');
+                // $detalleInscripcion->sesionesRestantes--;
+                $detalleInscripcion->save();
+
+                // Agregar registro de depuración
+                // Log::info('Sesiones Restantes después de registrar asistencia:', ['sesionesRestantes' => $detalleInscripcion->sesionesRestantes]);
+
+                // Cambiar el estado a "vencida" si los días restantes son 0
+                if ($membresiaActiva->diasRestantes === 0) {
+                    $membresiaActiva->estado = 'vencida';
+                    $membresiaActiva->save();
+                }
+
+                // Crear registro de asistencia
+                Asistencia::create([
+                    'idCliente' => $idCliente,
+                    'idInscripcion' => $membresiaActiva->idInscripcion,
+                    'metodoRegistro' => 'QR',
+                    'estado' => 'activa'
+                ]);
+
+                return response()->json(['success' => 'Asistencia registrada para membresía.']);
+            } else {
+                return response()->json(['error' => 'La membresía no está activa o no tiene días restantes.'], 400);
+            }
+        } elseif ($tipoProducto === 'servicio') {
+            // Obtener el detalle de inscripción del servicio
+            $detalleInscripcion = DetalleInscripcion::findOrFail($idDetalle);
+
+            // Verificar que el detalle de inscripción es de tipo servicio y tiene sesiones restantes
+            if ($detalleInscripcion->tipoProducto !== 'servicio' || $detalleInscripcion->sesionesRestantes <= 0) {
+                return response()->json(['error' => 'El servicio no está activo o no tiene sesiones restantes.'], 400);
+            }
+
+            // Registrar asistencia y descontar una sesión
+            $detalleInscripcion->sesionesRestantes--;
+            $detalleInscripcion->save();
+
+
+            // Crear registro de asistencia
+            Asistencia::create([
+                'idCliente' => $idCliente,
+                'idInscripcion' => $detalleInscripcion->idInscripcion,
+                'metodoRegistro' => 'QR',
+                'estado' => 'activa'
+            ]);
+
+            return response()->json(['success' => 'Asistencia registrada para servicio.']);
+        } else {
+            return response()->json(['error' => 'Tipo de producto inválido.'], 400);
+        }
+    }
+
 
 
 
@@ -69,13 +208,13 @@ class AsistenciaController extends Controller
     // Obtener todos los clientes para el filtro
     $clientes = Cliente::all();
 
-    // Filtros
+    // Filtros con fecha actual como valor predeterminado
     $clienteId = $request->input('cliente_id');
-    $fechaInicio = $request->input('fechaInicio');
-    $fechaFin = $request->input('fechaFin');
+    $fechaInicio = $request->input('fechaInicio', Carbon::today()->toDateString());
+    $fechaFin = $request->input('fechaFin', Carbon::today()->toDateString());
 
     // Query base de asistencias
-    $query = Asistencia::where('eliminado', 1); // Solo mostrar asistencias con eliminado = 1
+    $query = Asistencia::where('eliminado', 1);
 
     // Filtrar por cliente si se seleccionó
     if ($clienteId) {
@@ -91,10 +230,14 @@ class AsistenciaController extends Controller
         $query->whereDate('fechaAsistencia', '<=', $fechaFin);
     }
 
-    // Obtener las asistencias filtradas
-    $asistencias = $query->with('cliente')->orderBy('fechaAsistencia', 'desc')->get();
+    // Obtener las asistencias filtradas con las relaciones necesarias
+    $asistencias = $query->with([
+        'cliente',
+        'inscripcion.detallesInscripciones.membresia',
+        'inscripcion.detallesInscripciones.servicio',
+    ])->orderBy('fechaAsistencia', 'desc')->get();
 
-    // Estadísticas: Total de asistencias, asistencias del día, y sin hora de salida
+    // Estadísticas
     $totalAsistencias = $asistencias->count();
     $asistenciasHoy = Asistencia::whereDate('fechaAsistencia', Carbon::today())
         ->where('eliminado', 1)
@@ -109,6 +252,7 @@ class AsistenciaController extends Controller
         'fechaFin' => $fechaFin
     ]);
 }
+
 
 
     // AsistenciaController.php
@@ -149,7 +293,7 @@ class AsistenciaController extends Controller
     }
 
 
-    public function registrarAsistenciaQR(Request $request)
+    public function registrarAsistenciaQR4(Request $request)
     {
         // Decodificar los datos del QR que incluye el ID del cliente
         $qrData = $request->input('qrData'); // El QR contiene los datos de cliente e inscripción

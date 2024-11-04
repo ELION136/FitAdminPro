@@ -5,7 +5,6 @@
     <div class="col-12">
         <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
             <h4 class="mb-sm-0">Formulario</h4>
-
             <div class="page-title-right">
                 <ol class="breadcrumb m-0">
                     <li class="breadcrumb-item"><a href="javascript: void(0);">Añadir</a></li>
@@ -28,62 +27,38 @@
                     <div class="row gy-4">
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                             <label for="nombre" class="form-label">Nombre</label>
-                            <input type="text" class="form-control @error('nombre') is-invalid @enderror" id="nombre" name="nombre" value="{{ old('nombre') }}" required>
-                            @error('nombre')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                            @enderror
+                            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ old('nombre') }}" required>
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                             <label for="primerApellido" class="form-label">Primer Apellido</label>
-                            <input type="text" class="form-control @error('primerApellido') is-invalid @enderror" id="primerApellido" name="primerApellido" value="{{ old('primerApellido') }}" required>
-                            @error('primerApellido')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                            @enderror
+                            <input type="text" class="form-control" id="primerApellido" name="primerApellido" value="{{ old('primerApellido') }}" required>
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                             <label for="segundoApellido" class="form-label">Segundo Apellido</label>
-                            <input type="text" class="form-control @error('segundoApellido') is-invalid @enderror" id="segundoApellido" name="segundoApellido" value="{{ old('segundoApellido') }}">
-                            @error('segundoApellido')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                            @enderror
+                            <input type="text" class="form-control" id="segundoApellido" name="segundoApellido" value="{{ old('segundoApellido') }}">
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                             <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
-                            <input type="date" class="form-control @error('fechaNacimiento') is-invalid @enderror" id="fechaNacimiento" name="fechaNacimiento" value="{{ old('fechaNacimiento') }}" required>
-                            @error('fechaNacimiento')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                            @enderror
+                            <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento" value="{{ old('fechaNacimiento') }}" max="{{ now()->format('Y-m-d') }}" required>
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                             <label for="genero" class="form-label">Género</label>
-                            <select class="form-control @error('genero') is-invalid @enderror" id="genero" name="genero" required>
+                            <select class="form-control" id="genero" name="genero" required>
                                 <option value="" disabled selected>Seleccione</option>
                                 <option value="Masculino">Masculino</option>
                                 <option value="Femenino">Femenino</option>
                                 <option value="Otro">Otro</option>
                             </select>
-                            @error('genero')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                            @enderror
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                             <label for="telefonoEmergencia" class="form-label">Teléfono de Emergencia</label>
-                            <input type="text" class="form-control @error('telefonoEmergencia') is-invalid @enderror" id="telefonoEmergencia" name="telefonoEmergencia">
-                            @error('telefonoEmergencia')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                            @enderror
+                            <input type="text" class="form-control" id="telefonoEmergencia" name="telefonoEmergencia">
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="form-group mb-3">
                             <div class="row">
@@ -92,6 +67,7 @@
                                 </div>
                                 <div class="col-md-9">
                                     <input type="file" id="image" name="image" class="form-control">
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                         </div>
@@ -107,10 +83,10 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('createClient');
-        form.addEventListener('submit', function (e) {
+    $(document).ready(function () {
+        $('#createClient').on('submit', function (e) {
             e.preventDefault();
+
             Swal.fire({
                 title: '¿Estás seguro?',
                 text: "¡No podrás revertir esto!",
@@ -122,10 +98,41 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    form.submit();
+                    let formData = new FormData(this);
+
+                    $.ajax({
+                        url: "{{ route('admin.clientes.store') }}",
+                        type: "POST",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Cliente registrado',
+                                    text: data.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.href = "{{ route('admin.clientes.index') }}";
+                                });
+                            }
+                        },
+                        error: function (xhr) {
+                            let errors = xhr.responseJSON.errors;
+                            $('.form-control').removeClass('is-invalid'); // Resetear errores anteriores
+                            $('.invalid-feedback').text(''); // Limpiar mensajes anteriores
+                            $.each(errors, function (field, message) {
+                                $('#' + field).addClass('is-invalid');
+                                $('#' + field).next('.invalid-feedback').text(message[0]);
+                            });
+                        }
+                    });
                 }
             });
         });
     });
 </script>
 @endsection
+

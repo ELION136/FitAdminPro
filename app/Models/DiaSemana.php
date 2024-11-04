@@ -23,6 +23,10 @@ class DiaSemana extends Model
     public function servicios()
     {
         return $this->belongsToMany(Servicio::class, 'servicio_dias_horarios', 'idDia', 'idServicio')
-                    ->withPivot('horaInicio', 'horaFin');
+            ->withPivot('horaInicio', 'horaFin');
     }
+
+    // En el modelo ServicioDiaHorario.php
+  
+
 }

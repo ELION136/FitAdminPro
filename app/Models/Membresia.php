@@ -18,8 +18,6 @@ class Membresia extends Model
         'descripcion',
         'duracionDias',
         'precio',
-        'fechaInicio',
-        'fechaFin',
         'idAutor',
         'eliminado',
     ];

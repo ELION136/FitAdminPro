@@ -493,7 +493,7 @@
                                         <li class="nav-item">
                                             <a href="{{ route('admin.reportes.inscripciones-mes-anio') }}"
                                                 class="nav-link {{ Request::routeIs('admin.reportes.inscripciones-mes-anio') ? 'active' : '' }}">
-                                                <span data-key="t-material-design">Reportes de inscripciones</span></a>
+                                                <span data-key="t-material-design">Reportes generales</span></a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="{{ route('admin.reportes.ingresos-vendedor') }}"

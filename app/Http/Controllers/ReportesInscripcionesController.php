@@ -14,66 +14,77 @@ class ReportesInscripcionesController extends Controller
 {
     public function index(Request $request)
     {
-        // Filtros de fecha: año y mes
-        $anio = $request->input('anio');
-        $mes = $request->input('mes');
-    
-        // Si no se han seleccionado filtros de año y mes, devolver una colección vacía
-        if (!$request->filled('anio') || !$request->filled('mes')) {
-            // Tabla vacía y estadísticas vacías
+        // Fecha actual como predeterminado
+        $fechaActual = Carbon::now();
+        $anio = $request->input('anio', $fechaActual->year);
+        $mes = $request->input('mes', $fechaActual->month);
+        $dia = $request->input('dia', $fechaActual->day);
+
+        // Si no se han seleccionado filtros de año, mes y día, devolver una colección vacía
+        if (!$request->filled('anio') && !$request->filled('mes') && !$request->filled('dia')) {
             $inscripciones = collect(); // Colección vacía
             $totalInscripciones = 0;
             $totalGanado = 0;
         } else {
-            // Consulta para obtener las inscripciones agrupadas por mes y año
+            // Consulta para obtener las inscripciones agrupadas por fecha
             $inscripciones = Inscripcion::select(
                 DB::raw('YEAR(fechaInscripcion) as anio'),
                 DB::raw('MONTH(fechaInscripcion) as mes'),
+                DB::raw('DAY(fechaInscripcion) as dia'),
                 DB::raw('COUNT(*) as totalInscripciones'),
                 DB::raw('SUM(totalPago) as totalGanado') // Suma del total pagado
             )
-            ->when($request->filled('anio'), function ($query) use ($request) {
-                $query->whereYear('fechaInscripcion', $request->anio);
-            })
-            ->when($request->filled('mes'), function ($query) use ($request) {
-                $query->whereMonth('fechaInscripcion', $request->mes);
-            })
-            ->groupBy('anio', 'mes')
-            ->orderBy('anio', 'desc')
-            ->orderBy('mes', 'desc')
-            ->get();
-    
-            // Calcular el total de inscripciones del mes y año seleccionado
+                ->whereYear('fechaInscripcion', $anio)
+                ->whereMonth('fechaInscripcion', $mes)
+                ->whereDay('fechaInscripcion', $dia)
+                ->groupBy('anio', 'mes', 'dia')
+                ->orderBy('anio', 'desc')
+                ->orderBy('mes', 'desc')
+                ->orderBy('dia', 'desc')
+                ->get();
+
+            // Calcular el total de inscripciones y el total ganado
             $totalInscripciones = $inscripciones->sum('totalInscripciones');
-            $totalGanado = $inscripciones->sum('totalGanado'); // Total ganado calculado
+            $totalGanado = $inscripciones->sum('totalGanado');
         }
-    
-        // Consulta para obtener el reporte total anual agrupado por año
+
+        // Consulta para obtener el reporte anual agrupado por año
         $reporteAnual = Inscripcion::select(
             DB::raw('YEAR(fechaInscripcion) as anio'),
             DB::raw('COUNT(*) as totalInscripciones'),
             DB::raw('SUM(totalPago) as totalGanado')  // Suma del total pagado anual
         )
-        ->groupBy('anio')
-        ->orderBy('anio', 'desc')
-        ->get();
-    
-        return view('admin.reportes.inscripciones-mes-anio', compact('inscripciones', 'anio', 'mes', 'totalInscripciones', 'totalGanado', 'reporteAnual'));
-    }
-    
+            ->groupBy('anio')
+            ->orderBy('anio', 'desc')
+            ->get();
 
+        return view('admin.reportes.inscripciones-mes-anio', compact('inscripciones', 'anio', 'mes', 'dia', 'totalInscripciones', 'totalGanado', 'reporteAnual'));
+    }
 
     // Exportar a PDF
     public function exportarPDF(Request $request)
     {
-        $inscripciones = $this->filtrarInscripciones($request);
+        // Obtener las inscripciones filtradas
+        $inscripciones = $this->filtrarInscripciones($request->anio, $request->mes, $request->dia);
         $anio = $request->anio;
         $mes = $request->mes;
+        $dia = $request->dia;
 
-        // Calcular el total ganado sumando los pagos de las inscripciones
-        $totalGanado = $inscripciones->sum('totalPagado'); // O cambia a 'totalPago' si es el campo correcto
+        // Calcular el total ganado
+        $totalGanado = $inscripciones->sum('totalPagado');
 
-        $pdf = Pdf::loadView('admin.reportes.inscripciones-mes-anio-pdf', compact('inscripciones', 'anio', 'mes', 'totalGanado'))
+        // Obtener el reporte anual
+        $reporteAnual = Inscripcion::select(
+            DB::raw('YEAR(fechaInscripcion) as anio'),
+            DB::raw('COUNT(*) as totalInscripciones'),
+            DB::raw('SUM(totalPago) as totalGanado')
+        )
+            ->groupBy('anio')
+            ->orderBy('anio', 'desc')
+            ->get();
+
+        // Cargar la vista y generar el PDF
+        $pdf = Pdf::loadView('admin.reportes.inscripciones-mes-anio-pdf', compact('inscripciones', 'anio', 'mes', 'dia', 'totalGanado', 'reporteAnual'))
             ->setPaper('a4', 'portrait');
         $pdf->getDomPDF()->set_option("enable_remote", true);
         $pdf->getDomPDF()->set_option("isRemoteEnabled", true);
@@ -83,31 +94,37 @@ class ReportesInscripcionesController extends Controller
         return $pdf->stream('reporte_inscripciones_mes_anio.pdf');
     }
 
+
     // Exportar a Excel
     public function exportarExcel(Request $request)
     {
-        $inscripciones = $this->filtrarInscripciones($request);
+        // Fecha actual como predeterminado
+        $fechaActual = Carbon::now();
+        $anio = $request->input('anio', $fechaActual->year);
+        $mes = $request->input('mes', $fechaActual->month);
+        $dia = $request->input('dia', $fechaActual->day);
+
+        $inscripciones = $this->filtrarInscripciones($anio, $mes, $dia);
         return Excel::download(new InscripcionesExport($inscripciones), 'reporte_inscripciones_mes_anio.xlsx');
     }
 
     // Filtrar inscripciones según los parámetros de búsqueda
-    private function filtrarInscripciones(Request $request)
+    private function filtrarInscripciones($anio, $mes, $dia)
     {
         return Inscripcion::select(
             DB::raw('YEAR(fechaInscripcion) as anio'),
             DB::raw('MONTH(fechaInscripcion) as mes'),
+            DB::raw('DAY(fechaInscripcion) as dia'),
             DB::raw('COUNT(*) as totalInscripciones'),
             DB::raw('SUM(totalPago) as totalPagado')  // Suma del total pagado
         )
-            ->when($request->filled('anio'), function ($query) use ($request) {
-                $query->whereYear('fechaInscripcion', $request->anio);
-            })
-            ->when($request->filled('mes'), function ($query) use ($request) {
-                $query->whereMonth('fechaInscripcion', $request->mes);
-            })
-            ->groupBy('anio', 'mes')
+            ->whereYear('fechaInscripcion', $anio)
+            ->whereMonth('fechaInscripcion', $mes)
+            ->whereDay('fechaInscripcion', $dia)
+            ->groupBy('anio', 'mes', 'dia')
             ->orderBy('anio', 'desc')
             ->orderBy('mes', 'desc')
+            ->orderBy('dia', 'desc')
             ->get();
     }
 
