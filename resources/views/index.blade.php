@@ -1,365 +1,158 @@
-<!DOCTYPE html>
-<html lang="es">
+@extends('layouts.login')
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
-        integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="{{ url('styles/estilo.css') }}">
-    <!-- Favicon -->
-    <link rel="icon" href="{{ url('assets/images/brand-logos/toggle-logo2.png') }}" type="image/x-icon">
-    <title>FitAdminPro</title>
+@section('title', 'Escaneo de QR - FitAdminPro')
 
-</head>
-
-<body>
-    <!-- MENU -->
-    <div class="contenedor-header">
-        <header>
-            <h1><span class="txtRojo">F</span>it <span class="txtRojo">A</span>min <span class="txtRojo">P</span>ro</h1>
-            <nav id="nav">
-                <a href="#inicio" onclick="seleccionar()">inicio</a>
-                <a href="#nosotros" onclick="seleccionar()">Nosotros</a>
-                <a href="#servicios" onclick="seleccionar()">Servicios</a>
-                <a href="#comodidades" onclick="seleccionar()">Comodidades</a>
-                <a href="#galeria" onclick="seleccionar()">Galería</a>
-                <a href="#equipo" onclick="seleccionar()">Equipo</a>
-                <a href="#contacto" onclick="seleccionar()">Contacto</a>
-            </nav>
-            <!--     <div class="redes">
-                <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-                <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                <a href="#"><i class="fa-brands fa-square-instagram"></i></a>
+@section('content')
+<div class="auth-one-bg-position d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="col-sm-4 shadow p-3" style="background-color: #ffffff; border-radius: 10px;">
+        <h5 class="text-center mb-3">Escanear código QR</h5>
+        
+        <!-- Sección de Escaneo con Cámara -->
+        <div class="row text-center mb-3">
+            <a id="btn-scan-qr" href="#">
+                <img src="https://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2017/07/1499401426qr_icon.svg"
+                     class="img-fluid text-center" width="100" alt="Escanear QR">
+            </a>
+            <canvas hidden id="qr-canvas" class="img-fluid" style="width: 100%; height: 200px; max-width: 300px; margin: 0 auto; border: 1px solid #ccc; border-radius: 8px;"></canvas>
+        </div>
+        
+        <div class="row justify-content-center my-2">
+            <div class="camera-controls text-center">
+                <button class="btn btn-success btn-sm rounded-3 mb-2 me-2" onclick="encenderCamara()">Encender cámara</button>
+                <button class="btn btn-danger btn-sm rounded-3" onclick="cerrarCamara()">Detener cámara</button>
             </div>
-            Icono del menu responsive -->
-            <div id="icono-nav" class="nav-responsive" onclick="mostrarOcultarMenu()">
-                <i class="fa-solid fa-bars"></i>
-            </div>
-        </header>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{{ route('login') }}" class="styled-button" style="--clr:#0FF0FC;">
+                <span>Iniciar Sesión</span>
+                <i></i>
+            </a>
+        </div>
     </div>
+</div>
 
-    <!-- SECCION INICIO -->
-    <section id="inicio" class="inicio">
-        <div class="contenido-seccion">
-            <div class="info">
-                <h2>HAZ QUE <span class="txtRojo">OCURRA</span></h2>
-                <p>Triunfar es más facil de lo que piensas!</p>
+@endsection
 
-                <a href="{{ route('login') }}" class="styled-button" style="--clr:#0FF0FC">
-                    <span>inicia</span>
-                    <i></i>
-                </a>
-            </div>
-            <div class="opciones">
-                <div class="opcion">
-                    01.FITNESS
-                </div>
-                <div class="opcion">
-                    02.CROSSFIT
-                </div>
-                <div class="opcion">
-                    03.BOXING
-                </div>
-                <div class="opcion">
-                    04.ENDURANCE
-                </div>
-                <div class="opcion">
-                    05.YOGA
-                </div>
-                <div class="opcion">
-                    06.CARDIO
-                </div>
-            </div>
-        </div>
-    </section>
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsqrcode/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- SECCION NOSOTROS -->
-    <section id="nosotros" class="nosotros">
-        <div class="fila">
-            <div class="col">
-                <img src="{{ url('styles/img/nosotros.png') }}" alt="">
-            </div>
-            <div class="col">
-                <div class="contenedor-titulo">
-                    <div class="numero">
-                        01
-                    </div>
-                    <div class="info">
-                        <span class="frase">LA MEJOR EXPERIENCIA</span>
-                        <h2>NOSOTROS</h2>
-                    </div>
-                </div>
-                <p class="p-especial">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur necessitatibus quod provident
-                    libero, nam corrupti, adipisci ea inventore cum aliquid asperiores pariatur harum sunt. Tempore
-                    expedita atque quos ipsum nisi.</p>
-            </div>
-        </div>
-        <hr>
-        <div class="fila-nosotros">
-            <div class="col1">
-                <span class="frase">
-                    <span class="txtRojo">ENTRENA</span> DIFERENTE
-                </span>
-                <h2>ENTRENA <span class="txtRojo">GRATIS</span> HOY!</h2>
-            </div>
-            <div class="col2">
-                <button>PASE LIBRE</button>
-            </div>
-        </div>
-    </section>
+<script>
+    const successSound = new Audio("{{ asset('assets/sonido.mp3') }}");
+    const video = document.createElement("video");
+    const canvasElement = document.getElementById("qr-canvas");
+    const canvas = canvasElement.getContext("2d");
+    const btnScanQR = document.getElementById("btn-scan-qr");
 
-    <!-- SECCION SERVICIOS -->
-    <section class="servicios" id="servicios">
-        <div class="contenido-seccion">
-            <div class="fila">
-                <div class="col">
-                    <div class="contenedor-titulo">
-                        <div class="numero">
-                            02
-                        </div>
-                        <div class="info">
-                            <span class="frase">LA MEJOR EXPERIENCIA</span>
-                            <h2>SERVICIOS</h2>
-                        </div>
-                    </div>
-                    <p class="p-especial">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur necessitatibus quod
-                        provident libero, nam corrupti, adipisci ea inventore cum aliquid asperiores pariatur harum
-                        sunt. Tempore expedita atque quos ipsum nisi.</p>
-                </div>
-                <div class="col">
-                    <img src="{{ url('styles/img/servicios.png') }}" alt="">
-                </div>
-            </div>
-        </div>
-        <div class="info-servicios">
-            <table>
-                <tr>
-                    <td>
-                        <i class="fa-solid fa-person-walking"></i>
-                        <h3><span class="txtRojo">Clases </span> de Fitness</h3>
-                        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Facilis.</p>
-                    </td>
-                    <td>
-                        <i class="fa-solid fa-dumbbell"></i>
-                        <h3><span class="txtRojo">Clases </span> de Crossfit</h3>
-                        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Facilis.</p>
-                    </td>
-                    <td>
-                        <i class="fa-solid fa-mitten"></i>
-                        <h3><span class="txtRojo">Clases </span> de Boxeo</h3>
-                        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Facilis.</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <i class="fa-solid fa-clock"></i>
-                        <h3><span class="txtRojo">Clases </span> de Enduro</h3>
-                        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Facilis.</p>
-                    </td>
-                    <td>
-                        <i class="fa-solid fa-heart-circle-bolt"></i>
-                        <h3><span class="txtRojo">Clases </span> de Cardio</h3>
-                        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Facilis.</p>
-                    </td>
-                    <td>
-                        <i class="fa-solid fa-bicycle"></i>
-                        <h3><span class="txtRojo">Clases </span> de Ciclismo</h3>
-                        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Facilis.</p>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </section>
+    let scanning = false;
+    let selectedDeviceId = null;
 
-    <!-- SECCION COMODIDADES -->
-    <section id="comodidades" class="comodidades">
-        <div class="fila">
-            <div class="col">
-                <img src="{{ url('styles/img/nosotros.png') }}" alt="">
-            </div>
-            <div class="col">
-                <div class="contenedor-titulo">
-                    <div class="numero">
-                        03
-                    </div>
-                    <div class="info">
-                        <span class="frase">LA MEJOR EXPERIENCIA</span>
-                        <h2>COMODIDADES</h2>
-                    </div>
-                </div>
-                <p class="p-especial">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                <ul>
-                    <li><span>PILETA</span> - Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos tenetur, nam
-                        cumque adipisci ratione obcaecati impedit inventore eligendi</li>
-                    <li><span>WIFI GRATIS</span> - Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos tenetur,
-                        nam cumque adipisci ratione obcaecati impedit inventore</li>
-                    <li><span>ESTACIONAMIENTO GRATIS</span> - Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Eos tenetur, nam cumque adipisci ratione obcaecati impedit?</li>
-                </ul>
-            </div>
-        </div>
-    </section>
+    // Obtener cámaras disponibles
+    const getCameras = async () => {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
 
-    <!-- SECCION GALERIA -->
-    <section class="galeria" id="galeria">
-        <div class="contenido-seccion">
-            <div class="contenedor-titulo">
-                <div class="numero">
-                    04
-                </div>
-                <div class="info">
-                    <span class="frase">LA MEJOR EXPERIENCIA</span>
-                    <h2>GALERIA</h2>
-                </div>
-            </div>
-            <div class="fila">
-                <div class="col">
-                    <img src="{{ url('styles/') }}img/f1.jpg" alt="">
-                </div>
-                <div class="col">
-                    <img src="{{ url('styles/') }}img/f2.jpg" alt="">
-                </div>
-                <div class="col">
-                    <img src="{{ url('styles/') }}img/f3.jpg" alt="">
-                </div>
-            </div>
-            <div class="fila">
-                <div class="col">
-                    <img src="{{ url('styles/img/f4.jpg') }}" alt="">
-                </div>
-                <div class="col">
-                    <img src="{{ url('styles/img/f5.jpg') }}" alt="">
-                </div>
-                <div class="col">
-                    <img src="{{ url('styles/img/f6.jpg') }}" alt="">
-                </div>
-            </div>
-        </div>
-    </section>
+        const cameraSelect = document.createElement("select");
+        cameraSelect.className = "form-control mt-2";
+        cameraSelect.id = "cameraSelect";
 
-    <!-- SECCION EQUIPO
-    <section class="equipo" id="equipo">
-        <div class="contenido-seccion">
-            <div class="contenedor-titulo">
-                <div class="numero">
-                    05
-                </div>
-                <div class="info">
-                    <span class="frase">LA MEJOR EXPERIENCIA</span>
-                    <h2>EQUIPO</h2>
-                </div>
-            </div>
-            <div class="fila">
-                <div class="col">
-                    <img src="{{ url('styles/img/e1.png') }}" alt="">
-                    <div class="info">
-                        <h2>MARCOS</h2>
-                        <p>Fitness - Pilates - Yoga</p>
-                        <a href="#">
-                            <i class="fa-brands fa-facebook-f"></i>
-                        </a>
-                        <a href="#">
-                            <i class="fa-brands fa-twitter"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="col">
-                    <img src="url('styles/img/e2.png')" alt="">
-                    <div class="info">
-                        <h2>PATRICIA</h2>
-                        <p>Fitness - Pilates - Yoga</p>
-                        <a href="#">
-                            <i class="fa-brands fa-facebook-f"></i>
-                        </a>
-                        <a href="#">
-                            <i class="fa-brands fa-twitter"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="col">
-                    <img src="('styles/img/e3.png')" alt="">
-                    <div class="info">
-                        <h2>JUAN</h2>
-                        <p>Fitness - Pilates - Yoga</p>
-                        <a href="#">
-                            <i class="fa-brands fa-facebook-f"></i>
-                        </a>
-                        <a href="#">
-                            <i class="fa-brands fa-twitter"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>-->
+        videoDevices.forEach((device, index) => {
+            const option = document.createElement("option");
+            option.value = device.deviceId;
+            option.text = device.label || `Cámara ${index + 1}`;
+            cameraSelect.appendChild(option);
+        });
 
-    <!-- SECCION CONTACTO -->
-    <section class="contacto" id="contacto">
-        <div class="contenido-seccion">
-            <div class="contenedor-titulo">
-                <div class="numero">
-                    06
-                </div>
-                <div class="info">
-                    <span class="frase">LA MEJOR EXPERIENCIA</span>
-                    <h2>CONTACTO</h2>
-                </div>
-            </div>
-            <div class="fila">
-                <div class="col">
-                    <input type="text" placeholder="Ingrese Email">
-                </div>
-                <div class="col">
-                    <input type="text" placeholder="Ingrese Nombre">
-                </div>
-            </div>
-            <div class="mensaje">
-                <textarea name="" id="" cols="30" rows="10" placeholder="Ingresa el Mensaje"></textarea>
-                <button>Enviar Mensaje</button>
-            </div>
-            <div class="fila-datos">
-                <div class="col">
-                    <i class="fa-solid fa-location-dot"></i>
-                    Avenida Morro 255
-                </div>
-                <div class="col">
-                    <i class="fa-solid fa-phone"></i>
-                    2664 - 456788
-                </div>
-                <div class="col">
-                    <i class="fa-regular fa-clock"></i>
-                    Lunes a Sábado, 8:00h - 24:00h
-                </div>
-            </div>
-        </div>
+        document.querySelector(".camera-controls").appendChild(cameraSelect);
 
-    </section>
+        cameraSelect.addEventListener("change", (event) => {
+            selectedDeviceId = event.target.value;
+            cerrarCamara();
+            encenderCamara();
+        });
 
-    <footer>
-        <div class="info">
-            <p>202 - <span class="txtRojo">FitAdminPro</span> Todos los derechos reservados</p>
-            <div class="redes">
-                <a href="#">
-                    <i class="fa-brands fa-facebook-f"></i>
-                </a>
-                <a href="#">
-                    <i class="fa-brands fa-twitter"></i>
-                </a>
-                <a href="#">
-                    <i class="fa-brands fa-instagram"></i>
-                </a>
-                <a href="#">
-                    <i class="fa-brands fa-youtube"></i>
-                </a>
-            </div>
-        </div>
-    </footer>
-    <script src="{{ url('styles/app.js') }}"></script>
-</body>
+        selectedDeviceId = videoDevices[0]?.deviceId || null;
+    };
 
-</html>
+    getCameras();
+
+    const encenderCamara = () => {
+        if (!selectedDeviceId) {
+            Swal.fire("Error", "No se encontró ninguna cámara.", "error");
+            return;
+        }
+
+        navigator.mediaDevices.getUserMedia({
+            video: { deviceId: { exact: selectedDeviceId }}
+        }).then(function(stream) {
+            scanning = true;
+            btnScanQR.hidden = true;
+            canvasElement.hidden = false;
+            video.setAttribute("playsinline", true);
+            video.srcObject = stream;
+            video.play();
+            tick();
+            scan();
+        }).catch(function(error) {
+            console.error("Error al acceder a la cámara:", error);
+            Swal.fire("Error", "Error al acceder a la cámara. Por favor, comprueba los permisos.", "error");
+        });
+    };
+
+    function tick() {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvasElement.height = video.videoHeight / 4; // Reduce el tamaño
+            canvasElement.width = video.videoWidth / 4; // Reduce el tamaño
+            canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+
+            canvas.strokeStyle = "red";
+            canvas.lineWidth = 2;
+            canvas.strokeRect(0, 0, canvasElement.width, canvasElement.height);
+        }
+
+        scanning && requestAnimationFrame(tick);
+    }
+
+    function scan() {
+        try {
+            qrcode.decode();
+        } catch (e) {
+            console.log("Error de escaneo QR:", e);
+            setTimeout(scan, 100);
+        }
+    }
+
+    const cerrarCamara = () => {
+        if (video.srcObject) {
+            video.srcObject.getTracks().forEach((track) => {
+                track.stop();
+            });
+        }
+        scanning = false;
+        canvasElement.hidden = true;
+        btnScanQR.hidden = false;
+    };
+
+    qrcode.callback = (respuesta) => {
+        if (respuesta) {
+            const [idCliente, tipoProducto, idDetalle] = respuesta.split(',');
+
+            axios.post('{{ route('asistencias.registrarQRb') }}', {
+                idCliente: idCliente ? idCliente.trim() : null,
+                tipoProducto: tipoProducto ? tipoProducto.trim() : null,
+                idDetalle: idDetalle ? idDetalle.trim() : null,
+                _token: '{{ csrf_token() }}'
+            }).then(response => {
+                Swal.fire('Asistencia registrada', response.data.success, 'success');
+                successSound.play();
+            }).catch(error => {
+                Swal.fire('Error', error.response.data.error, 'error');
+            });
+
+            cerrarCamara();
+        }
+    };
+</script>
+@endpush

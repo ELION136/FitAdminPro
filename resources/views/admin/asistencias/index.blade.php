@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="row justify-content-center mt-5">
-        <div class="col-sm-6 shadow p-3" style="background-color: #f8f9fa; border-radius: 10px;">
+        <div class="col-sm-6 shadow p-3" style="background-color: #85b1dd; border-radius: 10px;">
             <h5 class="text-center">Escanear código QR</h5>
             <!-- Sección de Escaneo con Cámara -->
             <div class="row text-center mb-4">
@@ -45,6 +45,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+
+        const successSound = new Audio("{{ asset('assets/sonido.mp3') }}");
         const video = document.createElement("video");
         const canvasElement = document.getElementById("qr-canvas");
         const canvas = canvasElement.getContext("2d");
@@ -116,6 +118,7 @@
                 .catch(function(error) {
                     console.error("Error al acceder a la cámara:", error);
                     Swal.fire("Error", "Error al acceder a la cámara. Por favor, comprueba los permisos.", "error");
+                    
                 });
         };
 
@@ -168,6 +171,7 @@
                     })
                     .then(response => {
                         Swal.fire('Asistencia registrada', response.data.success, 'success');
+                        successSound.play();
                     })
                     .catch(error => {
                         Swal.fire('Error', error.response.data.error, 'error');

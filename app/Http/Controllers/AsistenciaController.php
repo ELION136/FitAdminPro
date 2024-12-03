@@ -40,7 +40,8 @@ class AsistenciaController extends Controller
 
             if ($membresiaActiva && $membresiaActiva->diasRestantes > 0) {
                 // Registrar asistencia y descontar un día
-                $membresiaActiva->diasRestantes--;
+                $membresiaActiva->decrement('diasRestantes');
+            
                 $membresiaActiva->save();
 
                 // Cambiar el estado a "vencida" si los días restantes son 0
@@ -125,8 +126,13 @@ class AsistenciaController extends Controller
 
 
 
-    public function registrarQR1($idCliente, $tipoProducto, $idDetalle = null)
+    public function registrarQR1(Request $request)
     {
+        
+        $idCliente = $request->input('idCliente');
+        $tipoProducto = $request->input('tipoProducto');
+        $idDetalle = $request->input('idDetalle');
+
         $cliente = Cliente::findOrFail($idCliente);
 
         if ($tipoProducto === 'membresia') {
@@ -137,20 +143,10 @@ class AsistenciaController extends Controller
                 ->first();
 
             if ($membresiaActiva && $membresiaActiva->diasRestantes > 0) {
-                // Verificar que la fecha de fin no haya pasado
-                $hoy = Carbon::today();
-                if ($membresiaActiva->fechaFin < $hoy) {
-                    return response()->json(['error' => 'La membresía ha vencido, no se puede registrar asistencia.'], 400);
-                }
-
                 // Registrar asistencia y descontar un día
-                $detalleInscripcion = DetalleInscripcion::find($idDetalle);
-                $detalleInscripcion->decrement('sesionesRestantes');
-                // $detalleInscripcion->sesionesRestantes--;
-                $detalleInscripcion->save();
-
-                // Agregar registro de depuración
-                // Log::info('Sesiones Restantes después de registrar asistencia:', ['sesionesRestantes' => $detalleInscripcion->sesionesRestantes]);
+                $membresiaActiva->decrement('diasRestantes');
+            
+                $membresiaActiva->save();
 
                 // Cambiar el estado a "vencida" si los días restantes son 0
                 if ($membresiaActiva->diasRestantes === 0) {
@@ -179,10 +175,42 @@ class AsistenciaController extends Controller
                 return response()->json(['error' => 'El servicio no está activo o no tiene sesiones restantes.'], 400);
             }
 
-            // Registrar asistencia y descontar una sesión
-            $detalleInscripcion->sesionesRestantes--;
-            $detalleInscripcion->save();
+            // Obtener el día de la semana y hora actual
+            $now = Carbon::now();
+            $diaSemana = $now->dayOfWeekIso; // 1 (lunes) a 7 (domingo)
+            $horaActual = $now->format('H:i:s');
 
+            // Obtener los horarios programados para ese servicio en el día actual
+            $horariosServicio = DB::table('servicio_dias_horarios')
+                ->where('idServicio', $detalleInscripcion->idServicio)
+                ->where('idDia', $diaSemana)
+                ->get();
+
+            // Verificar si la hora actual está dentro de alguno de los rangos de horario
+            $asistenciaPermitida = false;
+
+            foreach ($horariosServicio as $horario) {
+                if ($horaActual >= $horario->horaInicio && $horaActual <= $horario->horaFin) {
+                    $asistenciaPermitida = true;
+                    break;
+                }
+            }
+
+            if (!$asistenciaPermitida) {
+                return response()->json(['error' => 'No puedes registrar asistencia en este momento el servicio tiene un dia y hora especifico.'], 400);
+            }
+
+            // Registrar asistencia y descontar una sesión
+            $detalleInscripcion->decrement('sesionesRestantes');
+
+            // Actualizar el modelo después de la operación
+            $detalleInscripcion->refresh();
+
+            // Cambiar el estado a "vencida" si las sesiones restantes son 0
+            if ($detalleInscripcion->sesionesRestantes === 0) {
+                $detalleInscripcion->estado = 'vencida';
+                $detalleInscripcion->save();
+            }
 
             // Crear registro de asistencia
             Asistencia::create([

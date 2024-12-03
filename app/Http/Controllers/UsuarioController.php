@@ -214,7 +214,18 @@ class UsuarioController extends Controller
             'nombreUsuario' => 'required|string|max:255|min:3',
             'email' => 'required|string|email|max:255|unique:usuarios,email,' . $user->idUsuario . ',idUsuario',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'password' => 'nullable|string|min:8|confirmed',
+            'password' => [
+                'required',                // Hace que la contraseña sea obligatoria
+                'string',                  // Debe ser una cadena de texto
+                'min:8',                   // Longitud mínima de 8 caracteres
+                'max:20',                  // Longitud máxima de 20 caracteres (opcional)
+                'confirmed',               // Debe coincidir con el campo de confirmación de contraseña
+                'regex:/[a-z]/',           // Al menos una letra minúscula
+                'regex:/[A-Z]/',           // Al menos una letra mayúscula
+                'regex:/[0-9]/',           // Al menos un número
+                'regex:/[@$!%*?&]/',       // Al menos un carácter especial como @, $, !, %, *, ?, o &
+            ],
+
         ]);
 
         DB::beginTransaction();
@@ -248,7 +259,7 @@ class UsuarioController extends Controller
     }
 
 
-    
+
 
 }
 

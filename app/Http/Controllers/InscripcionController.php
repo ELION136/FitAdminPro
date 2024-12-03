@@ -121,7 +121,9 @@ class InscripcionController extends Controller
                         throw new \Exception('El descuento es inválido para el producto: ' . $productoData['idProducto']);
                     }
 
-                    $precioFinal = $detalle->precio - $detalle->descuento;
+                   // $precioFinal = $detalle->precio - $detalle->descuento;
+                    $precioFinal = $detalle->precio - ($detalle->precio * $detalle->descuento / 100);
+
                     $totalPago += $precioFinal;
 
                     // Actualizar días restantes en la inscripción
@@ -166,7 +168,9 @@ class InscripcionController extends Controller
                         throw new \Exception('El descuento es inválido para el producto: ' . $productoData['idProducto']);
                     }
 
-                    $precioFinal = $detalle->precio - $detalle->descuento;
+                   // $precioFinal = $detalle->precio - $detalle->descuento;
+                    $precioFinal = $detalle->precio - ($detalle->precio * $detalle->descuento / 100);
+
                     $totalPago += $precioFinal;
 
                     // Establecer sesiones restantes si aplica

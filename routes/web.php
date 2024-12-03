@@ -407,3 +407,5 @@ Route::post('/scanner/process', [QRCheckController::class, 'process'])->name('qr
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::post('/asistencias/registrarQRindex', [App\Http\Controllers\AsistenciaController::class, 'registrarQR1'])->name('asistencias.registrarQRb');
