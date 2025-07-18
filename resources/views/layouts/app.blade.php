@@ -5,7 +5,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>FitAdminPro</title>
+    <title>Gimnasio-Urbano</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
@@ -312,33 +312,7 @@
                         <!-- Visible para ambos roles (Administrador y Vendedor) -->
                         @if (auth()->user()->rol == 'Administrador' || auth()->user()->rol == 'Vendedor')
                             <!-- Entrenadores -->
-                            <li class="nav-item">
-                                <a class="nav-link menu-link {{ Request::is('admin/entrenadores*') ? 'active' : '' }}"
-                                    href="#sidebarEntrenadores" data-bs-toggle="collapse" role="button"
-                                    aria-expanded="{{ Request::is('admin/entrenadores*') ? 'true' : 'false' }}"
-                                    aria-controls="sidebarEntrenadores">
-                                    <i class="ri-run-line"></i><span data-key="t-entrenadores">Entrenadores</span>
-                                </a>
-                                <div class="collapse menu-dropdown {{ Request::is('admin/entrenadores*') ? 'show' : '' }}"
-                                    id="sidebarEntrenadores">
-                                    <ul class="nav nav-sm flex-column">
-                                        <li class="nav-item">
-                                            <a href="{{ route('admin.entrenadores.create') }}"
-                                                class="nav-link {{ Request::routeIs('admin.entrenadores.create') ? 'active' : '' }}"
-                                                data-key="t-add-entrenador">
-                                                <i class="ri-user-add-line"></i> Añadir Entrenador
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="{{ route('admin.entrenadores.index') }}"
-                                                class="nav-link {{ Request::routeIs('admin.entrenadores.index') ? 'active' : '' }}"
-                                                data-key="t-lista-entrenadores">
-                                                <i class="ri-list-unordered"></i> Lista de Entrenadores
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
+
 
                             <!-- Clientes -->
                             <li class="nav-item">
@@ -457,9 +431,42 @@
                                 </div>
                             </li>
                         @endif
+
+
+
+
                         <!-- Solo visible para Administradores -->
                         @if (auth()->user()->rol == 'Administrador')
                             <!-- Reportes -->
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ Request::is('admin/entrenadores*') ? 'active' : '' }}"
+                                    href="#sidebarEntrenadores" data-bs-toggle="collapse" role="button"
+                                    aria-expanded="{{ Request::is('admin/entrenadores*') ? 'true' : 'false' }}"
+                                    aria-controls="sidebarEntrenadores">
+                                    <i class="ri-run-line"></i><span data-key="t-entrenadores">Entrenadores</span>
+                                </a>
+                                <div class="collapse menu-dropdown {{ Request::is('admin/entrenadores*') ? 'show' : '' }}"
+                                    id="sidebarEntrenadores">
+                                    <ul class="nav nav-sm flex-column">
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.entrenadores.create') }}"
+                                                class="nav-link {{ Request::routeIs('admin.entrenadores.create') ? 'active' : '' }}"
+                                                data-key="t-add-entrenador">
+                                                <i class="ri-user-add-line"></i> Añadir Entrenador
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.entrenadores.index') }}"
+                                                class="nav-link {{ Request::routeIs('admin.entrenadores.index') ? 'active' : '' }}"
+                                                data-key="t-lista-entrenadores">
+                                                <i class="ri-list-unordered"></i> Lista de Entrenadores
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+
                             <li class="nav-item">
                                 <a class="nav-link menu-link {{ Request::is('admin/reportes*') ? 'active' : '' }}"
                                     href="#sidebarMaps" data-bs-toggle="collapse" role="button"
@@ -475,11 +482,7 @@
                                                 class="nav-link {{ Request::routeIs('admin.reportes.cliente') ? 'active' : '' }}"
                                                 data-key="t-form-select">Reporte clientes</a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a href="{{ route('admin.reportes.entrenadores') }}"
-                                                class="nav-link {{ Request::routeIs('admin.reportes.entrenadores') ? 'active' : '' }}"
-                                                data-key="t-form-select">Reporte Entrenadores</a>
-                                        </li>
+
                                         <li class="nav-item">
                                             <a href="{{ route('admin.reportes.ingresos') }}"
                                                 class="nav-link {{ Request::routeIs('admin.reportes.ingresos') ? 'active' : '' }}">
@@ -512,6 +515,11 @@
                                                 class="nav-link {{ Request::routeIs('admin.reportes.ingresos-servicios') ? 'active' : '' }}">
                                                 <span data-key="t-material-design">Reporte de Ingresos por
                                                     Servicios</span></a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.reportes.entrenadores') }}"
+                                                class="nav-link {{ Request::routeIs('admin.reportes.entrenadores') ? 'active' : '' }}"
+                                                data-key="t-form-select">Reporte Entrenadores</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -1677,6 +1685,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- jsPDF-AutoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <script src="{{ asset('package/dist/sweetalert2.all.min.js') }}"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />

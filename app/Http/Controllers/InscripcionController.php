@@ -121,7 +121,7 @@ class InscripcionController extends Controller
                         throw new \Exception('El descuento es inválido para el producto: ' . $productoData['idProducto']);
                     }
 
-                   // $precioFinal = $detalle->precio - $detalle->descuento;
+                    // $precioFinal = $detalle->precio - $detalle->descuento;
                     $precioFinal = $detalle->precio - ($detalle->precio * $detalle->descuento / 100);
 
                     $totalPago += $precioFinal;
@@ -168,7 +168,7 @@ class InscripcionController extends Controller
                         throw new \Exception('El descuento es inválido para el producto: ' . $productoData['idProducto']);
                     }
 
-                   // $precioFinal = $detalle->precio - $detalle->descuento;
+                    // $precioFinal = $detalle->precio - $detalle->descuento;
                     $precioFinal = $detalle->precio - ($detalle->precio * $detalle->descuento / 100);
 
                     $totalPago += $precioFinal;
@@ -252,8 +252,22 @@ class InscripcionController extends Controller
             return redirect()->route('admin.inscripciones.create')->with('error', 'El comprobante no está disponible.');
         }
 
-        // Generar el PDF
-        $pdf = PDF::loadView('pdf.comprobante2', compact('data'));
+
+        $qrData = json_encode([
+            'cliente' => $data['cliente'],
+            'fecha' => $data['fecha'],
+            'productos' => $data['productos'],
+            'totalPago' => $data['totalPago'],
+        ]);
+        // Generar el código QR
+        // Generar el código QR
+        $qrCode = QrCode::size(150)->generate($qrData);
+
+
+        $pdf = PDF::loadView('pdf.comprobante2', [
+            'data' => $data,
+            'qrCode' => base64_encode($qrCode), // Codificar para enviarlo a la vista
+        ]);
 
         // Eliminar los datos del comprobante de la sesión
         session()->forget('comprobantes.' . $id);

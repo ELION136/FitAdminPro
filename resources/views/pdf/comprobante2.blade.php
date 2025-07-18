@@ -1,176 +1,206 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
+
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comprobante de Inscripción - Gimnasio Urbano</title>
     <style>
-        /* Estilos mejorados para un diseño más profesional */
+        /* Global Styles */
         body {
-            font-family: 'Helvetica', sans-serif;
-            line-height: 1.6;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fdfdfd;
             color: #333;
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 700px;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
 
         .header {
+            background: #2c3e50;
+            color: #ffffff;
+            padding: 15px;
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            border-bottom: 2px solid #2c3e50;
+            border-bottom: 4px solid #e67e22;
         }
 
         .header img {
             max-width: 50px;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
 
-        .header h2 {
-            color: #2c3e50;
-            margin: 10px 0;
-            font-size: 24px;
+        .header h1 {
+            font-size: 20px;
+            margin: 0;
         }
 
         .business-info {
+            padding: 10px 20px;
+            background: #f4f4f4;
             text-align: center;
-            margin-bottom: 20px;
             font-size: 14px;
-            color: #666;
+            border-bottom: 2px solid #ddd;
         }
 
         .content {
-            margin: 0 30px;
+            padding: 20px;
         }
 
-        .customer-info {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+        .customer-info,
+        .invoice-summary {
+            margin-bottom: 10px;
         }
 
-        .invoice-details {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
+        .customer-info p {
+            margin: 3px 0;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-            background-color: white;
+            margin: 15px 0;
+            font-size: 14px;
         }
 
-        table, th, td {
-            border: 1px solid #dee2e6;
+        table th,
+        table td {
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #ddd;
         }
 
-        th {
+        table th {
             background-color: #2c3e50;
-            color: white;
-            padding: 12px 8px;
-            font-weight: normal;
-        }
-
-        td {
-            padding: 10px 8px;
-            color: #555;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
+            color: #ffffff;
         }
 
         .total {
+            margin-top: 10px;
             text-align: right;
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-        }
-
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-            padding: 20px 0;
-            border-top: 1px solid #dee2e6;
-            color: #666;
-            font-size: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #e67e22;
         }
 
         .qr-code {
             text-align: center;
-            margin: 20px 0;
+            margin: 15px 0;
+        }
+
+        .qr-code img {
+            width: 100px;
+            margin: 10px auto;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .signature-box {
+            width: 45%;
+            text-align: center;
+            border-top: 1px solid #333;
+            padding-top: 8px;
+            font-size: 12px;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #555;
+            padding: 10px 20px;
+            border-top: 2px solid #ddd;
+            background: #f4f4f4;
         }
     </style>
 </head>
+
 <body>
-    <div class="header">
-        <img src="{{ public_path('dist/assets/images/logo1.png') }}" alt="Gimnasio Urbano Logo">
-        <h2>GIMNASIO URBANO</h2>
-    </div>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <img src="{{ public_path('dist/assets/images/logo1.png') }}" alt="Logo">
+            <h1>Gimnasio Urbano</h1>
+        </div>
 
-    <div class="business-info">
-        <p>
-            <strong>Dirección:</strong> El Abra, Sacaba, Cochabamba<br>
-            <strong>Teléfono:</strong> 75983258<br>
-            <strong>Email:</strong> info@gimnasiourbano.com<br>
-            <strong>NIT:</strong> 1234567890
-        </p>
-    </div>
+        <!-- Business Info -->
+        <div class="business-info">
+            <p><strong>Dirección:</strong> El Abra, Sacaba, Cochabamba</p>
+            <p><strong>Teléfono:</strong> 75983258 | <strong>Email:</strong> info@gimnasiourbano.com</p>
+            <p><strong>NIT:</strong> 1234567890</p>
+        </div>
 
-    <div class="content">
-        <div class="customer-info">
-            <h3 style="color: #2c3e50; margin: 0 0 10px 0;">COMPROBANTE DE INSCRIPCIÓN</h3>
-            <div class="invoice-details">
-                <div>
-                    <p><strong>Cliente:</strong> {{ $data['cliente']['nombreCompleto'] }}<br>
-                    <strong>CI/NIT:</strong> {{ $data['cliente']['ci'] ?? 'N/A' }}</p>
-                </div>
-                <div>
-                    <p><strong>Nº Comprobante:</strong> {{ str_pad($data['numeroComprobante'] ?? rand(1000, 9999), 8, '0', STR_PAD_LEFT) }}<br>
-                    <strong>Fecha:</strong> {{ $data['fecha'] }}</p>
-                </div>
+        <!-- Content -->
+        <div class="content">
+            <!-- Customer Info -->
+            <div class="customer-info">
+                <h3 style="color: #2c3e50;">Comprobante de Inscripción</h3>
+                <p><strong>Cliente:</strong> {{ $data['cliente']['nombreCompleto'] }}</p>
+                <p><strong>CI/NIT:</strong> {{ $data['cliente']['ci'] ?? 'N/A' }}</p>
+                <p><strong>Nº Comprobante:</strong> {{ str_pad($data['numeroComprobante'] ?? rand(1000, 9999), 8, '0', STR_PAD_LEFT) }}</p>
+                <p><strong>Fecha:</strong> {{ $data['fecha'] }}</p>
+            </div>
+
+            <!-- Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Tipo</th>
+                        <th>Precio Unit.</th>
+                        <th>Desc.</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($data['productos'] as $producto)
+                        <tr>
+                            <td>{{ $producto['nombre'] }}</td>
+                            <td>{{ ucfirst($producto['tipoProducto']) }}</td>
+                            <td style="text-align: right;">Bs{{ number_format($producto['precio'], 2) }}</td>
+                            <td style="text-align: center;">{{ $producto['descuento'] }}%</td>
+                            <td style="text-align: right;">Bs{{ number_format($producto['precioFinal'], 2) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            <!-- Total -->
+            <div class="total">
+                Total Pagado: Bs{{ number_format($data['totalPago'], 2) }}
+            </div>
+
+            <!-- QR Code -->
+            <div class="qr-code">
+                <h4>Escanea el código QR:</h4>
+                <img src="data:image/png;base64,{{ $qrCode }}" alt="Código QR">
+            </div>
+
+            <!-- Signatures -->
+            <div class="signatures">
+                <div class="signature-box">Firma del Cliente</div>
+                <div class="signature-box">Firma del Responsable</div>
             </div>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>DESCRIPCIÓN</th>
-                    <th>TIPO</th>
-                    <th>PRECIO UNIT.</th>
-                    <th>DESC.</th>
-                    <th>TOTAL</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($data['productos'] as $producto)
-                <tr>
-                    <td>{{ $producto['nombre'] }}</td>
-                    <td>{{ ucfirst($producto['tipoProducto']) }}</td>
-                    <td style="text-align: right;">Bs{{ number_format($producto['precio'], 2) }}</td>
-                    <td style="text-align: center;">{{ $producto['descuento'] }}%</td>
-                    <td style="text-align: right;">Bs{{ number_format($producto['precioFinal'], 2) }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <div class="total">
-            <h3 style="color: #2c3e50; margin: 0;">Total Pagado: Bs{{ number_format($data['totalPago'], 2) }}</h3>
+        <!-- Footer -->
+        <div class="footer">
+            <p>Gracias por confiar en Gimnasio Urbano.<br>Visítenos en www.gimnasiourbano.com</p>
         </div>
-
-        <div class="qr-code">
-            <!-- Aquí puedes agregar un código QR si lo deseas -->
-        </div>
-    </div>
-
-    <div class="footer">
-        <p>¡Gracias por confiar en Gimnasio Urbano!<br>
-        Este comprobante es un documento válido para su inscripción.<br>
-        Para más información, visítenos en www.gimnasiourbano.com</p>
     </div>
 </body>
+
 </html>

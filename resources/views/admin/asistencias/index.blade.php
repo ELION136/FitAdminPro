@@ -21,7 +21,7 @@
             <hr>
 
             <!-- Sección de Escaneo con Imagen -->
-            <h5 class="text-center mt-4">O subir una imagen con código QR</h5>
+       <h5 class="text-center mt-4">O subir una imagen con código QR</h5>
             <div class="row text-center">
                 <input type="file" id="upload-qr" accept="image/*" class="form-control-file mt-2">
             </div>
@@ -35,6 +35,8 @@
             <div class="row mx-5 my-3">
                 <button id="debug-button" class="btn btn-info btn-sm rounded-3">Registrar Info de Depuración</button>
             </div>
+
+            
         </div>
     </div>
 @endsection

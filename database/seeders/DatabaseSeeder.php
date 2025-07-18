@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
          // Tabla Usuarios
          // 1. Crear el Administrador
          // Crear Usuario Admin
-       DB::table('usuarios')->insert([
+       /* DB::table('usuarios')->insert([
             'nombreUsuario' => 'admin',
             'password' => Hash::make('adminpassword'),
             'email' => 'admin@gmail.com',
@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
             'idAutor' => 1,
             'fechaCreacion' => Carbon::now(),
         ]);
-
+ */
 
         Cliente::create([
             'nombre' => 'Juan',

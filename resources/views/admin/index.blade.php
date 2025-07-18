@@ -179,6 +179,9 @@
                         </div>
                     </div>
                 </div>
+
+                <button id="generatePDF" class="btn btn-danger">Descargar PDF</button>
+
             </div>
         </div>
     </div>
@@ -453,6 +456,105 @@
         // Ajuste de tamaño al redimensionar la ventana
         window.addEventListener('resize', function() {
             incomeInteractiveChart.resize();
+        });
+
+
+
+        document.getElementById('generatePDF').addEventListener('click', async function() {
+            const {
+                jsPDF
+            } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4'); // Orientación vertical, unidad mm, tamaño A4
+
+            const charts = [{
+                    id: 'incomeChart',
+                    title: 'Ingresos en los Últimos 30 Días'
+                },
+                {
+                    id: 'servicesChart',
+                    title: 'Servicios Más Solicitados'
+                },
+                {
+                    id: 'attendanceChart',
+                    title: 'Asistencias de Esta Semana'
+                },
+                {
+                    id: 'membershipsChart',
+                    title: 'Membresías Más Adquiridas'
+                },
+                {
+                    id: 'incomeInteractiveChart',
+                    title: 'Ingresos Detallados'
+                }
+            ];
+
+            const margin = 10; // Margen del PDF
+            const pageHeight = pdf.internal.pageSize.height; // Altura de la página
+            const pageWidth = pdf.internal.pageSize.width; // Ancho de la página
+            let yPosition = margin; // Posición inicial para contenido
+
+            const header = (title) => {
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(16);
+                pdf.text(title, pageWidth / 2, margin, {
+                    align: 'center'
+                });
+                pdf.setFontSize(12);
+                pdf.setTextColor(100);
+                pdf.text(`Fecha: ${new Date().toLocaleDateString()}`, pageWidth - margin, margin + 5, {
+                    align: 'right'
+                });
+                pdf.setTextColor(0);
+                yPosition += 15; // Espacio para el encabezado
+            };
+
+            // Añadir encabezado inicial
+            header('Reporte de Gráficas');
+
+            for (let chart of charts) {
+                const chartElement = document.getElementById(chart.id);
+                if (chartElement) {
+                    // Capturar la gráfica como imagen
+                    const canvas = await html2canvas(chartElement);
+                    const imageData = canvas.toDataURL('image/png');
+                    const imgWidth = pageWidth - margin * 2; // Ancho de la imagen considerando márgenes
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width; // Mantener proporción
+
+                    // Si no hay suficiente espacio para una gráfica completa, añadir nueva página
+                    if (yPosition + imgHeight + 10 > pageHeight) {
+                        pdf.addPage();
+                        yPosition = margin;
+                        header('Continuación del Reporte');
+                    }
+
+                    // Añadir título de la gráfica
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setFontSize(14);
+                    pdf.text(chart.title, margin, yPosition);
+                    yPosition += 8; // Espacio debajo del título
+
+                    // Añadir la gráfica al PDF
+                    pdf.addImage(imageData, 'PNG', margin, yPosition, imgWidth, imgHeight);
+                    yPosition += imgHeight + 10; // Espacio debajo de la gráfica
+                }
+            }
+
+            // Pie de página
+            const totalPages = pdf.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                pdf.setPage(i);
+                pdf.setFontSize(10);
+                pdf.text(
+                    `Página ${i} de ${totalPages}`,
+                    pageWidth / 2,
+                    pageHeight - margin, {
+                        align: 'center'
+                    }
+                );
+            }
+
+            // Guardar el PDF
+            pdf.save('Reporte_Graficas.pdf');
         });
     </script>
 @endpush

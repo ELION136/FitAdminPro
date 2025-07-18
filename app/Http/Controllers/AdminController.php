@@ -28,6 +28,7 @@ class AdminController extends Controller
             ->where('eliminado', 1)
             ->whereMonth('fechaCreacion', date('m'))
             ->count();
+            
 
         // Métricas de Ingresos
         $incomeToday = DB::table('inscripciones')
@@ -94,6 +95,13 @@ class AdminController extends Controller
             ->whereNotNull('detalle_inscripciones.idMembresia')
             ->whereYear('inscripciones.fechaInscripcion', date('Y'))
             ->sum('inscripciones.totalPago');
+
+
+
+
+
+
+
 
 
         // Métricas de Membresías

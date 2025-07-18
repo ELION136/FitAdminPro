@@ -202,7 +202,7 @@
                                                         <a href="javascript:void(0);"
                                                             onclick="abrirVentanaPDF({{ $inscripcion->idInscripcion }}, '{{ $inscripcion->cliente->qrCode }}')"
                                                             class="btn btn-info btn-sm {{ $inscripcion->cliente->qrCode ? '' : 'disabled' }}"
-                                                            title="Imprimir Comprobante">
+                                                            title="Imprimir qr">
                                                             <i class="ri-printer-line"></i>
                                                         </a>
                                                     @endif
@@ -383,6 +383,7 @@
                 window.open(url, '_blank', 'width=800,height=600');
             };
 
+
             window.abrirVentanaPDF = (idInscripcion, qrCode) => {
                 abrirVentanaPDF(`{{ route('admin.inscripciones.comprobante2', ':id') }}`.replace(':id',
                     idInscripcion), qrCode);
@@ -464,7 +465,7 @@
             window.generarComprobante = (idDetalle) => {
                 const url = `{{ route('admin.inscripciones.comprobante_servicio', ':id') }}`.replace(':id',
                     idDetalle);
-                window.open(url, '_blank');
+                    window.open(url, '_blank', 'width=800,height=600');
             };
 
             window.marcarComoVencida = (idInscripcion) => {
