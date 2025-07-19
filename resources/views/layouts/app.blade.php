@@ -5,31 +5,22 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Gimnasio-Urbano</title>
+    <title>@yield('title', 'FitAdminPro')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-
-
-    <link rel="shortcut icon" href="{{ url('dist/assets/images/logo1.png') }}">
-
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{ url('dist/assets/images/logo11.png') }}">
     <!-- plugin css -->
     <link href="{{ url('dist/assets/libs/jsvectormap/css/jsvectormap.min.css') }}" rel="stylesheet" type="text/css" />
-
-    <!--datatable css-->
-
-
     <!--datatable responsive css-->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" />
 
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap.min.css" />
 
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
-
-
-
 
     <!-- Layout config Js -->
     <script src="{{ url('dist/assets/js/layout.js') }}"></script>
@@ -136,10 +127,6 @@
                             </button>
                         </div>
 
-
-
-
-
                         <div class="dropdown ms-sm-3 header-item topbar-user">
                             <button type="button" class="btn material-shadow-none" id="page-header-user-dropdown"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -205,19 +192,19 @@
                 <!-- Dark Logo-->
                 <a href="{{ route('admin.home') }}" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="{{ url('dist/assets/images/logo1.png') }}" alt="" height="30">
+                        <img src="{{ url('dist/assets/images/logo11.png') }}" alt="" height="30">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ url('dist/assets/images/logo3.png') }}" alt="" height="35">
+                        <img src="{{ url('dist/assets/images/logo31.png') }}" alt="" height="35">
                     </span>
                 </a>
                 <!-- Light Logo-->
                 <a href="{{ route('admin.home') }}" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="{{ url('dist/assets/images/logo1.png') }}" alt="" height="30">
+                        <img src="{{ url('dist/assets/images/logo11.png') }}" alt="" height="30">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ url('dist/assets/images/logo3.png') }}" alt="" height="35">
+                        <img src="{{ url('dist/assets/images/logo31.png') }}" alt="" height="35">
                     </span>
                 </a>
                 <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover"
@@ -226,7 +213,7 @@
                 </button>
             </div>
 
-            <div class="dropdown sidebar-user m-1 rounded">
+            {{-- <div class="dropdown sidebar-user m-1 rounded">
                 <button type="button" class="btn material-shadow-none" id="page-header-user-dropdown"
                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="d-flex align-items-center gap-2">
@@ -271,7 +258,8 @@
                             data-key="t-logout">Logout</span></a>
                 </div>
 
-            </div>
+            </div> --}}
+
             <div id="scrollbar">
                 <div class="container-fluid">
                     <div id="two-column-menu">
@@ -432,9 +420,6 @@
                             </li>
                         @endif
 
-
-
-
                         <!-- Solo visible para Administradores -->
                         @if (auth()->user()->rol == 'Administrador')
                             <!-- Reportes -->
@@ -530,18 +515,11 @@
                 <!-- Sidebar -->
             </div>
 
-
-
-
             <div class="sidebar-background"></div>
         </div>
         <!-- Left Sidebar End -->
         <!-- Vertical Overlay-->
         <div class="vertical-overlay"></div>
-
-
-
-
 
         @if (($message = Session::get('mensaje')) && ($icono = Session::get('icono')))
             <script>
@@ -577,7 +555,7 @@
                         </div>
                         <div class="col-sm-6">
                             <div class="text-sm-end d-none d-sm-block">
-                                Disiño y Desarrollo en INCOS CBBA
+                                Disiño y Desarrollo codeMeet
                             </div>
                         </div>
                     </div>
@@ -594,7 +572,8 @@
         </div>
         <!-- end main content-->
     </div>
-    <!-- END layout-wrapper -->
+    <!-- Ens layout-wrapper -->
+
     <!--start back-to-top-->
     <button onclick="topFunction()" class="btn btn-danger btn-icon" id="back-to-top">
         <i class="ri-arrow-up-line"></i>
@@ -610,13 +589,15 @@
         </div>
     </div>
 
-    <div class="customizer-setting d-none d-md-block">
+
+ <!-- configuracion de temas de sistema -->
+    {{-- <div class="customizer-setting d-none d-md-block">
         <div class="btn-info rounded-pill shadow-lg btn btn-icon btn-lg p-2" data-bs-toggle="offcanvas"
             data-bs-target="#theme-settings-offcanvas" aria-controls="theme-settings-offcanvas">
             <i class='mdi mdi-spin mdi-cog-outline fs-22'></i>
         </div>
     </div>
-
+ --}}
     <!-- Theme Settings -->
     <div class="offcanvas offcanvas-end border-0" tabindex="-1" id="theme-settings-offcanvas">
         <div class="d-flex align-items-center bg-primary bg-gradient p-3 offcanvas-header">
@@ -1673,6 +1654,7 @@
             </div>
         </div>
     </div>
+     <!--End Theme Settings -->
 
 
 
@@ -1686,7 +1668,7 @@
     <!-- jsPDF-AutoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
+
     <script src="{{ asset('package/dist/sweetalert2.all.min.js') }}"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -1696,10 +1678,6 @@
     <script src="{{ url('dist/assets/libs/feather-icons/feather.min.js') }}"></script>
     <script src="{{ url('dist/assets/js/pages/plugins/lord-icon-2.1.0.js') }}"></script>
     <script src="{{ url('dist/assets/js/plugins.js') }}"></script>
-
-
-
-
 
     <!--datatable js-->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
@@ -1728,15 +1706,11 @@
     <!-- Calendar init -->
     <script src="{{ url('dist/assets/js/pages/calendar.init.js') }}"></script>
 
-
-
     <!-- Dashboard init -->
     <script src="{{ url('dist/assets/js/pages/dashboard-analytics.init.js') }}"></script>
     <script src="{{ url('dist/assets/js/pages/dashboard-projects.init.js') }}"></script>
 
-
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
 
     <!-- App js -->
     @stack('scripts')

@@ -2,16 +2,29 @@
 
 @extends('layouts.app')
 @section('content')
-<div class="d-flex justify-content-between mb-3">
-    <h2>Calendario General de Horarios</h2>
-    <!-- Button to return to Servicios -->
-    <a href="{{ route('admin.servicios.index') }}" class="btn btn-primary">
-        <i class="bi bi-arrow-left-circle"></i> Volver a Servicios
-    </a>
+
+
+<div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
+                <h4 class="mb-sm-0">Calendario General de Horarios</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+                        <li class="breadcrumb-item active">Servicios</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
 </div>
+
+
     <div class="card">
         <div class="card-header">
             <h2 class="mb-0">Horarios</h2>
+            <a href="{{ route('admin.servicios.index') }}" class="btn btn-primary">
+        <i class="bi bi-arrow-left-circle"></i> Volver a Servicios
+    </a>
         </div>
         <div class="card-body">
             <div id="calendar"></div>
@@ -59,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
         expandRows: true,
         stickyHeaderDates: true,
         nowIndicator: true,
-        firstDay: 1, // Comenzar la semana en lunes
+        firstDay: 1, 
         buttonText: {
             today: 'Hoy',
             month: 'Mes',

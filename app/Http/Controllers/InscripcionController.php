@@ -337,8 +337,9 @@ class InscripcionController extends Controller
 
 
 
-    /**
-     * Lógica para aplicar descuento basado en el código promocional
+    
+    /*  
+    Lógica para aplicar descuento basado en el código promocional
    
     protected function aplicarDescuento($codigoPromocion, $totalPago)
     {

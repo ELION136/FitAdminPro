@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
-    data-sidebar-image="none" data-preloader="disable" data-theme="material" data-theme-colors="default" data-bs-theme="dark">
+    data-sidebar-image="none" data-preloader="disable" data-theme="material" data-theme-colors="default"
+    data-bs-theme="dark">
 
 <head>
     <meta charset="utf-8" />
@@ -11,22 +12,22 @@
 
 
 
-    <link rel="shortcut icon" href="{{ url('dist/assets/images/logo1.png') }}">
+    <link rel="shortcut icon" href="{{ url('dist/assets/images/logo11.png') }}">
 
     <!-- plugin css -->
     <link href="{{ url('dist/assets/libs/jsvectormap/css/jsvectormap.min.css') }}" rel="stylesheet" type="text/css" />
 
     <!--datatable css-->
 
-    
-<!--datatable responsive css-->
+
+    <!--datatable responsive css-->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" />
-    
+
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap.min.css" />
 
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
 
-    
+
     <!-- Layout config Js -->
     <script src="{{ url('dist/assets/js/layout.js') }}"></script>
     <!-- Bootstrap Css -->
@@ -142,12 +143,11 @@
                                             class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{ $userName ?? 'Usuario' }}</span>
                                         <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">
                                             Miembro:
-                                            
+
                                             @if (auth()->user()->rol === 'Administrador')
                                                 Administrador
                                             @elseif (auth()->user()->rol === 'Vendedor')
                                                 Vendedor
-                                            
                                             @else
                                                 Rol desconocido
                                             @endif
@@ -163,7 +163,6 @@
                                     <a class="dropdown-item" href="{{ route('profile.index') }}"><i
                                             class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i>
                                         <span class="align-middle">Perfil</span></a>
-                                
                                 @endif
 
                                 <li><a class="dropdown-item d.flex border-block-end" href="{{ route('logout') }}"
@@ -198,19 +197,19 @@
                 <!-- Dark Logo-->
                 <a href="index.html" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="{{ url('dist/assets/images/logo1.png') }}" alt="" height="30">
+                        <img src="{{ url('dist/assets/images/logo11.png') }}" alt="" height="30">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ url('dist/assets/images/logo3.png') }}" alt="" height="35">
+                        <img src="{{ url('dist/assets/images/logo31.png') }}" alt="" height="35">
                     </span>
                 </a>
                 <!-- Light Logo-->
                 <a href="index.html" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="{{ url('dist/assets/images/logo1.png') }}" alt="" height="30">
+                        <img src="{{ url('dist/assets/images/logo11.png') }}" alt="" height="30">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ url('dist/assets/images/logo3.png') }}" alt="" height="35">
+                        <img src="{{ url('dist/assets/images/logo31.png') }}" alt="" height="35">
                     </span>
                 </a>
                 <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover"
@@ -276,23 +275,23 @@
                                 role="button" aria-expanded="false" aria-controls="sidebarDashboards">
                                 <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Dashboards</span>
                             </a>
-                           
-                                <div class="collapse menu-dropdown" id="sidebarDashboards">
-                                    <ul class="nav nav-sm flex-column">
-                                        <li class="nav-item">
-                                            <a href="{{ route('admin.index') }}" class="nav-link" data-key="t-crm">
-                                                Panel de control
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                      
 
-                           
+                            <div class="collapse menu-dropdown" id="sidebarDashboards">
+                                <ul class="nav nav-sm flex-column">
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.index') }}" class="nav-link" data-key="t-crm">
+                                            Panel de control
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+
+
                         </li> <!-- end Dashboard Menu -->
                         <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Paginas</span>
                         </li>
-                       
+
                         @if (auth()->user() && (auth()->user()->rol === 'Administrador' || auth()->user()->rol === 'Vendedor'))
                             <li class="nav-item">
                                 <a class="nav-link menu-link" href="#sidebarForms" data-bs-toggle="collapse"
@@ -372,7 +371,7 @@
                                             <a href="{{ route('admin.horarios.index') }}" class="nav-link"
                                                 data-key="t-list-js">Horarios de Servicios</a>
                                         </li>
-                                        
+
                                     </ul>
                                 </div>
                             </li>
@@ -388,12 +387,12 @@
                                             <a href="{{ route('admin.reservas.index') }}" class="nav-link"><span
                                                     data-key="t-boxicons">Lista de Reservas</span> </a>
                                         </li>
-                                    
+
                                         <li class="nav-item">
                                             <a href="{{ route('admin.reservas.create') }}" class="nav-link"
                                                 data-key="t-list-js">Realizar Reservas</a>
                                         </li>
-                                        
+
                                     </ul>
                                 </div>
                             </li>
@@ -405,10 +404,10 @@
                                 <div class="collapse menu-dropdown" id="sidebarPagos">
                                     <ul class="nav nav-sm flex-column">
                                         <li class="nav-item">
-                                            <a href="{{route('admin.pagos.index')}}" class="nav-link"
+                                            <a href="{{ route('admin.pagos.index') }}" class="nav-link"
                                                 data-key="t-form-select">historial de pagos</a>
                                         </li>
-                                        
+
                                     </ul>
                                 </div>
                             </li>
@@ -423,12 +422,12 @@
                                             <a href="{{ route('admin.reportes.inscripciones') }}" class="nav-link"
                                                 data-key="t-form-select">Reportes de inscripciones </a>
                                         </li>
-                                    
-                                        
+
+
 
                                         <li class="nav-item">
-                                            <a href="{{ route('admin.reportes.reservas') }}"
-                                                class="nav-link"><span data-key="t-material-design">Reportes
+                                            <a href="{{ route('admin.reportes.reservas') }}" class="nav-link"><span
+                                                    data-key="t-material-design">Reportes
                                                     reservas</span>
                                             </a>
                                         </li>
@@ -491,13 +490,13 @@
                     </div>
                 </div>
             </footer>
-            
+
             <script>
-                document.addEventListener('DOMContentLoaded', function () {
+                document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('currentYear').textContent = new Date().getFullYear();
                 });
             </script>
-            
+
             <!-- Footer End -->
         </div>
         <!-- end main content-->
@@ -1581,6 +1580,7 @@
             </div>
         </div>
     </div>
+    <!-- end Theme Settings -->
 
 
 
@@ -1598,7 +1598,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-    
+
     <!--datatable js-->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>

@@ -63,8 +63,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="{{ asset('dist/assets/images/logo3.png') }}" alt="Gimnasio Urbano" height="50">
-            <h2>Gimnasio Urbano</h2>
+            <img src="{{ asset('dist/assets/images/logo31.png') }}" alt="Gimnasio Urbano" height="50">
+            <h2>FITADMINPRO</h2>
         </div>
         <div class="content">
             <h1>¡Hola, {{ $user->nombreUsuario }}!</h1>
